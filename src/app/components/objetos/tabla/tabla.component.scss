@@ -1,0 +1,156 @@
+.edit-btn {
+    position: relative;
+    margin-right: 10px;
+
+}
+
+.buttons {
+    display: flex;
+}
+
+.selected-row {
+    background-color: #c8e6c9 !important;
+    /* Change this to the desired color */
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.highlighted-row {
+    background-color: #a3c1f0;
+    /* Color de fondo para la fila resaltada por el número de fila */
+}
+
+.example-element-row {
+    cursor: pointer;
+}
+
+.example-expanded-row .example-element-detail {
+    overflow: hidden;
+    display: flex;
+}
+
+.example-element-diagram {
+    width: 40%;
+}
+
+.example-element-description {
+    padding: 16px;
+}
+
+.menu {
+    position: fixed;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.menu button:hover {
+    background-color: #f0f0f0;
+}
+
+.filter-menu {
+    position: fixed;
+    z-index: 1000;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+
+ul {
+    list-style-type: none;
+    position: relative;
+    right: 40px;
+    // margin-top: 4px;
+}
+
+.example-margin {
+    padding-right: 5px;
+}
+
+.table-container {
+    max-height: 400px;
+    /* Puedes ajustar la altura según tu necesidad */
+    overflow: auto;
+    /* Esto permite el desplazamiento si el contenido es más grande que el contenedor */
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: scroll;
+    /* Permite el desplazamiento horizontal si es necesario */
+}
+
+/* Aplica al contenedor de la tabla */
+.table-wrapper {
+    max-height: 800px;
+    overflow-y: auto;
+    overflow-x: auto;
+}
+
+/* WebKit Scrollbar */
+.table-wrapper::-webkit-scrollbar {
+    width: 12px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background-color: #140101;
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background-color: #1633d4;
+}
+
+/* Firefox Scrollbar */
+.table-wrapper {
+    scrollbar-width: thin;
+    scrollbar-color: #263872 #f1f1f1;
+}
+
+.img {
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.expired {
+    background-color: red;
+    color: white;
+    
+    
+}
+
+.no-stock-row {
+    background-color: #f8d7da!important;
+    /* Puedes ajustar el color aquí */
+    position: relative;
+    z-index:0;
+}
+
+
+.low-stock {
+    background-color: #d1e0cf; /* Color de fondo para stock 0 */
+    color: rgb(41, 2, 2); /* Texto de color rojo */
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+  }

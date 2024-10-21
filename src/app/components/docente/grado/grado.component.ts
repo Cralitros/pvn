@@ -1,0 +1,185 @@
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { TablaComponent } from '../../objetos/tabla/tabla.component';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Grado } from '../../modelos/grado';
+import { Column } from '../../modelos/column';
+import { CargatablaService } from '../../../services/cargatabla.service';
+import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { ConversiontablaService } from '../../../services/conversiontabla.service';
+import { MatDialog } from '@angular/material/dialog';
+import { lastValueFrom } from 'rxjs';
+import { GradodlgComponent } from '../../dialog/docente/gradodlg/gradodlg.component';
+
+@Component({
+  selector: 'app-grado',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatButtonModule,
+    TablaComponent,
+    MatPaginatorModule,
+    MatTableModule
+  ],
+  templateUrl: './grado.component.html',
+  styleUrl: './grado.component.scss'
+})
+export class GradoComponent {
+  tablaDepartamento: Grado[] = [];
+
+  @Input() codigo: any;
+
+  columns: Column[] = [
+    { columnDef: 'id', header: 'No.', cell: (element: Grado) => `${element.id}` },
+    { columnDef: 'codigo', header: 'Codigo Docente', cell: (element: Grado) => `${element.codigoDocente}` },
+    { columnDef: 'grado', header: 'Grado', cell: (element: Grado) => `${element.grado}` },
+    { columnDef: 'revalidado', header: 'Revalidado', cell: (element: Grado) => `${element.revalidado}` },
+    { columnDef: 'lugar_obtencion', header: 'Lugar obtencion', cell: (element: Grado) => `${element.lugar_obtencion}` },
+    { columnDef: 'fecha_obtencion', header: 'Fecha obtencion', cell: (element: Grado) => `${element.fecha_obtencion}` },
+    { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
+  ];
+
+  formulario?: FormGroup | any = null;
+  departamentoForm: FormGroup;
+  dataSource = new MatTableDataSource<any>([]);
+
+  titulo = "Provincias";
+
+  @Output() titulos = new EventEmitter<any>();
+
+  constructor(private fb: FormBuilder,
+    private sctabla: CargatablaService,
+    private mservice: MaestrosserviceService,
+    private cartabla: ConversiontablaService,
+    private formBuilder: FormBuilder,
+    public dialog: MatDialog
+  ) {
+
+    this.departamentoForm = this.fb.group({
+      nombre: ['', Validators.required]
+    });
+    this.titulos.emit(this.titulo);
+  }
+  ngOnInit(): void {
+    this.cargartabla();
+    this.formulario = this.formBuilder.group({
+      codigo: ['']
+    });
+  }
+
+  async cargartabla() {
+    this.mservice.ponerurl("docentesgrado");
+    const source$ = this.mservice.get();
+    const finalNumber: any = await lastValueFrom(source$);
+
+    this.cartabla.ponerdata(finalNumber);
+    this.tablaDepartamento = this.cartabla.array;
+    console.log(this.tablaDepartamento);
+
+    this.sctabla.setData(this.tablaDepartamento);
+  }
+  dialogo() {
+    let laboral: any;
+    this.mservice.ponerurl("docentes/cod");
+    this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
+      console.log(data);
+      laboral = data;
+      if (data.length > 0) {//verifica si existe el docente
+
+        this.mservice.ponerurl("docentesgrado");
+        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
+          console.log(data2);
+          
+            const dialogRef = this.dialog.open(GradodlgComponent, {
+              width: '500px',
+              height: '550px',
+              data: {
+                title: `Agregar ${this.titulo}`,
+                valores: { laboral },
+                modo: 0
+              }
+            });
+            dialogRef.afterClosed().subscribe(result => {
+              //if (result) {
+              this.cargartabla();
+              // }
+            });
+          
+
+        });
+        /* const dialogRef = this.dialog.open(LaboraldlgComponent, {
+           width: '500px',
+           height:'550px',
+           data: {
+             title: `Agregar ${this.titulo}`,
+             valores:{},
+             modo:0
+           }
+         });
+         dialogRef.afterClosed().subscribe(result => {
+           //if (result) {
+             this.cargartabla();
+          // }
+         });*/
+      }
+    });
+
+    /*const dialogRef = this.dialog.open(LaboraldlgComponent, {
+      width: '500px',
+      height:'550px',
+      data: {
+        title: `Agregar ${this.titulo}`,
+        valores:{},
+        modo:0
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      //if (result) {
+        this.cargartabla();
+     // }
+    });*/
+  }
+  editar(element: any) {
+    const dialogRef = this.dialog.open(GradodlgComponent, {
+      width: '500px',
+      height: '550px',
+      data: {
+        title: `Editar ${this.titulo}`,
+        valores: {
+          id: this.cartabla.dataSeleccionada.id,
+          grado: this.cartabla.dataSeleccionada.grado,
+          revalidado: this.cartabla.dataSeleccionada.revalidado,
+          lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,
+          fecha_obtencion: this.cartabla.dataSeleccionada.fecha_obtencion,
+          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
+
+        },
+        modo: 1
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      // if (result) {
+      this.cargartabla();
+      //  }
+    });
+
+  }
+  eliminar(element: any) {
+    console.log("dep", element);
+    this.mservice.delete(element.id).subscribe(data => {
+      console.log("Eliminado");
+      this.cargartabla();
+    })
+  }
+
+}

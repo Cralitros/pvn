@@ -1,1 +1,59 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+$custom-primary-palette: (
+    50:#e5e9f0,
+    100:#bec7db,
+    200:#94a3c2,
+    300:#6b80aa,
+    400:#4b659a,
+    500:#274c8b,
+    600:#204583,
+    700:#163c77,
+    800:#0e336b,
+    900:#042354,
+    contrast:(50:#eee2ee,
+        100:#eee2ee,
+        200:#eee2ee,
+        300:#eee2ee,
+        400:#d6b6d5,
+        500:#d6b6d5,
+        600:#d6b6d5,
+        700:#bb86ba,
+        800:#bb86ba,
+        900:#350454,
+    )
+);
+$custom-typography: mat.define-typography-config($font-family: "Roboto, sans-serif");
+$custom-primary: mat.define-palette($custom-primary-palette);
+$custom-accent: mat.define-palette($custom-primary-palette);
+$custom-warn: mat.define-palette($custom-primary-palette);
+
+$custom-theme: mat.define-light-theme((color:(primary:$custom-primary,
+                accent:$custom-accent,
+                warn:$custom-warn ),
+            typography:$custom-typography));
+
+@include mat.all-component-themes($custom-theme);
+
+::ng-deep .mat-tooltip.multi-line-tooltip {
+    white-space: pre-line;
+}
+
+.myTooltip {
+    .mdc-tooltip__surface {
+        max-width: 350px;
+        padding: 5px;
+        white-space: pre-line;
+    }
+}

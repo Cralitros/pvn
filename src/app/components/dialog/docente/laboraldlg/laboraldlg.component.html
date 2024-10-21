@@ -1,0 +1,77 @@
+<div class="contenido">
+    <h1 class="titulo">{{funcion}}</h1>
+
+    <form [formGroup]="formulario">
+        <div class="general">
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Codigo docente</mat-label>
+                    <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Trabajo</mat-label>
+                    <input matInput formControlName="trabajo" placeholder="Trabajo">
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Cargo actual</mat-label>
+                    <input matInput formControlName="cargo_actual" placeholder="Cargo actual">
+                </mat-form-field>
+            </div>
+            <div class="form">
+
+                <mat-form-field class="example-full-width">
+                    <mat-label>Tipo empresa</mat-label>
+                    <mat-select formControlName="tipo_empresa">
+                        <mat-option *ngFor="let item of tipo_empresa" [value]="item">{{item}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Direccion empresa</mat-label>
+                    <input matInput formControlName="direccion_empresa" placeholder="Direccion empresa">
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Telefono empresa</mat-label>
+                    <input matInput formControlName="telefono_empresa" placeholder="Telefono empresa">
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Correo empresa</mat-label>
+                    <input matInput formControlName="correo_corporativo" placeholder="Correo empresa">
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Correo personal</mat-label>
+                    <input matInput formControlName="correo_personal" placeholder="Correo personal">
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Correo alternativo</mat-label>
+                    <input matInput formControlName="correo_alternativo" placeholder="Correo alternativo">
+                </mat-form-field>
+            </div>
+            <div class="form">
+                <mat-form-field class="example-full-width">
+                    <mat-label>Contacto</mat-label>
+                    <input matInput formControlName="contacto" placeholder="Contacto">
+                </mat-form-field>
+            </div>
+        </div>
+        
+    </form>
+    <div mat-dialog-actions class="buttons">
+        <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
+        <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
+            cdkFocusInitial>{{funcion}}</button>
+    </div>
+</div>

@@ -1,0 +1,54 @@
+<form [formGroup]="formularioGrado" class="formulario">
+    <div class="general">
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Codigo docente</mat-label>
+                <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
+            </mat-form-field>
+        </div>
+
+        <div class="form">
+            <mat-form-field class="example-full-width nac">
+                <mat-label>Grado</mat-label>
+                <mat-select formControlName="grado" >
+                    <mat-option>Seleccionar grado</mat-option>
+                    @for (grado of grados; track grado) {
+                    <mat-option [value]="grado">{{grado}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Profesión</mat-label>
+                <input matInput formControlName="profesion" placeholder="Revalidado">
+            </mat-form-field>
+        </div>
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Revalidado</mat-label>
+                <input matInput formControlName="revalidado" placeholder="Revalidado">
+            </mat-form-field>
+        </div>
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Lugar Obtencion</mat-label>
+                <input matInput formControlName="lugar_obtencion" placeholder="Lugar obtencion">
+            </mat-form-field>
+        </div>
+
+
+        <div class="form">
+            <mat-form-field class="example-full-width calendario">
+                <mat-label>Fecha obtencion grado/titulo</mat-label>
+                <input matInput [matDatepicker]="picker2" formControlName="fecha_obtencion">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+
+        </div>
+    </div>
+    <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
+        (click)="add_grado()">Agregar</button>
+</form>

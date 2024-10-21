@@ -1,0 +1,49 @@
+<div class="contenido">
+    <h1 class="titulo">{{funcion}}</h1>
+    <form [formGroup]="formulario">
+        <mat-form-field class="example-full-width" *ngIf="data.modo==1">
+            <mat-label>ID</mat-label>
+            <input matInput formControlName="id" placeholder="ID">
+        </mat-form-field>
+        <div class="example-full-width mensaje" *ngIf="formulario?.get('id')?.invalid && formulario?.get('id')?.touched && data.modo==1">
+            ID es requerido.
+        </div>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Nombre">
+        </mat-form-field>
+        <div class="example-full-width mensaje" *ngIf="formulario?.get('nombre')?.invalid && formulario?.get('nombre')?.touched">
+            Nombre es requerido.
+        </div>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Valor</mat-label>
+            <input matInput formControlName="valor" placeholder="valor">
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Provincia</mat-label>
+            <mat-select formControlName="provincia_id">
+                <mat-option>Seleccionar departamento</mat-option>
+                @for (departamento of departamentos; track departamento) {
+                <mat-option [value]="departamento.id">{{departamento.nombre}}</mat-option>
+                }
+            </mat-select>
+            <div *ngIf="formulario?.get('provincia_id')?.invalid && formulario?.get('provincia_id')?.touched">
+                Departamento es requerido.
+            </div>
+        </mat-form-field>
+
+        <div class="example-full-width mensaje" *ngIf="formulario?.get('valor')?.invalid && formulario?.get('valor')?.touched">
+            Valor es requerido.
+        </div>
+
+        <div mat-dialog-actions class="buttons">
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
+                cdkFocusInitial>{{funcion}}</button>
+        </div>
+    </form>
+</div>

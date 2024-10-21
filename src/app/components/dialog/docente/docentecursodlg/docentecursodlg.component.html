@@ -1,0 +1,78 @@
+<form [formGroup]="formularioGrado" class="formulario">
+    <div class="general">
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Codigo docente</mat-label>
+                <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
+            </mat-form-field>
+        </div>
+
+
+        <div class="form">
+            <mat-form-field class="example-full-width nac">
+                <mat-label>Curso</mat-label>
+                <mat-select formControlName="codigoCurso" >
+                    <mat-option>Seleccionar curso</mat-option>
+                    @for (curso of cursos; track curso) {
+                    <mat-option [value]="curso.codigo">{{curso.nombre}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
+        <div class="form">
+            <mat-form-field class="example-full-width calendario">
+                <mat-label>Fecha Inicio Curso</mat-label>
+                <input matInput [matDatepicker]="picker2" formControlName="fecha_inicio">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+        </div>
+
+        <div class="form">
+            <mat-form-field class="example-full-width calendario">
+                <mat-label>Fecha fin Curso</mat-label>
+                <input matInput [matDatepicker]="picker1" formControlName="fecha_fin">
+                <mat-hint>MM/DD/YYYY</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <mat-form-field class="example-full-width">
+            <mat-label>Modalidad del curso</mat-label>
+            <mat-select formControlName="modalidad">
+                <mat-option>Seleccionar modalidad del curso</mat-option>
+                <mat-option *ngFor="let item of modalidad" [value]="item">{{item}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Tipo de curso</mat-label>
+            <mat-select formControlName="tipo">
+                <mat-option>Seleccionar tipo de curso</mat-option>
+                <mat-option *ngFor="let item of tipo" [value]="item">{{item}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Tipo de clase</mat-label>
+            <mat-select formControlName="tipo_clase">
+                <mat-option>Seleccionar tipo de clase</mat-option>
+                <mat-option *ngFor="let item of tipo_clase" [value]="item">{{item}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Estado de provisión</mat-label>
+            <mat-select formControlName="estado">
+                <mat-option>Seleccionar estado de provisión</mat-option>
+                <mat-option *ngFor="let item of estado" [value]="item">{{item}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+        
+
+    </div>
+    <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
+        (click)="add_grado()">Agregar</button>
+</form>

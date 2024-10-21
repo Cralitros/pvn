@@ -1,0 +1,10 @@
+<button class="button-add" mat-raised-button color="primary" type="submit" (click)="dialogo()"> Añadir Docente</button>
+<div class="contenedortabla">
+    <app-tabla class="tabla"
+    [columns]="columns" 
+    [dataSource]="dataSource"
+    [tipo]="tipo"
+    (edit)="editar($event)" 
+    (delete)="eliminar($event)"
+   ></app-tabla>
+</div>

@@ -1,0 +1,359 @@
+<div class="contenido">
+    <h1 class="titulo">{{funcion}}</h1>
+    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedTabChange)="tabActive($event)"
+        [selectedIndex]="selectedIndex" [disableRipple]="true">
+        <mat-tab label="Personal" >
+            <form [formGroup]="formulario1">
+                <div class="general">
+                    <div class="form">
+                        <mat-form-field class="example-full-width" >
+                            <mat-label>Código verificador</mat-label>
+                            <input matInput formControlName="codigo" placeholder="Código">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('codigo')?.invalid && formulario1?.get('codigo')?.touched && data.modo==1">
+                            Codigo es requerido.
+                        </div>
+                    </div>
+
+                    
+                    
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>DNI</mat-label>
+                            <input matInput formControlName="dni" placeholder="DNI">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('dni')?.invalid && formulario1?.get('dni')?.touched">
+                            DNI es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width" >
+                            <mat-label>Dígito</mat-label>
+                            <input matInput formControlName="digito" placeholder="Dígito">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('digito')?.invalid && formulario1?.get('digito')?.touched && data.modo==1">
+                            Dígito es requerido.
+                        </div>
+                    </div>
+
+                    
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Pasaporte</mat-label>
+                            <input matInput formControlName="pasaporte" placeholder="Pasaporte">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('pasaporte')?.invalid && formulario1?.get('pasaporte')?.touched">
+                            Pasaporte es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Nombres</mat-label>
+                            <input matInput formControlName="nombres" placeholder="nombres">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('nombres')?.invalid && formulario1?.get('nombres')?.touched">
+                            Nombres es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Apellidos</mat-label>
+                            <input matInput formControlName="apellidos" placeholder="Apellidos">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('apellidos')?.invalid && formulario1?.get('apellidos')?.touched">
+                            Apellidos es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width calendario">
+                            <mat-label>Fecha nacimiento</mat-label>
+                            <input matInput [matDatepicker]="picker2" formControlName="fecha_nacimiento">
+                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('fecha_nacimiento')?.invalid && formulario1?.get('fecha_nacimiento')?.touched">
+                            Fecha de nacimiento es requerido.
+                        </div>
+                    </div>
+                    <div class="form">
+                        <mat-form-field class="example-full-width nac">
+                            <mat-label>Sexo</mat-label>
+                            <mat-select formControlName="sexo" >
+                                <mat-option>Seleccionar Sexo</mat-option>
+                                @for (sexo of sexos; track sexo) {
+                                <mat-option [value]="sexo">{{sexo}}</mat-option>
+                                }
+                            </mat-select>
+                            <div class="combo"
+                                *ngIf="formulario1?.get('sexo')?.invalid && formulario1?.get('sexo')?.touched">
+                                Sexo es requerido.
+                            </div>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="lugar nacimiento">
+                        <table>
+                            <tr>
+                                <td><div class="form texto"><span>Lugar Nacimiento</span></div></td>
+                            </tr>
+                            <tr>
+                                <td><div class="form">
+                                    <mat-form-field class="example-full-width nac">
+                                        <mat-label>Departamento</mat-label>
+                                        <mat-select formControlName="departamento" [(ngModel)]="selectedValue"
+                                            (selectionChange)="onSelectChangeDepartamento($event)">
+                                            <mat-option>Seleccionar departamento</mat-option>
+                                            @for (departamento of departamentos; track departamento) {
+                                            <mat-option [value]="departamento.id">{{departamento.nombre}}</mat-option>
+                                            }
+                                        </mat-select>
+                                        <div class="combo"
+                                            *ngIf="formulario1?.get('departamento')?.invalid && formulario1?.get('departamento')?.touched">
+                                            Departamento es requerido.
+                                        </div>
+                                    </mat-form-field>
+                                </div></td>
+                                <td><div class="form">
+                                    <mat-form-field class="example-full-width nac">
+                                        <mat-label>Provincias</mat-label>
+                                        <mat-select formControlName="provincia"
+                                            (selectionChange)="onSelectChangeProvincia($event)">
+                                            <mat-option>Seleccionar provincia</mat-option>
+                                            @for (provincia of provincias; track provincia) {
+                                            <mat-option [value]="provincia.id">{{provincia.nombre}}</mat-option>
+                                            }
+                                        </mat-select>
+                                        <div class="combo"
+                                            *ngIf="formulario1?.get('provincia')?.invalid && formulario1?.get('provincia')?.touched">
+                                            Provincia es requerido.
+                                        </div>
+                                    </mat-form-field>
+                                </div></td>
+                                <td><div class="form">
+                                    <mat-form-field class="example-full-width nac">
+                                        <mat-label>Distritos</mat-label>
+                                        <mat-select formControlName="distrito">
+                                            <mat-option>Seleccionar distrito</mat-option>
+                                            @for (distrito of distritos; track distrito) {
+                                            <mat-option [value]="distrito.id">{{distrito.nombre}}</mat-option>
+                                            }
+                                        </mat-select>
+                                        <div class="combo"
+                                            *ngIf="formulario1?.get('distrito')?.invalid && formulario1?.get('distrito')?.touched">
+                                            Distrito es requerido.
+                                        </div>
+                                    </mat-form-field>
+                                </div></td>
+                            </tr>
+                        </table>   
+
+                    </div>
+                    <div class="form">
+                        <mat-form-field class="example-full-width calendario">
+                            <mat-label>Fecha CV</mat-label>
+                            <input matInput [matDatepicker]="picker" formControlName="fecha_cv">
+                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario2?.get('fecha_cv')?.invalid && formulario2?.get('fecha_cv')?.touched">
+                            Fecha CV es requerido.
+                        </div>
+                    </div>
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Domicilio</mat-label>
+                            <input matInput formControlName="domicilio" placeholder="Domicilio">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('domicilio')?.invalid && formulario1?.get('domicilio')?.touched">
+                            Domicilio es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Telefono</mat-label>
+                            <input matInput formControlName="telefono" placeholder="Telefono">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('telefono')?.invalid && formulario1?.get('telefono')?.touched ">
+                            Telefono es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Celular</mat-label>
+                            <input matInput formControlName="celular" placeholder="celular">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('celular')?.invalid && formulario1?.get('celular')?.touched">
+                            Celular es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Estado civil</mat-label>
+                            <mat-select formControlName="estado_civil">
+                                <mat-option>Seleccionar departamento</mat-option>
+                                @for (estado of estadosc; track estado) {
+                                <mat-option [value]="estado">{{estado}}</mat-option>
+                                }
+                            </mat-select>
+                            <div class="combo"
+                                *ngIf="formulario1?.get('estado_civil')?.invalid && formulario1?.get('estado_civil')?.touched">
+                                Estado Civil es requerido.
+                            </div>
+                        </mat-form-field>
+                    </div>
+
+
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Numero hijos</mat-label>
+                            <input matInput formControlName="numero_hijos" placeholder="Numero hijos">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('numero_hijos')?.invalid && formulario1?.get('numero_hijos')?.touched">
+                            Numero hijos es requerido.
+                        </div>
+
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Nacionalidad</mat-label>
+                            <input matInput formControlName="nacionalidad" placeholder="Nacionalidad">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('nacionalidad')?.invalid && formulario1?.get('nacionalidad')?.touched">
+                            Nacionalidad es requerido.
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <button class="btn-sgte btm" mat-raised-button color="primary" type="submit" (click)="siguiente(1)">Siguiente</button>
+           
+        </mat-tab>
+        <mat-tab label="Bancario" >
+            <form [formGroup]="formulario2">
+                <div class="general">
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Banco</mat-label>
+                            <mat-select formControlName="banco">
+                                <mat-option>Seleccionar banco</mat-option>
+                                @for (banco of bancos; track banco) {
+                                <mat-option [value]="banco">{{banco}}</mat-option>
+                                }
+                            </mat-select>
+                            <div class="combo"
+                                *ngIf="formulario2?.get('banco')?.invalid && formulario2?.get('banco')?.touched">
+                                Banco es requerido.
+                            </div>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Cuenta</mat-label>
+                            <input matInput formControlName="cuenta" placeholder="Cuenta">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario2?.get('cuenta')?.invalid && formulario2?.get('cuenta')?.touched">
+                            Cuenta es requerido.
+                        </div>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>AFP</mat-label>
+                            <mat-select formControlName="afp">
+                                <mat-option>Seleccionar AFP</mat-option>
+                                @for (afp of afps; track afp) {
+                                <mat-option [value]="afp">{{afp}}</mat-option>
+                                }
+                            </mat-select>
+                            <div class="combo"
+                                *ngIf="formulario2?.get('afp')?.invalid && formulario2?.get('afp')?.touched">
+                                Banco es requerido.
+                            </div>
+                        </mat-form-field>
+                    </div>
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>CUSSP</mat-label>
+                            <input matInput formControlName="cussp" placeholder="cussp">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario2?.get('cussp')?.invalid && formulario2?.get('cussp')?.touched">
+                            CUSSP es requerido.
+                        </div>
+                    </div>
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Afiliacion</mat-label>
+                            <input matInput formControlName="afiliacion" placeholder="Afiliacion">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario2?.get('afiliacion')?.invalid && formulario2?.get('afiliacion')?.touched">
+                            Afiliacion es requerido.
+                        </div>
+                    </div>
+                    
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>RUC</mat-label>
+                            <input matInput formControlName="ruc" placeholder="ruc">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario2?.get('ruc')?.invalid && formulario2?.get('ruc')?.touched">
+                            RUC es requerido.
+                        </div>
+                    </div>
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Observaciones</mat-label>
+                            <input matInput formControlName="observaciones" placeholder="observaciones">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario2?.get('observaciones')?.invalid && formulario2?.get('observaciones')?.touched">
+                            Observaciones es requerido.
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            <hr>
+            <div mat-dialog-actions class="buttons">
+                <button class="btn-ant btm" mat-raised-button color="primary" type="submit" (click)="siguiente(0)">Anterior</button>
+                <button class="btn" mat-raised-button color="primary" type="submit"
+                    (click)="onNoClick()">Cancel</button>
+                <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
+                    cdkFocusInitial>{{funcion}}</button>
+                
+            </div>
+        </mat-tab>
+
+        
+
+    </mat-tab-group>
+</div>

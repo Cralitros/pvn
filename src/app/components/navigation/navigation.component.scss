@@ -1,0 +1,32 @@
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 300px;
+}
+
+.sidenav .mat-toolbar {
+  background: inherit;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.btn {
+  border-color: rgb(71, 24, 102);
+  border-width: 2px;
+  border-style: dashed;
+  background-color: #819fd3;
+}
+.imagen{
+  cursor: pointer;
+
+}
+
+.example-spacer {
+  flex: 1 1 auto;
+}

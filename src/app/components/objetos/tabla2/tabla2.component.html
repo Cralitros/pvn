@@ -1,0 +1,32 @@
+<div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource">
+
+        <!-- Dynamic columns -->
+    <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
+        <th mat-header-cell *matHeaderCellDef> {{column.header}} </th>
+        <td mat-cell *matCellDef="let element">
+          <ng-container *ngIf="!column.isAction"> <!-- Check if it's not an action column -->
+            {{column.cell(element)}}
+          </ng-container>
+          <ng-container *ngIf="column.isAction"> <!-- If it's an action column, render buttons -->
+            <div class="buttons">
+                <button class="edit-btn" mat-icon-button color="primary" (click)="editElement(element)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button class="del-btn" mat-icon-button color="warn" (click)="deleteElement(element)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+          </ng-container>
+        </td>
+      </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row (click)="dataCliked(row)" (dblclick)="dataClickedData(row)"
+            [ngClass]="{'selected-row': isRowSelected(row), 'highlighted-row': isRowHighlighted(row)}"
+            *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
+    </mat-paginator>
+</div>

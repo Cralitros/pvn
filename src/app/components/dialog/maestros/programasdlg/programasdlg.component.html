@@ -1,0 +1,98 @@
+<div class="contenido">
+    <h1 class="titulo">{{funcion}}</h1>
+    <form [formGroup]="formulario">
+        <mat-form-field class="example-full-width" *ngIf="data.modo==1">
+            <mat-label>ID</mat-label>
+            <input matInput formControlName="id" placeholder="ID">
+        </mat-form-field>
+        <div class="example-full-width mensaje"
+            *ngIf="formulario?.get('id')?.invalid && formulario?.get('id')?.touched && data.modo==1">
+            ID es requerido.
+        </div>
+        <mat-form-field class="example-full-width">
+            <mat-label>Unidad académica</mat-label>
+            <mat-select formControlName="facultad" (selectionChange)="onCategoryChangeFacultad($event)">
+                <mat-option>Seleccionar unidad</mat-option>
+                @for (facultad of facultades; track facultad) {
+                <mat-option [value]="facultad">{{facultad.nombre}}</mat-option>
+                }
+            </mat-select>
+            <div class="example-full-width mensaje" *ngIf="formulario?.get('facultad')?.invalid && formulario?.get('facultad')?.touched">
+                Unidad académica es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Departamento académico</mat-label>
+            <mat-select formControlName="escuela" (selectionChange)="onCategoryChangeEscuela($event)">
+                <mat-option>Seleccionar Departamento</mat-option>
+                @for (escuela of escuelas; track escuela) {
+                <mat-option [value]="escuela">{{escuela.nombre}}</mat-option>
+                }
+            </mat-select>
+            <div class="example-full-width mensaje" *ngIf="formulario?.get('escuela')?.invalid && formulario?.get('escuela')?.touched">
+                Departamento académico es requerido.
+            </div>
+        </mat-form-field>
+
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Escuela y/o Programa</mat-label>
+            <input matInput formControlName="programa" placeholder="Escuela y/o Programa">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('programa')?.invalid && formulario?.get('programa')?.touched">
+                Escuela es requerido.
+            </div>
+        </mat-form-field>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Gestor</mat-label>
+            <input matInput formControlName="gestor" placeholder="Nombre gestor">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('gestor')?.invalid && formulario?.get('gestor')?.touched">
+                Nombre es requerido.
+            </div>
+        </mat-form-field>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Director</mat-label>
+            <input matInput formControlName="director" placeholder="Nombre director">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('director')?.invalid && formulario?.get('director')?.touched">
+                Director es requerido.
+            </div>
+        </mat-form-field>
+
+
+        
+        <mat-form-field class="rangfecha">
+            <mat-label>Ingresa el rango de periodo</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate placeholder="Start date" formControlName="inicio">
+                <input matEndDate placeholder="End date" formControlName="fin">
+            </mat-date-range-input>
+            <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('inicio')?.invalid && formulario?.get('inicio')?.touched">
+                fecha inicio es requerido.
+            </div>
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('fin')?.invalid && formulario?.get('fin')?.touched">
+                fecha fin es requerido.
+            </div>
+        </mat-form-field>
+
+
+
+        <div mat-dialog-actions class="buttons">
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
+                cdkFocusInitial>{{funcion}}</button>
+        </div>
+    </form>
+</div>

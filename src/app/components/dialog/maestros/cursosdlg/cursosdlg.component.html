@@ -1,0 +1,102 @@
+<div class="contenido">
+    <h1 class="titulo">{{funcion}}</h1>
+    <form [formGroup]="formulario">
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Codigo</mat-label>
+            <input matInput formControlName="codigo" placeholder="Codigo">
+        </mat-form-field>
+        <div class="example-full-width mensaje"
+            *ngIf="formulario?.get('codigo')?.invalid && formulario?.get('codigo')?.touched && data.modo==1">
+            Codigo es requerido.
+        </div>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Nombre">
+        </mat-form-field>
+        <div class="example-full-width mensaje"
+            *ngIf="formulario?.get('nombre')?.invalid && formulario?.get('nombre')?.touched">
+            Nombre es requerido.
+        </div>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Semestre</mat-label>
+            <input matInput formControlName="semestre" placeholder="Semestre">
+        </mat-form-field>
+        <div class="example-full-width mensaje"
+            *ngIf="formulario?.get('semestre')?.invalid && formulario?.get('semestre')?.touched">
+            Semestre es requerido.
+        </div>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Nivel</mat-label>
+            <input matInput formControlName="nivel" placeholder="Nivel">
+        </mat-form-field>
+        <div class="example-full-width mensaje"
+            *ngIf="formulario?.get('nivel')?.invalid && formulario?.get('nivel')?.touched">
+            Nivel es requerido.
+        </div>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Creditos</mat-label>
+            <input matInput formControlName="creditos" placeholder="Creditos">
+        </mat-form-field>
+        <div class="example-full-width mensaje"
+            *ngIf="formulario?.get('creditos')?.invalid && formulario?.get('creditos')?.touched">
+            Creditos es requerido.
+        </div>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Facultad</mat-label>
+            <mat-select formControlName="facultad" (selectionChange)="onSelectChangeFacultad($event)">
+                <mat-option>Seleccionar Facultad</mat-option>
+                @for (facultad of facultades; track facultad) {
+                <mat-option [value]="facultad.id">{{facultad.nombre}}</mat-option>
+                }
+            </mat-select>
+            <div  class="example-full-width mensaje"
+                *ngIf="formulario?.get('facultad')?.invalid && formulario?.get('facultad')?.touched">
+                Facultad es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width ">
+            <mat-label>Escuela</mat-label>
+            <mat-select formControlName="escuela" (selectionChange)="onSelectChangeEscuela($event)">
+                <mat-option>Seleccionar Escuela</mat-option>
+                @for (escuela of escuelas; track escuela) {
+                <mat-option [value]="escuela.id">{{escuela.nombre}}</mat-option>
+                }
+            </mat-select>
+            <div class="example-full-width mensaje combo" 
+                *ngIf="formulario?.get('escuela')?.invalid && formulario?.get('escuela')?.touched">
+                Escuela es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width ">
+            <mat-label>Programa</mat-label>
+            <mat-select formControlName="programa" (selectionChange)="onSelectChangePrograma($event)">
+                <mat-option>Seleccionar programa</mat-option>
+                @for (programa of programas; track programa) {
+                <mat-option [value]="programa.id">{{programa.programa}}</mat-option>
+                }
+            </mat-select>
+            <div class="combo example-full-width mensaje" 
+                *ngIf="formulario?.get('escuela')?.invalid && formulario?.get('escuela')?.touched">
+                Programa es requerido.
+            </div>
+        </mat-form-field>
+
+
+
+        <div mat-dialog-actions class="buttons">
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
+                cdkFocusInitial>{{funcion}}</button>
+        </div>
+    </form>
+</div>

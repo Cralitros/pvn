@@ -1,0 +1,114 @@
+<div class="contenido">
+    <h1 class="titulo">{{funcion}}</h1>
+    <form [formGroup]="formulario">
+        <mat-form-field class="example-full-width" *ngIf="data.modo==1">
+            <mat-label>ID</mat-label>
+            <input matInput formControlName="id" placeholder="ID">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('id')?.invalid && formulario?.get('id')?.touched && data.modo==1">
+                ID es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>dni</mat-label>
+            <input matInput formControlName="dni" placeholder="DNI">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('dni')?.invalid && formulario?.get('dni')?.touched">
+                DNI es requerido.
+            </div>
+        </mat-form-field>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Contraseña</mat-label>
+            <input type="password" matInput formControlName="password" placeholder="Contraseña">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('password')?.invalid && formulario?.get('password')?.touched">
+                Pass es requerido.
+            </div>
+        </mat-form-field>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Seleccione nivel</mat-label>
+            <!--<mat-select formControlName="nivel">
+                <mat-option *ngFor="let nvl of nivel" [value]="nvl" [matTooltip]="nvl.descripcion" matTooltipClass="multi-line-tooltip" matTooltipPosition="right">
+                    {{nvl.nivel}}
+                </mat-option>
+            </mat-select>-->
+
+            <mat-select formControlName="nivel">
+                <mat-option *ngFor="let nvl of nivel" 
+                            [value]="nvl.nivel" 
+                            [matTooltip]="nvl.descripcion" 
+                            matTooltipClass="myTooltip"
+                            matTooltipPosition="right"
+                            matTooltipDisable="false">
+                  {{nvl.nivel}}
+                </mat-option>
+              </mat-select>
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('nivel')?.invalid && formulario?.get('nivel')?.touched">
+                Nivel es requerido.
+            </div>
+        </mat-form-field>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Seleccione rol</mat-label>
+            <mat-select formControlName="rol">
+                <mat-option *ngFor="let rl of rol" [value]="rl">
+                    {{rl}}
+                </mat-option>
+            </mat-select>
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('rol')?.invalid && formulario?.get('rol')?.touched">
+                Rol es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Nombres</mat-label>
+            <input matInput formControlName="nombres" placeholder="Nombres">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('nombres')?.invalid && formulario?.get('nombres')?.touched">
+                Nombres es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Apellidos</mat-label>
+            <input matInput formControlName="apellidos" placeholder="Apellidos">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('apellidos')?.invalid && formulario?.get('apellidos')?.touched">
+                Apellidos es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" placeholder="Email">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('email')?.invalid && formulario?.get('email')?.touched">
+                Email es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Cargo</mat-label>
+            <input matInput formControlName="cargo" placeholder="Cargo">
+            <div class="example-full-width mensaje"
+                *ngIf="formulario?.get('cargo')?.invalid && formulario?.get('cargo')?.touched">
+                Cargo es requerido.
+            </div>
+        </mat-form-field>
+
+
+        <div mat-dialog-actions class="buttons">
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
+                cdkFocusInitial>{{funcion}}</button>
+        </div>
+    </form>
+</div>

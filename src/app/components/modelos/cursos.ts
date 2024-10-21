@@ -1,0 +1,11 @@
+import { Programa } from "./programa";
+
+export interface Curso{
+    codigo:string;
+    nombre:string;
+    semestre:string;
+    nivel:string;
+    creditos:string;
+    idPrograma:string;
+    Programa:Programa;
+}
