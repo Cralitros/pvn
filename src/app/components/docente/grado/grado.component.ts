@@ -16,6 +16,7 @@ import { ConversiontablaService } from '../../../services/conversiontabla.servic
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { GradodlgComponent } from '../../dialog/docente/gradodlg/gradodlg.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-grado',
@@ -62,7 +63,8 @@ export class GradoComponent {
     private mservice: MaestrosserviceService,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private route: ActivatedRoute
   ) {
 
     this.departamentoForm = this.fb.group({
@@ -77,6 +79,42 @@ export class GradoComponent {
     });
   }
 
+  ngAfterViewInit() {
+    this.route.queryParams.subscribe((params: any) => {
+      // const tipo = params['tipo'];
+      const data = params['selectedRow'];
+
+      console.log('Selected Row:', data);
+      this.cargartabla().then(() => {
+        this.buscar(data);
+      });
+    });
+
+  }
+  async buscar(data: any) {
+    if (this.tablaDepartamento.length == 0) {
+      this.formulario?.setValue({ 'codigo': data });
+      //this.cartabla.dataSeleccionada = item;
+      this.dialogo();
+
+    }
+    for (let item of await this.tablaDepartamento) {
+      console.log(item);
+      if (item.codigoDocente == data) {
+        console.log("encontrado");
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        console.log(this.cartabla.dataSeleccionada);
+        this.editar(this.cartabla.dataSeleccionada);
+        break;
+      } else {
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        this.dialogo();
+      }
+
+    }
+  }
   async cargartabla() {
     this.mservice.ponerurl("docentesgrado");
     const source$ = this.mservice.get();

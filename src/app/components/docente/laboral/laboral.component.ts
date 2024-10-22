@@ -89,16 +89,40 @@ export class LaboralComponent {
   }
 
   ngAfterViewInit() {
-    this.route.queryParams.subscribe((params:any) => {
-     // const tipo = params['tipo'];
+    this.route.queryParams.subscribe((params: any) => {
+      // const tipo = params['tipo'];
       const data = params['selectedRow'];
-  
+
       console.log('Selected Row:', data);
       this.cargartabla().then(() => {
         this.buscar(data);
       });
     });
-    
+
+  }
+  async buscar(data: any) {
+    if (this.tablaDepartamento.length == 0) {
+      this.formulario?.setValue({ 'codigo': data });
+      //this.cartabla.dataSeleccionada = item;
+      this.dialogo();
+
+    }
+    for (let item of await this.tablaDepartamento) {
+      console.log(item);
+      if (item.codigoDocente == data) {
+        console.log("encontrado");
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        console.log(this.cartabla.dataSeleccionada);
+        this.editar(this.cartabla.dataSeleccionada);
+        break;
+      } else {
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        this.dialogo();
+      }
+
+    }
   }
   async cargartabla() {
     this.mservice.ponerurl("docenteslaboral");
@@ -111,20 +135,7 @@ export class LaboralComponent {
 
     this.sctabla.setData(this.tablaDepartamento);
   }
-  async buscar(data:any){
-    for(let item of await this.tablaDepartamento ){
-      console.log(item);
-      if(item.codigoDocente== data){
-        console.log("encontrado");
-        this.formulario?.setValue({'codigo':data});
-        this.cartabla.dataSeleccionada=item;
-        console.log(this.cartabla.dataSeleccionada);
-        this.editar(this.cartabla.dataSeleccionada);
-        break;
-      }
-      
-    }
-  }
+  
   dialogo() {
     let laboral: any;
     this.mservice.ponerurl("docentes/cod");

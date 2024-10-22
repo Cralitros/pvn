@@ -19,6 +19,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Personal } from '../../modelos/personal';
+import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 
 
 @Component({
@@ -52,6 +53,7 @@ export class TablaComponent {
   @Input() fila: any;
   @Input() dataSource = new MatTableDataSource<any>([]);
   @Input() tipo: any;
+  @Input() report: any;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -82,7 +84,8 @@ export class TablaComponent {
 
   constructor(private sctabla: CargatablaService,
     private das: ConversiontablaService,
-    private router: Router
+    private router: Router,
+    private mservice:MaestrosserviceService
   ) {
 
   }
@@ -370,6 +373,11 @@ export class TablaComponent {
     this.router.navigate([`/dashboard/${tip}`], { 
       queryParams: { selectedRow }
     });
+  }
+  reporte(){
+    console.log(this.report);
+
+    this.mservice.reporte();
   }
 
 }

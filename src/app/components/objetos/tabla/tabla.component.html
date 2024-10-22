@@ -10,6 +10,10 @@
     <mat-label>Filtro</mat-label>
   </button>
 
+  <button mat-fab extended (click)="reporte()">
+    <mat-label>Reporte</mat-label>
+  </button>
+
   <div class="table-wrapper">
     <table mat-table [dataSource]="dataSource">
 
@@ -52,14 +56,14 @@
   </mat-paginator>
 
   <div *ngIf="selectedRow && dpintar" class="menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
-    <button mat-button (click)="editElement(selectedRow)">Editar</button>
-    <button mat-button (click)="deleteElement(selectedRow)">Eliminar</button>
-    <button *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
-    <button *ngIf="tipo=='personal'" mat-button >Grado</button>
-    <button *ngIf="tipo=='personal'" mat-button >Categoria</button>
-    <button *ngIf="tipo=='personal'" mat-button >Investigación</button>
-    <button *ngIf="tipo=='personal'" mat-button >Cursos</button>
-    <button mat-button (click)="cerrar()">Cerrar</button>
+    <button class="btncss" mat-button (click)="editElement(selectedRow)">Editar</button>
+    <button class="btncss" mat-button (click)="deleteElement(selectedRow)">Eliminar</button>
+    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
+    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'grado')">Grado</button>
+    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'categoria')">Categoria</button>
+    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
+    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
+    <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
     
   </div>
 

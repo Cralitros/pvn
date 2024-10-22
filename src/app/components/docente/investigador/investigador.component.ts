@@ -16,6 +16,7 @@ import { ConversiontablaService } from '../../../services/conversiontabla.servic
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { InvestigadlgComponent } from '../../dialog/docente/investigadlg/investigadlg.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-investigador',
@@ -27,8 +28,8 @@ import { InvestigadlgComponent } from '../../dialog/docente/investigadlg/investi
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    TablaComponent, 
-    MatPaginatorModule, 
+    TablaComponent,
+    MatPaginatorModule,
     MatTableModule
   ],
   templateUrl: './investigador.component.html',
@@ -36,18 +37,18 @@ import { InvestigadlgComponent } from '../../dialog/docente/investigadlg/investi
 })
 export class InvestigadorComponent {
 
-  tablaDepartamento:Investigador[]=[];
-/*    id:string;
-    orcid:string;
-    renacyt:Date;
-    grupo:string;
-    nivel:string;
-    registro:string;
-    rol:string;
-    reconocimiento:string;
-    contenido:string;
-    codigoDocente:string;
-}*/ 
+  tablaDepartamento: Investigador[] = [];
+  /*    id:string;
+      orcid:string;
+      renacyt:Date;
+      grupo:string;
+      nivel:string;
+      registro:string;
+      rol:string;
+      reconocimiento:string;
+      contenido:string;
+      codigoDocente:string;
+  }*/
   columns: Column[] = [
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true },  // Columna de acciones
     { columnDef: 'id', header: 'No.', cell: (element: Investigador) => `${element.id}` },
@@ -59,28 +60,29 @@ export class InvestigadorComponent {
     { columnDef: 'registro', header: 'Registro', cell: (element: Investigador) => `${element.registro}` },
     { columnDef: 'rol', header: 'Rol', cell: (element: Investigador) => `${element.rol}` },
     { columnDef: 'reconocimiento', header: 'Reconocimiento', cell: (element: Investigador) => `${element.reconocimiento}` },
-    { columnDef: 'contenido', header: 'Contenido', cell: (element: Investigador) => `${element.contenido}` },    
+    { columnDef: 'contenido', header: 'Contenido', cell: (element: Investigador) => `${element.contenido}` },
   ];
-  formulario?: FormGroup| any= null;
+  formulario?: FormGroup | any = null;
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
 
-  titulo="Investigador";
+  titulo = "Investigador";
 
   @Output() titulos = new EventEmitter<any>();
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice:MaestrosserviceService,
-    private cartabla:ConversiontablaService,
+    private mservice: MaestrosserviceService,
+    private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private route: ActivatedRoute
   ) {
-    
+
     this.cargartabla();
     console.log("************");
     console.log(this.tablaDepartamento);
-    
+
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
       nombre: ['', Validators.required]
@@ -90,83 +92,120 @@ export class InvestigadorComponent {
   ngOnInit(): void {
     this.cargartabla();
     this.formulario = this.formBuilder.group({
-      codigo:['']});
-   }
+      codigo: ['']
+    });
+  }
+  ngAfterViewInit() {
+    this.route.queryParams.subscribe((params: any) => {
+      // const tipo = params['tipo'];
+      const data = params['selectedRow'];
 
-  async cargartabla(){
+      console.log('Selected Row:', data);
+      this.cargartabla().then(() => {
+        this.buscar(data);
+      });
+    });
+
+  }
+  async buscar(data: any) {
+    if (this.tablaDepartamento.length == 0) {
+      this.formulario?.setValue({ 'codigo': data });
+      //this.cartabla.dataSeleccionada = item;
+      this.dialogo();
+
+    }
+    for (let item of await this.tablaDepartamento) {
+      console.log(item);
+      if (item.codigoDocente == data) {
+        console.log("encontrado");
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        console.log(this.cartabla.dataSeleccionada);
+        this.editar(this.cartabla.dataSeleccionada);
+        break;
+      } else {
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        this.dialogo();
+      }
+
+    }
+  }
+
+  async cargartabla() {
     this.mservice.ponerurl("docentesinvestiga");
     const source$ = this.mservice.get();
-    const finalNumber:any = await lastValueFrom(source$);
-  
+    const finalNumber: any = await lastValueFrom(source$);
+
     this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento=this.cartabla.array;
+    this.tablaDepartamento = this.cartabla.array;
     console.log(this.tablaDepartamento);
-    
+
     this.sctabla.setData(this.tablaDepartamento);
   }
-  dialogo(){
-    let laboral:any;
+  dialogo() {
+    let laboral: any;
     this.mservice.ponerurl("docentes/cod");
-    this.mservice.getid(this.formulario?.value.codigo).subscribe((data:any)=>{
+    this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
       console.log(data);
-      laboral=data;
-      if(data.length>0){//verifica si existe el docente
+      laboral = data;
+      if (data.length > 0) {//verifica si existe el docente
 
         this.mservice.ponerurl("docentesinvestiga/cod");
-        this.mservice.getid(this.formulario?.value.codigo?this.formulario?.value.codigo:0).subscribe((data2:any)=>{//verifica si existe registro del docente
+        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
           console.log(data2);
-          if(data2.length==0){
+          if (data2.length == 0) {
             const dialogRef = this.dialog.open(InvestigadlgComponent, {
               width: '500px',
-              height:'550px',
+              height: '550px',
               data: {
                 title: `Agregar ${this.titulo}`,
-                valores:{laboral},
-                modo:0
+                valores: { laboral },
+                modo: 0
               }
             });
             dialogRef.afterClosed().subscribe(result => {
               //if (result) {
-                this.cargartabla();
-             // }
+              this.cargartabla();
+              // }
             });
           }
-          
+
         });
-      }      
+      }
     });
   }
-  editar(element: any){
+  editar(element: any) {
     const dialogRef = this.dialog.open(InvestigadlgComponent, {
       width: '500px',
-      height:'550px',
+      height: '550px',
       data: {
         title: `Editar ${this.titulo}`,
-        valores:{ 
-          id:this.cartabla.dataSeleccionada.id,
+        valores: {
+          id: this.cartabla.dataSeleccionada.id,
           orcid: this.cartabla.dataSeleccionada.orcid,
           renacyt: this.cartabla.dataSeleccionada.renacyt,
           grupo: this.cartabla.dataSeleccionada.grupo,
-          nivel:  this.cartabla.dataSeleccionada.nivel,
-          registro:  this.cartabla.dataSeleccionada.registro,
-          rol:  this.cartabla.dataSeleccionada.rol,
-          reconocimiento:  this.cartabla.dataSeleccionada.reconocimiento,
-          contenido:  this.cartabla.dataSeleccionada.contenido,
+          nivel: this.cartabla.dataSeleccionada.nivel,
+          registro: this.cartabla.dataSeleccionada.registro,
+          rol: this.cartabla.dataSeleccionada.rol,
+          reconocimiento: this.cartabla.dataSeleccionada.reconocimiento,
+          contenido: this.cartabla.dataSeleccionada.contenido,
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente
         },
-        modo:1     
+        modo: 1
       }
     });
     dialogRef.afterClosed().subscribe(result => {
-     // if (result) {
-        this.cargartabla();
-    //  }
+      // if (result) {
+      this.cargartabla();
+      //  }
     });
 
   }
-  eliminar(element: any){
-    console.log("dep",element);
-    this.mservice.delete(element.id).subscribe(data=>{
+  eliminar(element: any) {
+    console.log("dep", element);
+    this.mservice.delete(element.id).subscribe(data => {
       console.log("Eliminado");
       this.cargartabla();
     })

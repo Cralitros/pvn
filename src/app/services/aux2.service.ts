@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +19,15 @@ export class Aux2Service {
     this.apiUrl=`${this.apiUrl}${direccion}`;
     console.log(this.apiUrl);
     
+  }
+  reporte() {
+    this.http.get(`${this.apiUrl}/reporte`, { responseType: 'blob' })
+    .subscribe((response: Blob) => {
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    });
+    //return this.http.get<any[]>(this.apiUrl);
   }
 
   get(): Observable<any[]> {

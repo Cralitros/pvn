@@ -18,6 +18,7 @@ import { lastValueFrom } from 'rxjs';
 import { DocentecursodlgComponent } from '../../dialog/docente/docentecursodlg/docentecursodlg.component';
 import { Aux1Service } from '../../../services/aux1.service';
 import { Aux2Service } from '../../../services/aux2.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-docentecurso',
@@ -68,7 +69,8 @@ export class DocentecursoComponent {
     private saux2: Aux2Service,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private route: ActivatedRoute
   ) {
 
     this.departamentoForm = this.fb.group({
@@ -81,6 +83,43 @@ export class DocentecursoComponent {
     this.formulario = this.formBuilder.group({
       codigo: ['']
     });
+  }
+
+  ngAfterViewInit() {
+    this.route.queryParams.subscribe((params: any) => {
+      // const tipo = params['tipo'];
+      const data = params['selectedRow'];
+
+      console.log('Selected Row:', data);
+      this.cargartabla().then(() => {
+        this.buscar(data);
+      });
+    });
+
+  }
+  async buscar(data: any) {
+    if (this.tablaDepartamento.length == 0) {
+      this.formulario?.setValue({ 'codigo': data });
+      //this.cartabla.dataSeleccionada = item;
+      this.dialogo();
+
+    }
+    for (let item of await this.tablaDepartamento) {
+      console.log(item);
+      if (item.codigoDocente == data) {
+        console.log("encontrado");
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        console.log(this.cartabla.dataSeleccionada);
+        this.editar(this.cartabla.dataSeleccionada);
+        break;
+      } else {
+        this.formulario?.setValue({ 'codigo': data });
+        this.cartabla.dataSeleccionada = item;
+        this.dialogo();
+      }
+
+    }
   }
 
   async cargartabla() {
