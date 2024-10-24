@@ -76,7 +76,7 @@ export class PersonaldlgComponent {
   distritos?: Distrito[];
   funcion: any;
   fnc: boolean = true;
-  estadosc = ["Soltero", "Casado", "Divorciado", "Viudo"];
+  estadosc = ["Soltero(a)","Conviviente", "Unión de hecho", "Casado(a)", "Divorciado(a)", "Separado(a)","Viudo(a)", "Otro(a)"];
   bancos = ["BCP", "BBVA", "Scotiabank", "Interbank"];
   afps = ["integra", "Buena vista", "ONP", "otra"];
   sexos = ["Masculino", "Femenino"];

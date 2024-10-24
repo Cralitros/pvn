@@ -7,8 +7,8 @@
                 <div class="general">
                     <div class="form">
                         <mat-form-field class="example-full-width" >
-                            <mat-label>Código verificador</mat-label>
-                            <input matInput formControlName="codigo" placeholder="Código">
+                            <mat-label>Código PUCP</mat-label>
+                            <input matInput formControlName="codigo" placeholder="Código PUCP">
                         </mat-form-field>
                         <div class="example-full-width mensaje"
                             *ngIf="formulario1?.get('codigo')?.invalid && formulario1?.get('codigo')?.touched && data.modo==1">
@@ -32,8 +32,8 @@
 
                     <div class="form">
                         <mat-form-field class="example-full-width" >
-                            <mat-label>Dígito</mat-label>
-                            <input matInput formControlName="digito" placeholder="Dígito">
+                            <mat-label>Dígito verificador</mat-label>
+                            <input matInput formControlName="digito" placeholder="Dígito verificador">
                         </mat-form-field>
                         <div class="example-full-width mensaje"
                             *ngIf="formulario1?.get('digito')?.invalid && formulario1?.get('digito')?.touched && data.modo==1">

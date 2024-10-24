@@ -18,6 +18,9 @@ import { logueoGuard } from './logueo.guard';
 import { deslogueoGuard } from './deslogueo.guard';
 import { ProgramaComponent } from './components/maestros/programa/programa.component';
 import { UsuariosComponent } from './components/maestros/usuarios/usuarios.component';
+import { BancosComponent } from './components/maestros/bancos/bancos.component';
+import { AfpsComponent } from './components/maestros/afps/afps.component';
+import { PlanComponent } from './components/maestros/plan/plan.component';
 
 
 export const routes: Routes = [
@@ -40,6 +43,9 @@ export const routes: Routes = [
             { path: 'facultad', component: FacultadComponent,title: "Facultad", canActivate:[deslogueoGuard] },
             { path: 'escuela', component: EscuelaComponent,title: "Escuela" , canActivate:[deslogueoGuard]},
             { path: 'programa', component: ProgramaComponent,title: "Programa" , canActivate:[deslogueoGuard]},
+            { path: 'bancos', component: BancosComponent,title: "Bancos" , canActivate:[deslogueoGuard]},
+            { path: 'afps', component: AfpsComponent,title: "AFP" , canActivate:[deslogueoGuard]},
+            { path: 'plan', component: PlanComponent,title: "Plan Académico" , canActivate:[deslogueoGuard]},
            
         ],canActivate:[deslogueoGuard]
     },

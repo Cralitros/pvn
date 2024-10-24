@@ -8,46 +8,60 @@ import { MatInputModule } from '@angular/material/input';
 import { TablaComponent } from '../../objetos/tabla/tabla.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Distrito } from '../../modelos/distrito';
+import { Plan } from '../../modelos/plan';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
-import { DstdlgComponent } from '../../dialog/maestros/dstdlg/dstdlg.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatIconModule } from '@angular/material/icon';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { PlandlgComponent } from '../../dialog/maestros/plandlg/plandlg.component';
 
 @Component({
-  selector: 'app-distrito',
+  selector: 'app-plan',
   standalone: true,
   imports: [
-    CommonModule,
-    MatCardModule,
     MatFormFieldModule,
+    CommonModule,
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    TablaComponent, 
-    MatPaginatorModule, 
-    MatTableModule
-  ],
-  templateUrl: './distrito.component.html',
-  styleUrl: './distrito.component.scss'
+    MatSelectModule,
+    MatTabsModule,
+    MatDatepickerModule,
+    MatIconModule,
+    MatNativeDateModule,
+    MatCardModule,
+    MatPaginatorModule,
+    MatTableModule,
+    MatRadioModule,
+    MatCheckboxModule,
+    TablaComponent
+],
+  templateUrl: './plan.component.html',
+  styleUrl: './plan.component.scss'
 })
-export class DistritoComponent {
-  tablaDepartamento:Distrito[]=[];
+export class PlanComponent {
+  tablaDepartamento:Plan[]=[];
   columns: Column[] = [
-    { columnDef: 'id', header: 'No.', cell: (element: Distrito) => `${element.id}` },
-    { columnDef: 'nombre', header: 'Nombre Distrito', cell: (element: Distrito) => `${element.nombre}` },
-    { columnDef: 'valor', header: 'Valor', cell: (element: Distrito) => `${element.valor}` },
-    { columnDef: 'Provincium', header: 'Provincia', cell: (element: Distrito) => `${element.Provincium?.nombre}` },
+    { columnDef: 'id', header: 'No.', cell: (element: Plan) => `${element.id}` },
+    { columnDef: 'nombre', header: 'Nombre Departamento', cell: (element: Plan) => `${element.nombre}` },
+    { columnDef: 'nivel_academico', header: 'Nivel académico', cell: (element: Plan) => `${element.nivel_academico}` },
+    { columnDef: 'vigencia', header: 'Vigencia', cell: (element: Plan) => `${element.vigencia}` },
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
   ];
 
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
-  tipo="distritos";
-  titulo="Distritos";
+  tipo="plan";
+  titulo="Plan";
 
   @Output() titulos = new EventEmitter<any>();
 
@@ -59,7 +73,6 @@ export class DistritoComponent {
   ) {
     
     this.cargartabla();
-    console.log("************");
     console.log(this.tablaDepartamento);
     
     sctabla.setData(this.tablaDepartamento);
@@ -73,20 +86,18 @@ export class DistritoComponent {
    }
 
   async cargartabla(){
-    this.mservice.ponerurl("distritos");
+    this.mservice.ponerurl("plan");
     const source$ = this.mservice.get();
     const finalNumber:any = await lastValueFrom(source$);
   
     this.cartabla.ponerdata(finalNumber);
     this.tablaDepartamento=this.cartabla.array;
-    console.log(this.tablaDepartamento);
-    
     this.sctabla.setData(this.tablaDepartamento);
   }
   dialogo(){
-    const dialogRef = this.dialog.open(DstdlgComponent, {
+    const dialogRef = this.dialog.open(PlandlgComponent, {
       width: '290px',
-      height:'450px',
+      height:'350px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -100,16 +111,14 @@ export class DistritoComponent {
     });
   }
   editar(element: any){
-    const dialogRef = this.dialog.open(DstdlgComponent, {
+    const dialogRef = this.dialog.open(PlandlgComponent, {
       width: '250px',
-      height:'450px',
+      height:'350px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 
           id: this.cartabla.dataSeleccionada.id,
           nombre:this.cartabla.dataSeleccionada.nombre,
-          valor:this.cartabla.dataSeleccionada.valor,
-          provincia_id:this.cartabla.dataSeleccionada.provincia_id,
         },
         modo:1     
       }
@@ -128,4 +137,5 @@ export class DistritoComponent {
       this.cargartabla();
     })
   }
+
 }

@@ -48,7 +48,7 @@ import { MaestrosserviceService } from '../../../services/maestrosservice.servic
     MatButtonModule],
   
 })
-export class TablaComponent {
+export class  TablaComponent {
   @Input() columns: Column[] = [];
   @Input() fila: any;
   @Input() dataSource = new MatTableDataSource<any>([]);

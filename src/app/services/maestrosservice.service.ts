@@ -21,6 +21,8 @@ export class MaestrosserviceService {
     
   }
   reporte() {
+    console.log(`${this.apiUrl}/report`);
+    
     this.http.get(`${this.apiUrl}/report`, { responseType: 'blob' })
     .subscribe((response: Blob) => {
       const blob = new Blob([response], { type: 'application/pdf' });

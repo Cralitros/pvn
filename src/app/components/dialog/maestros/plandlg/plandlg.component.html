@@ -1,0 +1,49 @@
+<div class="contenido">
+    <h1 class="titulo">{{funcion}}</h1>
+    <form [formGroup]="formulario">
+        <mat-form-field class="example-full-width" *ngIf="data.modo==1">
+            <mat-label>ID</mat-label>
+            <input matInput formControlName="id" placeholder="ID">
+        </mat-form-field>
+        <div class="example-full-width mensaje" *ngIf="formulario?.get('id')?.invalid && formulario?.get('id')?.touched && data.modo==1">
+            ID es requerido.
+        </div>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="nombre" placeholder="Nombre">
+        </mat-form-field>
+        <div class="example-full-width mensaje" *ngIf="formulario?.get('nombre')?.invalid && formulario?.get('nombre')?.touched">
+            Nombre es requerido.
+        </div>
+
+
+        <mat-form-field class="example-full-width">
+            <mat-label>Nivel academico</mat-label>
+            <mat-select formControlName="nivel_academico">
+                <mat-option>Seleccionar nivel</mat-option>
+                @for (nvl of nivelesacad; track nvl) {
+                <mat-option [value]="nvl">{{nvl}}</mat-option>
+                }
+            </mat-select>
+            <div *ngIf="formulario?.get('nivel_academico')?.invalid && formulario?.get('nivel_academico')?.touched">
+                Nivel academico es requerido.
+            </div>
+        </mat-form-field>
+
+        <mat-form-field class="example-full-width calendario">
+            <mat-label>Vigencia</mat-label>
+            <input matInput [matDatepicker]="picker2" formControlName="vigencia">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+
+        <div mat-dialog-actions class="buttons">
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
+            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
+                cdkFocusInitial>{{funcion}}</button>
+        </div>
+    </form>
+</div>

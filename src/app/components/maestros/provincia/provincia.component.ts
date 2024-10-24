@@ -47,6 +47,7 @@ export class ProvinciaComponent {
 
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
+  tipo="provincias";
 
   titulo="Provincias";
 

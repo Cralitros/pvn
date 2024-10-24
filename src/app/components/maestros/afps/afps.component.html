@@ -1,9 +1,9 @@
-<button class="button-add" mat-raised-button color="primary" type="submit" (click)="dialogo()"> Añadir Unidad Académica</button>
+<button class="button-add" mat-raised-button color="primary" type="submit" (click)="dialogo()"> Añadir AFP</button>
 <div class="contenedortabla">
     <app-tabla class="tabla"
     [columns]="columns" 
-    [report]="tipo"
     [dataSource]="dataSource"
+    [report]="tipo"
     (edit)="editar($event)" 
     (delete)="eliminar($event)"
    ></app-tabla>

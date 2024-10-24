@@ -48,6 +48,7 @@ export class EscuelaComponent {
 
   titulo="Provincias";
 
+  tipo="escuela";
   @Output() titulos = new EventEmitter<any>();
 
   constructor(private fb: FormBuilder,
