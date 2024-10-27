@@ -261,8 +261,8 @@
                             <mat-label>Banco</mat-label>
                             <mat-select formControlName="banco">
                                 <mat-option>Seleccionar banco</mat-option>
-                                @for (banco of bancos; track banco) {
-                                <mat-option [value]="banco">{{banco}}</mat-option>
+                                @for (banco of bancosarr; track banco) {
+                                <mat-option [value]="banco.nombre">{{banco.nombre}}</mat-option>
                                 }
                             </mat-select>
                             <div class="combo"
@@ -288,8 +288,8 @@
                             <mat-label>AFP</mat-label>
                             <mat-select formControlName="afp">
                                 <mat-option>Seleccionar AFP</mat-option>
-                                @for (afp of afps; track afp) {
-                                <mat-option [value]="afp">{{afp}}</mat-option>
+                                @for (afp of afpsarr; track afp) {
+                                <mat-option [value]="afp.nombre">{{afp.nombre}}</mat-option>
                                 }
                             </mat-select>
                             <div class="combo"

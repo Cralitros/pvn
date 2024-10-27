@@ -23,5 +23,7 @@ export interface Personal{
     fecha_cv: string;
     ruc: string;
     observaciones: string;
- 
+    idDepartamento:string;
+    idProvincia:string;
+    idDistrito:string;
 }

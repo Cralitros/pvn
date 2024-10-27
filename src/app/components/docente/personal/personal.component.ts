@@ -37,7 +37,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 export class PersonalComponent {
   tablaDepartamento:Personal[]=[];
   tablaDepartamento2:Personal[]=[];
-  tipo="personal";
+  tipo="docentes";
 
   columns: Column[] = [
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true },  // Columna de acciones

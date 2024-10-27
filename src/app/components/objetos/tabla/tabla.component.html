@@ -58,11 +58,11 @@
   <div *ngIf="selectedRow && dpintar" class="menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
     <button class="btncss" mat-button (click)="editElement(selectedRow)">Editar</button>
     <button class="btncss" mat-button (click)="deleteElement(selectedRow)">Eliminar</button>
-    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
-    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'grado')">Grado</button>
-    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'categoria')">Categoria</button>
-    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
-    <button class="btncss" *ngIf="tipo=='personal'" mat-button (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'grado')">Grado</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'categoria')">Categoria</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
     <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
     
   </div>

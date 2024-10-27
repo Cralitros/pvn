@@ -2,6 +2,7 @@
 <div class="contenedortabla">
     <app-tabla class="tabla"
     [columns]="columns" 
+    [report]="tipo"
     [dataSource]="dataSource"
     (edit)="editar($event)" 
     (delete)="eliminar($event)"

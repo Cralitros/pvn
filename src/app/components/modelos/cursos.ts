@@ -1,3 +1,4 @@
+import { Plan } from "./plan";
 import { Programa } from "./programa";
 
 export interface Curso{
@@ -7,5 +8,7 @@ export interface Curso{
     nivel:string;
     creditos:string;
     idPrograma:string;
+    codigoPlan:string;
     Programa:Programa;
+    Plan:Plan;
 }

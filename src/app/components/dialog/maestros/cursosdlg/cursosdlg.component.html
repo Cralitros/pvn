@@ -31,8 +31,8 @@
         </div>
 
         <mat-form-field class="example-full-width">
-            <mat-label>Nivel</mat-label>
-            <input matInput formControlName="nivel" placeholder="Nivel">
+            <mat-label>Ciclo</mat-label>
+            <input matInput formControlName="nivel" placeholder="Ciclo">
         </mat-form-field>
         <div class="example-full-width mensaje"
             *ngIf="formulario?.get('nivel')?.invalid && formulario?.get('nivel')?.touched">
@@ -48,6 +48,19 @@
             Creditos es requerido.
         </div>
 
+        <mat-form-field class="example-full-width">
+            <mat-label>Plan de estudio</mat-label>
+            <mat-select formControlName="plan" >
+                <mat-option>Seleccionar plan</mat-option>
+                @for (plan of planes; track plan) {
+                <mat-option [value]="plan.id">{{plan.nombre}}</mat-option>
+                }
+            </mat-select>
+            <div  class="example-full-width mensaje"
+                *ngIf="formulario?.get('facultad')?.invalid && formulario?.get('facultad')?.touched">
+                Facultad es requerido.
+            </div>
+        </mat-form-field>
 
         <mat-form-field class="example-full-width">
             <mat-label>Facultad</mat-label>

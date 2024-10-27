@@ -44,12 +44,13 @@ export class CursosComponent {
     { columnDef: 'nivel', header: 'Nivel', cell: (element: Curso) => `${element.nivel}` },
     { columnDef: 'creditos', header: 'Creditos', cell: (element: Curso) => `${element.creditos}` },
     { columnDef: 'programa', header: 'Programa', cell: (element: Curso) => `${element.Programa.programa}` },
+    { columnDef: 'plan', header: 'Plan', cell: (element: Curso) => `${element.Plan.nombre}` },
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
   ];
 
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
-
+  tipo="curso";
   titulo="Departamentos";
 
   @Output() titulos = new EventEmitter<any>();
@@ -116,6 +117,7 @@ export class CursosComponent {
           semestre:this.cartabla.dataSeleccionada.semestre,
           nivel:this.cartabla.dataSeleccionada.nivel,
           programa:this.cartabla.dataSeleccionada.Programa,
+          plan:this.cartabla.dataSeleccionada.Plan,
           creditos:this.cartabla.dataSeleccionada.creditos,
         },
         modo:1     

@@ -45,7 +45,7 @@ export class AfpsComponent {
 
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
-  tipo="afp";
+  tipo="afps";
   titulo="AFP";
 
   @Output() titulos = new EventEmitter<any>();

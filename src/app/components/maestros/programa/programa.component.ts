@@ -46,8 +46,8 @@ export class ProgramaComponent {
 
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
-
-  titulo="Provincias";
+  tipo="programa";
+  titulo="Programas";
 
   @Output() titulos = new EventEmitter<any>();
 

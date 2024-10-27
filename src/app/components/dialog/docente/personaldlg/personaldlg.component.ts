@@ -30,6 +30,8 @@ import { MatCardModule } from '@angular/material/card';
 import { Tabla2Component } from "../../../objetos/tabla2/tabla2.component";
 import { Saux4Service } from '../../../../services/saux4.service';
 import { GradoComponent } from "../../../docente/grado/grado.component";
+import { Banco } from '../../../modelos/banco';
+import { Afp } from '../../../modelos/afp';
 
 @Component({
   selector: 'app-personaldlg',
@@ -74,6 +76,11 @@ export class PersonaldlgComponent {
   departamentos?: Departamento[];
   provincias?: Provincia[];
   distritos?: Distrito[];
+
+  bancosarr?: Banco[];
+  afpsarr?: Afp[];
+  
+
   funcion: any;
   fnc: boolean = true;
   estadosc = ["Soltero(a)","Conviviente", "Unión de hecho", "Casado(a)", "Divorciado(a)", "Separado(a)","Viudo(a)", "Otro(a)"];
@@ -176,6 +183,16 @@ export class PersonaldlgComponent {
       this.departamentos = data;
     })
 
+    this.saux2.ponerurl("bancos");
+    this.saux2.get().subscribe(data => {
+      this.bancosarr = data;
+    })
+
+    this.saux3.ponerurl("afps");
+    this.saux3.get().subscribe(data => {
+      this.afpsarr = data;
+    })
+
 
     this.cgdepr.ponerurl("docentes");
     this.cgdepr.get().subscribe(data => {
@@ -253,7 +270,10 @@ export class PersonaldlgComponent {
       afiliacion: this.formulario2.value.afiliacion,
       fecha_cv: this.formulario1.value.fecha_cv,
       ruc: this.formulario2.value.ruc,
-      observaciones: this.formulario2.value.observaciones
+      observaciones: this.formulario2.value.observaciones,
+      idDepartamento:this.formulario1.value.departamento,
+      idProvincia:this.formulario1.value.provincia,
+      idDistrito:this.formulario1.value.distrito,
     }
     this.cgdepr.ponerurl("docentes")
     if (this.formulario2?.valid && this.formulario1?.valid) {

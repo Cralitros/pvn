@@ -13,6 +13,7 @@ import { Aux2Service } from '../../../../services/aux2.service';
 import { Facultad } from '../../../modelos/facultad';
 import { Escuela } from '../../../modelos/escuela';
 import { Programa } from '../../../modelos/programa';
+import { Plan } from '../../../modelos/plan';
 
 @Component({
   selector: 'app-cursosdlg',
@@ -34,6 +35,7 @@ export class CursosdlgComponent {
   facultades?:Facultad[];
   escuelas?:Escuela[];
   programas?:Programa[];
+  planes?:Plan[];
   funcion:any;
   fnc:boolean=true;
   constructor(public dialogRef: MatDialogRef<CursosdlgComponent>,
@@ -60,6 +62,7 @@ export class CursosdlgComponent {
       facultad: this.data.valores.programa.Escuela.Facultad.id,
       escuela: this.data.valores.programa.Escuela.id,
       programa: this.data.valores.programa.id,
+      plan: this.data.valores.plan.id,
 
     });
     this.onSelectChangeFacultad(this.data.valores.programa.Escuela.Facultad.id);
@@ -78,6 +81,7 @@ export class CursosdlgComponent {
       facultad: ['', Validators.required],
       escuela: ['', Validators.required],
       programa: ['', Validators.required],
+      plan: ['', Validators.required],
     });
     this.cgdepr.ponerurl("curso");
     this.cgdepr.get().subscribe(data=>{
@@ -90,6 +94,13 @@ export class CursosdlgComponent {
       console.log(data);
       this.facultades=data;
     });
+
+    this.saux2.ponerurl("plan");
+    this.saux2.get().subscribe(data=>{
+      console.log(data);
+      this.planes=data;
+    });
+
     if(this.data.modo==1){
       this.funcion="Editar";
       this.fnc=false;
@@ -108,6 +119,7 @@ export class CursosdlgComponent {
       semestre: this.formulario.value.semestre,
       nivel: this.formulario.value.nivel,
       creditos: this.formulario.value.creditos,
+      codigoPlan:this.formulario.value.plan,
       idEscuela: this.formulario.value.escuela,
       idPrograma: this.formulario.value.programa,
     }
@@ -167,5 +179,6 @@ export class CursosdlgComponent {
   onSelectChangePrograma(event:any){
 
   }
+  
 
 }
