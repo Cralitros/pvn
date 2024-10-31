@@ -21,6 +21,8 @@ import { Router } from '@angular/router';
 import { Personal } from '../../modelos/personal';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 
+import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
+
 
 @Component({
   selector: 'app-tabla',
@@ -45,7 +47,9 @@ import { MaestrosserviceService } from '../../../services/maestrosservice.servic
     FiltroComponent,
     InputsComponent,
     MatFormFieldModule,
+    MatSortModule,
     MatButtonModule],
+
   
 })
 export class  TablaComponent {
@@ -56,6 +60,7 @@ export class  TablaComponent {
   @Input() report: any;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort?: MatSort|any;
 
   displayedColumns: string[] = [];
 
@@ -98,6 +103,7 @@ export class  TablaComponent {
 
     this.sctabla.data$.subscribe(data => {
       this.dataSource.data = data;
+      this.dataSource.sort = this.sort;
       this.dataSrc2 = data;
     });
 
@@ -378,6 +384,19 @@ export class  TablaComponent {
     console.log(this.report);
 
     this.mservice.reporte();
+  }
+
+  /** Announce the change in sort state for assistive technology. */
+  announceSortChange(sortState: Sort) {
+    // This example uses English messages. If your application supports
+    // multiple language, you would internationalize these strings.
+    // Furthermore, you can customize the message to add additional
+    // details about the values being sorted.
+    /*if (sortState.direction) {
+      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
+    } else {
+      this._liveAnnouncer.announce('Sorting cleared');
+    }*/
   }
 
 }
