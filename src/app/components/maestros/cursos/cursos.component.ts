@@ -16,6 +16,7 @@ import { ConversiontablaService } from '../../../services/conversiontabla.servic
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { CursosdlgComponent } from '../../dialog/maestros/cursosdlg/cursosdlg.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cursos',
@@ -134,6 +135,11 @@ export class CursosComponent {
     console.log("dep",element);
     this.mservice.delete(element.codigo).subscribe(data=>{
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

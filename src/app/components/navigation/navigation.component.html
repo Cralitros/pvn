@@ -3,7 +3,7 @@
       [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
       [mode]="(isHandset$ | async) ? 'over' : 'side'"
       [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Menu</mat-toolbar>
+    <mat-toolbar>Menú</mat-toolbar>
     <mat-nav-list>
       <mat-expansion-panel hideToggle *ngIf="nivel==1">
         <mat-expansion-panel-header >
@@ -12,6 +12,7 @@
           </mat-panel-description>
         </mat-expansion-panel-header>
         <a mat-list-item routerLink="/dashboard/usuarios" routerLinkActive="active-link">Usuarios</a>
+        <a mat-list-item routerLink="/dashboard/nacionalidad" routerLinkActive="active-link">Nacionalidad</a>
         <a mat-list-item routerLink="/dashboard/departamento" routerLinkActive="active-link">Departamento</a>
         <a mat-list-item routerLink="/dashboard/provincia" routerLinkActive="active-link">Provincia</a>
         <a mat-list-item routerLink="/dashboard/distrito" routerLinkActive="active-link">Distrito</a>
@@ -19,8 +20,8 @@
         <a mat-list-item routerLink="/dashboard/afps" routerLinkActive="active-link">AFPs</a>
         <a mat-list-item routerLink="/dashboard/plan" routerLinkActive="active-link">Plan Académico</a>
         <!--<a mat-list-item routerLink="/dashboard/condicion" routerLinkActive="active-link">Condiciones</a>-->
-        <a mat-list-item routerLink="/dashboard/facultad" routerLinkActive="active-link">Unidades Academicas</a>
-        <a mat-list-item routerLink="/dashboard/escuela" routerLinkActive="active-link">Departamento Academico</a>
+        <a mat-list-item routerLink="/dashboard/facultad" routerLinkActive="active-link">Unidades Académicas</a>
+        <a mat-list-item routerLink="/dashboard/escuela" routerLinkActive="active-link">Departamento Académico</a>
         <a mat-list-item routerLink="/dashboard/programa" routerLinkActive="active-link">Escuela y Programas</a>
         <a mat-list-item routerLink="/dashboard/curso" routerLinkActive="active-link">Cursos</a>
         
@@ -34,14 +35,14 @@
         <a mat-list-item routerLink="/dashboard/personal" routerLinkActive="active-link">Info. Personal</a>
         <a mat-list-item routerLink="/dashboard/laboral" routerLinkActive="active-link" >Info. Laboral</a>
         <a mat-list-item routerLink="/dashboard/grado" routerLinkActive="active-link" >Info. Grado</a>
-        <a mat-list-item routerLink="/dashboard/categoria" routerLinkActive="active-link" >Info. Categoria</a>
-        <a mat-list-item routerLink="/dashboard/investigador" routerLinkActive="active-link" >Info. Investigacion</a>
+        <a mat-list-item routerLink="/dashboard/categoria" routerLinkActive="active-link" >Info. Categoría</a>
+        <a mat-list-item routerLink="/dashboard/investigador" routerLinkActive="active-link" >Info. Investigación</a>
         <a mat-list-item routerLink="/dashboard/cursoDocentes" routerLinkActive="active-link" >Cursos asignados</a>
       </mat-expansion-panel>
-      <a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Postulacion</a>
+      <!--<a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Postulacion</a>
       <a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Ratificacion</a>
       <a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Promocion</a>
-      <a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Bienestar</a>
+      <a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Bienestar</a>-->
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -55,7 +56,7 @@
           <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
         </button>
       }
-      <span class="example-spacer">Gestion docente</span>
+      <span class="example-spacer">Gestión docente</span>
 
       <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon" (click)="cerrar_sesion()">
         <mat-icon>logout</mat-icon>

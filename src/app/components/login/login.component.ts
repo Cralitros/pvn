@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { BrowserModule } from '@angular/platform-browser';
 import { Router, RouterOutlet } from '@angular/router';
 import { MaestrosserviceService } from '../../services/maestrosservice.service';
+import Swal from 'sweetalert2';
+import { catchError, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -34,8 +36,26 @@ export class LoginComponent implements OnInit{
     console.log(this.formulario.value);
     const login=this.formulario.value;
     this.srconsulta.ponerurl("login/login");
-    this.srconsulta.add(login).subscribe(data=>{
+    this.srconsulta.add(login).pipe(
+      catchError(error => {
+        console.log("Error capturado:", error);
+        Swal.fire({
+          title: "¡Error en el usuario o contraseña, revise nuevamente sus accesos!",
+          text: "Continuar",
+          icon: "error"
+        });
+
+        return throwError(error); // Esto es opcional si deseas propagar el error
+      })
+    ).subscribe(data=>{
+      console.log("******************");
+      
       console.log(data);
+      Swal.fire({
+        title: "¡Bienvenido!",
+        text: "Continua",
+        icon: "success"
+      });
       if(data.token){
         localStorage.setItem("token",data.token);
         localStorage.setItem("nivel",data.nivel);

@@ -28,9 +28,7 @@ import { routes } from '../../app.routes';
     MatListModule,
     MatIconModule,
     AsyncPipe,
-    DashboardComponent,
     MatExpansionModule,
-    DepartamentoComponent,
     RouterLink
   ]
 })
@@ -39,7 +37,9 @@ export class NavigationComponent {
   private breakpointObserver = inject(BreakpointObserver);
 
   constructor(private route:Router){
-    this.nivel=localStorage.getItem('nivel')
+    if (typeof window !== 'undefined' && window.localStorage) {
+      this.nivel = localStorage.getItem('nivel');
+    }
 
   }
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -49,8 +49,9 @@ export class NavigationComponent {
     );
   
   cerrar_sesion() {
-    localStorage.removeItem("token");
-    //this.route.
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem("token");
+    }
     this.route.navigate(['login']);
     //inject(Router).navigate(['login']);
   }

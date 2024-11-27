@@ -17,6 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { CategoriadlgComponent } from '../../dialog/docente/categoriadlg/categoriadlg.component';
 import { ActivatedRoute } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-categoria',
@@ -208,6 +209,11 @@ export class CategoriaComponent {
     console.log("dep", element);
     this.mservice.delete(element.codigoDocente).subscribe(data => {
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-usuariosdlg',
@@ -91,7 +92,7 @@ export class UsuariosdlgComponent {
     }
 
   }
-  onSubmit() {
+  async onSubmit() {
     let body={
       id:this.formulario.value?.id,
       dni:this.formulario.value.dni,
@@ -107,16 +108,28 @@ export class UsuariosdlgComponent {
     if (this.formulario?.valid) {
       if(this.fnc==true){
         this.cgdepr.ponerurl("login/register")
-        this.cgdepr.add(body).subscribe(data=>{
+        await this.cgdepr.add(body).subscribe(data=>{
           console.log("agregado");
+          Swal.fire({
+            title: "Usuario agregado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
         })
       }else{
-        this.cgdepr.update(body.id,body).subscribe(data=>{
+        await this.cgdepr.update(body.id,body).subscribe(data=>{
           console.log("actualizado");
+          Swal.fire({
+            title: "Usuario actualizado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
         })
       }
 
-      this.dialogRef.close(this.formulario.value);
+      
     } else {
       // Marcar campos como tocados para mostrar errores de validación
       this.formulario?.markAllAsTouched();

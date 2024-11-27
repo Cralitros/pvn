@@ -19,6 +19,7 @@ import { DocentecursodlgComponent } from '../../dialog/docente/docentecursodlg/d
 import { Aux1Service } from '../../../services/aux1.service';
 import { Aux2Service } from '../../../services/aux2.service';
 import { ActivatedRoute } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-docentecurso',
@@ -198,6 +199,11 @@ export class DocentecursoComponent {
     console.log("dep", element);
     this.mservice.delete(element.id).subscribe(data => {
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

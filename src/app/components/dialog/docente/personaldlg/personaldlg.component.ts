@@ -32,6 +32,8 @@ import { Saux4Service } from '../../../../services/saux4.service';
 import { GradoComponent } from "../../../docente/grado/grado.component";
 import { Banco } from '../../../modelos/banco';
 import { Afp } from '../../../modelos/afp';
+import Swal from 'sweetalert2';
+import { Nacionalidad } from '../../../modelos/nacionalidad';
 
 @Component({
   selector: 'app-personaldlg',
@@ -79,7 +81,7 @@ export class PersonaldlgComponent {
 
   bancosarr?: Banco[];
   afpsarr?: Afp[];
-  
+  nacionalidades?:Nacionalidad[];
 
   funcion: any;
   fnc: boolean = true;
@@ -87,6 +89,7 @@ export class PersonaldlgComponent {
   bancos = ["BCP", "BBVA", "Scotiabank", "Interbank"];
   afps = ["integra", "Buena vista", "ONP", "otra"];
   sexos = ["Masculino", "Femenino"];
+  
   public selectedIndex = 0;
 
   selectedValue?: string;
@@ -193,6 +196,11 @@ export class PersonaldlgComponent {
       this.afpsarr = data;
     })
 
+    this.saux4.ponerurl("nacionalidad");
+    this.saux4.get().subscribe(data => {
+      this.nacionalidades = data;
+    })
+
 
     this.cgdepr.ponerurl("docentes");
     this.cgdepr.get().subscribe(data => {
@@ -282,10 +290,22 @@ export class PersonaldlgComponent {
         //  body.digito = body.codigo.length;
         this.cgdepr.add(body).subscribe(data => {
           console.log("agregado");
+          Swal.fire({
+            title: "Agregado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(body);
         })
       } else {
         this.cgdepr.update(body.codigo, body).subscribe(data => {
           console.log("actualizado");
+          Swal.fire({
+            title: "Actualizado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(body);
         })
       }
 

@@ -16,6 +16,7 @@ import { ConversiontablaService } from '../../../services/conversiontabla.servic
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { UsuariosdlgComponent } from '../../dialog/maestros/usuariosdlg/usuariosdlg.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-usuarios',
@@ -77,15 +78,24 @@ export class UsuariosComponent {
   }
 
   async cargartabla() {
-    this.mservice.ponerurl("login");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
-
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento = this.cartabla.array;
-    console.log(this.tablaDepartamento);
-
-    this.sctabla.setData(this.tablaDepartamento);
+    try {
+      this.mservice.ponerurl("login");
+      const source$ = this.mservice.get();
+      const finalNumber: any = await lastValueFrom(source$);
+  
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento = this.cartabla.array;
+      console.log(this.tablaDepartamento);
+  
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      console.error('Error cargando la tabla:', error);
+      Swal.fire({
+        title: "Error cargando la tabla",
+        text: "recargue la  vista",
+        icon: "error"
+      });
+    }
   }
   dialogo() {
     const dialogRef = this.dialog.open(UsuariosdlgComponent, {
@@ -134,6 +144,11 @@ export class UsuariosComponent {
     console.log("dep", element);
     this.mservice.delete(element.id).subscribe(data => {
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

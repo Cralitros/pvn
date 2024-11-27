@@ -238,16 +238,23 @@
 
                     </div>
 
+
                     <div class="form">
                         <mat-form-field class="example-full-width">
                             <mat-label>Nacionalidad</mat-label>
-                            <input matInput formControlName="nacionalidad" placeholder="Nacionalidad">
+                            <mat-select formControlName="nacionalidad">
+                                <mat-option>Seleccionar Nacionalidad</mat-option>
+                                @for (nacionalidad of nacionalidades; track nacionalidad) {
+                                <mat-option [value]="nacionalidad.nombre">{{nacionalidad.nombre}}</mat-option>
+                                }
+                            </mat-select>
+                            <div class="combo"
+                                *ngIf="formulario2?.get('nacionalidad')?.invalid && formulario2?.get('nacionalidad')?.touched">
+                                Nacionalidad es requerido.
+                            </div>
                         </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario1?.get('nacionalidad')?.invalid && formulario1?.get('nacionalidad')?.touched">
-                            Nacionalidad es requerido.
-                        </div>
                     </div>
+
                 </div>
             </form>
             <button class="btn-sgte btm" mat-raised-button color="primary" type="submit" (click)="siguiente(1)">Siguiente</button>

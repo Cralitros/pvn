@@ -17,6 +17,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { InvestigadlgComponent } from '../../dialog/docente/investigadlg/investigadlg.component';
 import { ActivatedRoute } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-investigador',
@@ -207,6 +208,11 @@ export class InvestigadorComponent {
     console.log("dep", element);
     this.mservice.delete(element.id).subscribe(data => {
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

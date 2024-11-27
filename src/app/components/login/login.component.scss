@@ -3,14 +3,15 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  /*height: 100vh;*/
   margin: 0;
   font-family: 'Arial', sans-serif;
   color: #fff;
+  
 }
 
-.login-container {
-  
+.login-contain {
+  position: fixed;
   display: flex;
   justify-content: center;
   align-items: center;

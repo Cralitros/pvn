@@ -17,6 +17,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-personal',
@@ -173,6 +174,11 @@ export class PersonalComponent {
     console.log("dep",element);
     this.mservice.delete(element.codigo).subscribe(data=>{
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

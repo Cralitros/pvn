@@ -11,6 +11,7 @@ import { MaestrosserviceService } from '../../../../services/maestrosservice.ser
 import { Facultad } from '../../../modelos/facultad';
 import { Escuela } from '../../../modelos/escuela';
 import {MatDatepickerModule} from '@angular/material/datepicker';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-programasdlg',
@@ -108,10 +109,23 @@ export class ProgramasdlgComponent {
       if(this.fnc==true){
         this.cgdepr.add(body).subscribe(data=>{
           console.log("agregado");
+          Swal.fire({
+            title: "Agregado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
+          
         })
       }else{
         this.cgdepr.update(body.id,body).subscribe(data=>{
           console.log("actualizado");
+          Swal.fire({
+            title: "Actualizado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
         })
       }
 

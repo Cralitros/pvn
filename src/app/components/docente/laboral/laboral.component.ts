@@ -18,6 +18,7 @@ import { lastValueFrom } from 'rxjs';
 import { LaboraldlgComponent } from '../../dialog/docente/laboraldlg/laboraldlg.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Personal } from '../../modelos/personal';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-laboral',
@@ -232,6 +233,11 @@ export class LaboralComponent {
     console.log("dep", element);
     this.mservice.delete(element.id).subscribe(data => {
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

@@ -17,6 +17,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog } from '@angular/material/dialog';
 import { DptdlgComponent } from '../../dialog/maestros/dptdlg/dptdlg.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-departamento',
@@ -121,6 +122,11 @@ export class DepartamentoComponent {
     console.log("dep",element);
     this.mservice.delete(element.id).subscribe(data=>{
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

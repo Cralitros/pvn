@@ -17,6 +17,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
 import { Curso } from '../../../modelos/cursos';
 import { Aux1Service } from '../../../../services/aux1.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-docentecursodlg',
@@ -137,10 +138,22 @@ export class DocentecursodlgComponent {
       if (this.fnc == true) {
         this.cgdepr.add(body).subscribe(data => {
           console.log("agregado");
+          Swal.fire({
+            title: "Agregado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formularioGrado.value);
         })
       } else {
         this.cgdepr.update(body.codigoDocente, body).subscribe(data => {
           console.log("actualizado");
+          Swal.fire({
+            title: "Actualizado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formularioGrado.value);
         })
       }
 

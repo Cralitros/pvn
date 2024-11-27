@@ -17,6 +17,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-plandlg',
@@ -102,10 +103,22 @@ export class PlandlgComponent {
       if(this.fnc==true){
         this.cgdepr.add(body).subscribe(data=>{
           console.log("agregado");
+          Swal.fire({
+            title: "Agregado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
         })
       }else{
         this.cgdepr.update(body.id,body).subscribe(data=>{
           console.log("actualizado");
+          Swal.fire({
+            title: "Actualizado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
         })
       }
 

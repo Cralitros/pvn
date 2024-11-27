@@ -16,6 +16,7 @@ import { ConversiontablaService } from '../../../services/conversiontabla.servic
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { EscueladlgComponent } from '../../dialog/maestros/escueladlg/escueladlg.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-escuela',
@@ -124,6 +125,11 @@ export class EscuelaComponent {
     console.log("dep",element);
     this.mservice.delete(element.id).subscribe(data=>{
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

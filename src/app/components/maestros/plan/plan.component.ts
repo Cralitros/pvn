@@ -23,6 +23,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { PlandlgComponent } from '../../dialog/maestros/plandlg/plandlg.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-plan',
@@ -134,6 +135,11 @@ export class PlanComponent {
     console.log("dep",element);
     this.mservice.delete(element.id).subscribe(data=>{
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }

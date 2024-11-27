@@ -14,6 +14,7 @@ import { Facultad } from '../../../modelos/facultad';
 import { Escuela } from '../../../modelos/escuela';
 import { Programa } from '../../../modelos/programa';
 import { Plan } from '../../../modelos/plan';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cursosdlg',
@@ -128,10 +129,22 @@ export class CursosdlgComponent {
       if(this.fnc==true){
         this.cgdepr.add(body).subscribe(data=>{
           console.log("agregado");
+          Swal.fire({
+            title: "Agregado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
         })
       }else{
         this.cgdepr.update(body.codigo,body).subscribe(data=>{
           console.log("actualizado");
+          Swal.fire({
+            title: "Actualizado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formulario.value);
         })
       }
 

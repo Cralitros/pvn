@@ -15,6 +15,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-gradodlg',
@@ -124,10 +125,22 @@ export class GradodlgComponent {
       if(this.fnc==true){
         this.cgdepr.add(body).subscribe(data=>{
           console.log("agregado");
+          Swal.fire({
+            title: "Agregado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formularioGrado.value);
         })
       }else{
         this.cgdepr.update(body.codigoDocente,body).subscribe(data=>{
           console.log("actualizado");
+          Swal.fire({
+            title: "Actualizado",
+            text: "Continuar",
+            icon: "info"
+          });
+          this.dialogRef.close(this.formularioGrado.value);
         })
       }
 

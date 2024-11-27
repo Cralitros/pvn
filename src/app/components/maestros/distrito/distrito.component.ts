@@ -16,6 +16,7 @@ import { ConversiontablaService } from '../../../services/conversiontabla.servic
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { DstdlgComponent } from '../../dialog/maestros/dstdlg/dstdlg.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-distrito',
@@ -125,6 +126,11 @@ export class DistritoComponent {
     console.log("dep",element);
     this.mservice.delete(element.id).subscribe(data=>{
       console.log("Eliminado");
+      Swal.fire({
+        title: "Eliminado",
+        text: "Continuar",
+        icon: "info"
+      });
       this.cargartabla();
     })
   }
