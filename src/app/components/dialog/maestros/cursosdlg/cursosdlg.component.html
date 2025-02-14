@@ -104,6 +104,20 @@
             </div>
         </mat-form-field>
 
+        <mat-form-field class="example-full-width ">
+            <mat-label>Area</mat-label>
+            <mat-select formControlName="areas">
+                <mat-option>Seleccionar area</mat-option>
+                @for (area of areas; track area) {
+                <mat-option [value]="area.id">{{area.nombre}}</mat-option>
+                }
+            </mat-select>
+            <div class="combo example-full-width mensaje" 
+                *ngIf="formulario?.get('areas')?.invalid && formulario?.get('areas')?.touched">
+                Area es requerido.
+            </div>
+        </mat-form-field>
+
 
 
         <div mat-dialog-actions class="buttons">

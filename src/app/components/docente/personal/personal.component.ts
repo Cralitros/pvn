@@ -63,6 +63,7 @@ export class PersonalComponent {
     { columnDef: 'cussp', header: 'CUSSP', cell: (element: Personal) => `${element.cussp}` },
     { columnDef: 'afiliacion', header: 'Afiliacion', cell: (element: Personal) => `${element.afiliacion}` },
     { columnDef: 'fecha_cv', header: 'Fecha_cv', cell: (element: Personal) => `${element.fecha_cv}` },
+    { columnDef: 'especialidad', header: 'Especialidad', cell: (element: Personal) => `${element.especialidad}` },
     { columnDef: 'observaciones', header: 'Observaciones', cell: (element: Personal) => `${element.observaciones}` },
     
   ];
@@ -158,7 +159,8 @@ export class PersonalComponent {
           afiliacion: this.cartabla.dataSeleccionada.afiliacion,
           fecha_cv: this.cartabla.dataSeleccionada.fecha_cv,
           ruc: this.cartabla.dataSeleccionada.ruc,
-          observaciones: this.cartabla.dataSeleccionada.observaciones
+          observaciones: this.cartabla.dataSeleccionada.observaciones,
+          especialidad:this.cartabla.dataSeleccionada.especialidad
         },
         modo:1     
       }

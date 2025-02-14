@@ -22,7 +22,7 @@ import { Personal } from '../../modelos/personal';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 
 import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
-
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-tabla',
@@ -397,6 +397,14 @@ export class  TablaComponent {
     } else {
       this._liveAnnouncer.announce('Sorting cleared');
     }*/
+  }
+
+  exportToExcel() {
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.dataSource.data);
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  
+    XLSX.writeFile(workbook, 'my-excel-file.xlsx');
   }
 
 }

@@ -201,6 +201,7 @@ export class GradoComponent {
           lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,
           fecha_obtencion: this.cartabla.dataSeleccionada.fecha_obtencion,
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
+          profesion: this.cartabla.dataSeleccionada.profesion,
 
         },
         modo: 1

@@ -48,7 +48,7 @@ export class DocentecursodlgComponent {
   cursos?: Curso[];
   modalidad=["Presencial","Semipresencial","Virtual","A distancia","Práctica"];
   tipo=["Clase","Asesoría","Práctica","Taller"];
-  tipo_clase=["Única","Compartida","Codictado"];
+  tipo_clase=["Regular","Compartida","Codictado"];
   estado=["Provisionado","Provisionado asesoría","Pendiente", "Falta de V°B° JD",
     "Rechazado","Duplicado","Desprovisionado","No provisionado","Horario Cerrado","Curso Cerrado","Cerrado",
     "Cancelado"]

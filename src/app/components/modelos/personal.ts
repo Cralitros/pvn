@@ -3,6 +3,7 @@ export interface Personal{
     nombres: string;
     apellidos: string;
     digito: string;
+    especialidad:string;
     domicilio:string;
     telefono: string;
     celular: string;

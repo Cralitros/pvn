@@ -22,6 +22,7 @@ import { BancosComponent } from './components/maestros/bancos/bancos.component';
 import { AfpsComponent } from './components/maestros/afps/afps.component';
 import { PlanComponent } from './components/maestros/plan/plan.component';
 import { NacionalidadComponent } from './components/maestros/nacionalidad/nacionalidad.component';
+import { AreasComponent } from './components/maestros/areas/areas.component';
 
 
 export const routes: Routes = [
@@ -48,6 +49,7 @@ export const routes: Routes = [
             { path: 'nacionalidad', component: NacionalidadComponent,title: "Nacionalidades" , canActivate:[deslogueoGuard]},
             { path: 'afps', component: AfpsComponent,title: "AFP" , canActivate:[deslogueoGuard]},
             { path: 'plan', component: PlanComponent,title: "Plan Académico" , canActivate:[deslogueoGuard]},
+            { path: 'area', component: AreasComponent,title: "Áreas" , canActivate:[deslogueoGuard]},
            
         ],canActivate:[deslogueoGuard]
     },

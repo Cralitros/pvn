@@ -15,6 +15,7 @@ import { Escuela } from '../../../modelos/escuela';
 import { Programa } from '../../../modelos/programa';
 import { Plan } from '../../../modelos/plan';
 import Swal from 'sweetalert2';
+import { Area } from '../../../modelos/area';
 
 @Component({
   selector: 'app-cursosdlg',
@@ -37,6 +38,7 @@ export class CursosdlgComponent {
   escuelas?:Escuela[];
   programas?:Programa[];
   planes?:Plan[];
+  areas?:Area[];
   funcion:any;
   fnc:boolean=true;
   constructor(public dialogRef: MatDialogRef<CursosdlgComponent>,
@@ -45,7 +47,8 @@ export class CursosdlgComponent {
     private cgdepr:MaestrosserviceService,
     private saux1:Aux1Service,
     private saux2:Aux2Service,
-    private saux3:Aux2Service,){
+    private saux3:Aux2Service,
+    private saux4:Aux2Service,){
       
       
       
@@ -64,6 +67,7 @@ export class CursosdlgComponent {
       escuela: this.data.valores.programa.Escuela.id,
       programa: this.data.valores.programa.id,
       plan: this.data.valores.plan.id,
+      areas: this.data.valores.areas,
 
     });
     this.onSelectChangeFacultad(this.data.valores.programa.Escuela.Facultad.id);
@@ -83,6 +87,7 @@ export class CursosdlgComponent {
       escuela: ['', Validators.required],
       programa: ['', Validators.required],
       plan: ['', Validators.required],
+      areas: [''],
     });
     this.cgdepr.ponerurl("curso");
     this.cgdepr.get().subscribe(data=>{
@@ -101,6 +106,13 @@ export class CursosdlgComponent {
       console.log(data);
       this.planes=data;
     });
+
+    this.saux4.ponerurl("area");
+    this.saux4.get().subscribe(data=>{
+      console.log(data);
+      this.areas=data;
+    });
+
 
     if(this.data.modo==1){
       this.funcion="Editar";
@@ -123,6 +135,7 @@ export class CursosdlgComponent {
       codigoPlan:this.formulario.value.plan,
       idEscuela: this.formulario.value.escuela,
       idPrograma: this.formulario.value.programa,
+      areas: this.formulario.value.areas,
     }
     this.cgdepr.ponerurl("curso")
     if (this.formulario?.valid) {

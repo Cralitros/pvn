@@ -80,7 +80,7 @@
                         <mat-form-field class="example-full-width calendario">
                             <mat-label>Fecha nacimiento</mat-label>
                             <input matInput [matDatepicker]="picker2" formControlName="fecha_nacimiento">
-                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-hint>DD/MM/YYYY</mat-hint>
                             <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                             <mat-datepicker #picker2></mat-datepicker>
                         </mat-form-field>
@@ -166,7 +166,7 @@
                         <mat-form-field class="example-full-width calendario">
                             <mat-label>Fecha CV</mat-label>
                             <input matInput [matDatepicker]="picker" formControlName="fecha_cv">
-                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-hint>DD/MM/YYYY</mat-hint>
                             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                             <mat-datepicker #picker></mat-datepicker>
                         </mat-form-field>
@@ -253,6 +253,17 @@
                                 Nacionalidad es requerido.
                             </div>
                         </mat-form-field>
+                    </div>
+
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Especialidad</mat-label>
+                            <input matInput formControlName="especialidad" placeholder="Especialidad">
+                        </mat-form-field>
+                        <div class="example-full-width mensaje"
+                            *ngIf="formulario1?.get('especialidad')?.invalid && formulario1?.get('especialidad')?.touched ">
+                            Especilidad es requerido.
+                        </div>
                     </div>
 
                 </div>

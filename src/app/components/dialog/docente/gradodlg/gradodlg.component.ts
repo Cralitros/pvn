@@ -11,11 +11,23 @@ import { Grado } from '../../../modelos/grado';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MAT_DATE_FORMATS, MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableModule } from '@angular/material/table';
 import Swal from 'sweetalert2';
+
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-gradodlg',
@@ -48,8 +60,12 @@ import Swal from 'sweetalert2';
 
   ],
   templateUrl: './gradodlg.component.html',
-  styleUrl: './gradodlg.component.scss'
+  styleUrl: './gradodlg.component.scss',
+  providers: [
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS }
+  ]
 })
+
 export class GradodlgComponent {
   formularioGrado?: FormGroup| any= null;
   departamentos?:Grado[] ;
@@ -157,3 +173,5 @@ export class GradodlgComponent {
  
 
 }
+
+

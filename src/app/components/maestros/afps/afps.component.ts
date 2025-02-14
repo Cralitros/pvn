@@ -40,7 +40,7 @@ export class AfpsComponent {
   tablaDepartamento:Afp[]=[];
   columns: Column[] = [
     { columnDef: 'id', header: 'No.', cell: (element: Afp) => `${element.id}` },
-    { columnDef: 'nombre', header: 'Nombre Departamento', cell: (element: Afp) => `${element.nombre}` },
+    { columnDef: 'nombre', header: 'Nombre AFP', cell: (element: Afp) => `${element.nombre}` },
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
   ];
 

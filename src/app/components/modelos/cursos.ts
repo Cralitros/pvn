@@ -1,3 +1,4 @@
+import { Area } from "./area";
 import { Plan } from "./plan";
 import { Programa } from "./programa";
 
@@ -11,4 +12,5 @@ export interface Curso{
     codigoPlan:string;
     Programa:Programa;
     Plan:Plan;
+    areas:Area;
 }

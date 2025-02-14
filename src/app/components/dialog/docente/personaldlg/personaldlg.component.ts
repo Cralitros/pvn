@@ -129,6 +129,7 @@ export class PersonaldlgComponent {
       numero_hijos: this.data.valores.numero_hijos,
       nacionalidad: this.data.valores.nacionalidad,
       fecha_cv: this.data.valores.fecha_cv,
+      especialidad:this.data.valores.especialidad,
     });
 
     this.formulario2 = this.formBuilder.group({
@@ -163,6 +164,7 @@ export class PersonaldlgComponent {
       numero_hijos: ['', Validators.required],
       nacionalidad: ['', Validators.required],
       fecha_cv: ['', Validators.required],
+      especialidad:['', Validators.required],
     });
 
     this.formulario2 = this.formBuilder.group({
@@ -282,6 +284,7 @@ export class PersonaldlgComponent {
       idDepartamento:this.formulario1.value.departamento,
       idProvincia:this.formulario1.value.provincia,
       idDistrito:this.formulario1.value.distrito,
+      especialidad:this.formulario1.value.especialidad,
     }
     this.cgdepr.ponerurl("docentes")
     if (this.formulario2?.valid && this.formulario1?.valid) {
