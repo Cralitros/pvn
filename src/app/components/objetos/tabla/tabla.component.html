@@ -18,6 +18,10 @@
     <mat-label>Exportar a Excel</mat-label>
   </button>
 
+  <button mat-fab extended (click)="refresh()">
+    <mat-label>Refrescar tabla</mat-label>
+  </button>
+
   <div class="table-wrapper">
     <table mat-table matSort  [dataSource]="dataSource" (matSortChange)="announceSortChange($event)">
 

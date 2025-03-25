@@ -96,7 +96,11 @@ export class  TablaComponent {
   }
   ngOnInit(): void {
     console.log(this.fila, "fila");
+    this.tabla();
 
+  }
+
+  tabla(){
     this.displayedColumns = this.columns.map(c => c.columnDef);
 
     this.columnsToDisplayWithExpand = [...this.displayedColumns, 'expandedDetail'];
@@ -107,6 +111,9 @@ export class  TablaComponent {
       this.dataSrc2 = data;
     });
 
+  }
+  refresh(){
+    this.tabla();
   }
   toggleFilter(event: any) {
     console.log(event);

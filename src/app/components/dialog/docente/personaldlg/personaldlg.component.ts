@@ -158,8 +158,8 @@ export class PersonaldlgComponent {
       distrito: ['', Validators.required],
       sexo: ['', Validators.required],
       domicilio: ['', Validators.required],
-      telefono: ['', Validators.required],
-      celular: ['', Validators.required],
+      telefono: [''],
+      celular: [''],
       estado_civil: ['', Validators.required],
       numero_hijos: ['', Validators.required],
       nacionalidad: ['', Validators.required],
@@ -173,8 +173,7 @@ export class PersonaldlgComponent {
       afp: ['', Validators.required],
       cussp: ['', Validators.required],
       afiliacion: ['', Validators.required],
-
-      ruc: ['', Validators.required],
+      ruc: [''],
       observaciones: ['']
     });
 
@@ -317,6 +316,32 @@ export class PersonaldlgComponent {
       // Marcar campos como tocados para mostrar errores de validación
       this.formulario1?.markAllAsTouched();
       this.formulario2?.markAllAsTouched();
+      const camposFaltantes: string[] = [];
+
+      const formularios = [
+        { grupo: this.formulario1, nombre: 'Formulario 1' },
+        { grupo: this.formulario2, nombre: 'Formulario 2' }
+      ];
+    
+      formularios.forEach(form => {
+        Object.keys(form.grupo.controls).forEach(campo => {
+          const control = form.grupo.get(campo);
+          if (control?.invalid && control?.errors?.['required']) {
+            camposFaltantes.push(campo);
+          }
+        });
+      });
+    
+      if (camposFaltantes.length > 0) {
+        console.warn("Campos obligatorios faltantes:", camposFaltantes);
+        Swal.fire({
+          title: "Campos obligatorios incompletos",
+          html: `<ul style="text-align: left">${camposFaltantes.map(c => `<li>${c}</li>`).join('')}</ul>`,
+          icon: "warning"
+        });
+      }
+    
+      
     }
   }
   onNoClick(): void {
