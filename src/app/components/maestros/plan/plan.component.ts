@@ -113,13 +113,15 @@ export class PlanComponent {
   }
   editar(element: any){
     const dialogRef = this.dialog.open(PlandlgComponent, {
-      width: '250px',
-      height:'350px',
+      width: '350px',
+      height:'450px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 
           id: this.cartabla.dataSeleccionada.id,
           nombre:this.cartabla.dataSeleccionada.nombre,
+          nivel_academico:this.cartabla.dataSeleccionada.nivel_academico,
+          vigencia:this.cartabla.dataSeleccionada.vigencia,
         },
         modo:1     
       }

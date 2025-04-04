@@ -23,11 +23,11 @@
   </button>
 
   <div class="table-wrapper">
-    <table mat-table matSort  [dataSource]="dataSource" (matSortChange)="announceSortChange($event)">
+    <table mat-table matSort [dataSource]="dataSource" (matSortChange)="announceSortChange($event)">
 
       <!-- Dynamic columns -->
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> 
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <div class="header-container">
             <span>{{ column.header }}</span>
             <app-inputs [campo]="column" (seleccionado)="filtroinput($event)"></app-inputs>
@@ -45,6 +45,26 @@
               <button class="del-btn" mat-icon-button color="warn" (click)="deleteElement(element)">
                 <mat-icon>delete</mat-icon>
               </button>
+              <div>
+                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="contrato(element)">
+                    <mat-icon>picture_as_pdf</mat-icon>
+                    <span>Contrato general</span>
+                  </button>
+                  
+                  <!--<button mat-menu-item disabled>
+                    <mat-icon>voicemail</mat-icon>
+                    <span>Check voice mail</span>
+                  </button>
+                  <button mat-menu-item>
+                    <mat-icon>notifications_off</mat-icon>
+                    <span>Disable alerts</span>
+                  </button>-->
+                </mat-menu>
+              </div>
             </div>
           </ng-container>
         </td>
@@ -57,19 +77,25 @@
         *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
   </div>
-  <mat-paginator [pageSizeOptions]="[10, 20, 30, 50, 100, 1000,3000]" showFirstLastButtons aria-label="Select page of periodic elements">
+  <mat-paginator [pageSizeOptions]="[10, 20, 30, 50, 100, 1000,3000]" showFirstLastButtons
+    aria-label="Select page of periodic elements">
   </mat-paginator>
 
   <div *ngIf="selectedRow && dpintar" class="menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
     <button class="btncss" mat-button (click)="editElement(selectedRow)">Editar</button>
     <button class="btncss" mat-button (click)="deleteElement(selectedRow)">Eliminar</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'grado')">Grado</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'categoria')">Categoria</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+      (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+      (click)="mover(selectedRow.codigo, 'grado')">Grado</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+      (click)="mover(selectedRow.codigo, 'categoria')">Categoria</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+      (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+      (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
     <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
-    
+
   </div>
 
   <div *ngIf="filterMenuVisible" class="filter-menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">

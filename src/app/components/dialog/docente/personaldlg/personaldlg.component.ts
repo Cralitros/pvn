@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, inject, Inject, signal, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Condiciones } from '../../../modelos/condiciones';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
@@ -9,7 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDatepicker, MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepicker';
 import { Departamento } from '../../../modelos/departamento';
 import { Provincia } from '../../../modelos/provincia';
 import { Distrito } from '../../../modelos/distrito';
@@ -34,6 +34,22 @@ import { Banco } from '../../../modelos/banco';
 import { Afp } from '../../../modelos/afp';
 import Swal from 'sweetalert2';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
+
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
+
+
+
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-personaldlg',
@@ -62,12 +78,18 @@ import { Nacionalidad } from '../../../modelos/nacionalidad';
     MatTableModule,
     Tabla2Component,
     GradoComponent
+  ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-Es' }, // Opcional: configura localidad
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+    
   ]
 })
 export class PersonaldlgComponent {
 
   formulario1?: FormGroup | any = null;
   formulario2?: FormGroup | any = null;
+  fechaNacimientoControl?:FormControl;
 
   formularioLaboral?: FormGroup | any = null;
   formularioCategoria?: FormGroup | any = null;
@@ -81,18 +103,30 @@ export class PersonaldlgComponent {
 
   bancosarr?: Banco[];
   afpsarr?: Afp[];
-  nacionalidades?:Nacionalidad[];
+  nacionalidades?: Nacionalidad[];
 
   funcion: any;
   fnc: boolean = true;
-  estadosc = ["Soltero(a)","Conviviente", "Unión de hecho", "Casado(a)", "Divorciado(a)", "Separado(a)","Viudo(a)", "Otro(a)"];
+  estadosc = ["Soltero(a)", "Conviviente", "Unión de hecho", "Casado(a)", "Divorciado(a)", "Separado(a)", "Viudo(a)", "Otro(a)"];
   bancos = ["BCP", "BBVA", "Scotiabank", "Interbank"];
   afps = ["integra", "Buena vista", "ONP", "otra"];
   sexos = ["Masculino", "Femenino"];
-  
+
+  private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
+  private readonly _intl = inject(MatDatepickerIntl);
+  private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
+  readonly dateFormatString = computed(() => {
+    if (this._locale() === 'ja-JP') {
+      return 'YYYY/MM/DD';
+    } else if (this._locale() === 'es-Es') {
+      return 'DD/MM/YYYY';
+    }
+    return '';
+  });
   public selectedIndex = 0;
 
   selectedValue?: string;
+  @ViewChild('picker2') picker2?: MatDatepicker<Date>;
 
   constructor(public dialogRef: MatDialogRef<PersonaldlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -129,7 +163,7 @@ export class PersonaldlgComponent {
       numero_hijos: this.data.valores.numero_hijos,
       nacionalidad: this.data.valores.nacionalidad,
       fecha_cv: this.data.valores.fecha_cv,
-      especialidad:this.data.valores.especialidad,
+      especialidad: this.data.valores.especialidad,
     });
 
     this.formulario2 = this.formBuilder.group({
@@ -142,9 +176,16 @@ export class PersonaldlgComponent {
       observaciones: this.data.valores.observaciones
     });
     //this.form.value.id=this.data.valores.id;
+
+    // Aplicar validación según el banco seleccionado
+    // Aplica validación sin resetear el valor (porque estamos en edición)
+    this.actualizarValidacionCuenta(this.data.valores.banco, true);
   }
 
   ngOnInit(): void {
+
+    this.fechaNacimientoControl = new FormControl('', [Validators.required]);
+
     this.formulario1 = this.formBuilder.group({
       codigo: ['', Validators.required],
       digito: ['', Validators.required],
@@ -152,7 +193,7 @@ export class PersonaldlgComponent {
       pasaporte: [''],
       nombres: ['', Validators.required],
       apellidos: ['', Validators.required],
-      fecha_nacimiento: ['', Validators.required],
+      fecha_nacimiento: this.fechaNacimientoControl,
       departamento: ['', Validators.required],
       provincia: ['', Validators.required],
       distrito: ['', Validators.required],
@@ -164,7 +205,7 @@ export class PersonaldlgComponent {
       numero_hijos: ['', Validators.required],
       nacionalidad: ['', Validators.required],
       fecha_cv: ['', Validators.required],
-      especialidad:['', Validators.required],
+      especialidad: ['', Validators.required],
     });
 
     this.formulario2 = this.formBuilder.group({
@@ -176,11 +217,6 @@ export class PersonaldlgComponent {
       ruc: [''],
       observaciones: ['']
     });
-
-
-
-
-
 
     this.saux1.ponerurl("departamentos");
     this.saux1.get().subscribe(data => {
@@ -217,9 +253,73 @@ export class PersonaldlgComponent {
       this.funcion = "Añadir"
       this.fnc = true;
     }
+    this.formulario2.get('banco')?.valueChanges.subscribe((selectedBanco: any) => {
+      this.actualizarValidacionCuenta(selectedBanco, this.data.modo === 1);
+    });
 
   }
 
+  onPaste(event: ClipboardEvent,campo:string) {
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text/plain') || '';
+    
+    // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
+    const cleanText = pastedText.replace(/[^\d]/g, '');
+    
+    // Formatear según diferentes patrones de entrada
+    let formattedDate = '';
+    
+    // Caso 1: DDMMYYYY (8 dígitos)
+    if (cleanText.length === 8) {
+        const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
+        const month = cleanText.substring(2, 4);
+        const year = cleanText.substring(4, 8);
+        formattedDate = `${year}-${month}-${day}`; // Formato YYYY-MM-DD que entiende el datepicker
+    }
+    // Caso 2: DD/MM/YYYY (con separadores)
+    else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = pastedText.split('/');
+        formattedDate = `${year}-${month}-${day}`;
+    }
+
+    console.log(formattedDate);
+    console.log(Date.parse(formattedDate));
+    
+    
+    // Caso 3: Otros formatos podrían agregarse aquí
+    
+    if (formattedDate) {
+        const fechaControl = this.formulario1.get(campo);
+        fechaControl?.patchValue(formattedDate);
+        
+        // Forzar la actualización del datepicker si es necesario
+        setTimeout(() => {
+            fechaControl?.updateValueAndValidity();
+        });
+    }
+    
+    // Si no es válido, marca error
+  //  this.fechaControl.setErrors({ invalidDate: true });
+  }
+
+  // Agrega este método a la clase:
+  actualizarValidacionCuenta(selectedBanco: string, isEditMode: boolean = false) {
+    const cuentaControl = this.formulario2.get('cuenta');
+    console.log("seleccionado");
+    if (selectedBanco === 'No registrado') {
+      cuentaControl?.clearValidators();
+      console.log("seleccionado");
+
+      // if (cuentaControl?.value === '') {  // Solo asigna '0000000000' si estaba vacío
+      cuentaControl?.patchValue('0000000000');
+      // }
+    } else {
+    //  cuentaControl?.patchValue('');
+      cuentaControl?.setValidators([Validators.required]);
+      // No forzamos setValue('') para no perder datos al editar
+    }
+    cuentaControl?.updateValueAndValidity();
+  }
   anterior(num: any) {
 
   }
@@ -280,10 +380,10 @@ export class PersonaldlgComponent {
       fecha_cv: this.formulario1.value.fecha_cv,
       ruc: this.formulario2.value.ruc,
       observaciones: this.formulario2.value.observaciones,
-      idDepartamento:this.formulario1.value.departamento,
-      idProvincia:this.formulario1.value.provincia,
-      idDistrito:this.formulario1.value.distrito,
-      especialidad:this.formulario1.value.especialidad,
+      idDepartamento: this.formulario1.value.departamento,
+      idProvincia: this.formulario1.value.provincia,
+      idDistrito: this.formulario1.value.distrito,
+      especialidad: this.formulario1.value.especialidad,
     }
     this.cgdepr.ponerurl("docentes")
     if (this.formulario2?.valid && this.formulario1?.valid) {
@@ -322,7 +422,7 @@ export class PersonaldlgComponent {
         { grupo: this.formulario1, nombre: 'Formulario 1' },
         { grupo: this.formulario2, nombre: 'Formulario 2' }
       ];
-    
+
       formularios.forEach(form => {
         Object.keys(form.grupo.controls).forEach(campo => {
           const control = form.grupo.get(campo);
@@ -331,7 +431,7 @@ export class PersonaldlgComponent {
           }
         });
       });
-    
+
       if (camposFaltantes.length > 0) {
         console.warn("Campos obligatorios faltantes:", camposFaltantes);
         Swal.fire({
@@ -340,8 +440,8 @@ export class PersonaldlgComponent {
           icon: "warning"
         });
       }
-    
-      
+
+
     }
   }
   onNoClick(): void {

@@ -11,7 +11,7 @@
         <div class="form">
             <mat-form-field class="example-full-width calendario">
                 <mat-label>Fecha</mat-label>
-                <input matInput [matDatepicker]="picker2" formControlName="fecha">
+                <input matInput [matDatepicker]="picker2" formControlName="fecha" (paste)="onPaste($event)">
                 <mat-hint>DD/MM/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                 <mat-datepicker #picker2></mat-datepicker>

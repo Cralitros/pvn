@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, computed, inject, Inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
+import { MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -21,6 +21,17 @@ import { Condiciones } from '../../../modelos/condiciones';
 import { Aux1Service } from '../../../../services/aux1.service';
 import Swal from 'sweetalert2';
 
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-categoriadlg',
@@ -43,7 +54,12 @@ import Swal from 'sweetalert2';
     MatCheckboxModule
   ],
   templateUrl: './categoriadlg.component.html',
-  styleUrl: './categoriadlg.component.scss'
+  styleUrl: './categoriadlg.component.scss',
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-Es' }, // Opcional: configura localidad
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
+    
+  ]
 })
 export class CategoriadlgComponent {
   formularioCategoria?: FormGroup| any= null;
@@ -63,6 +79,18 @@ export class CategoriadlgComponent {
   tipoRatificado: string[] = ['Desempeño Academico', 'Investigación','Desempeño administrativo','Capacitación continua'];
   bloqueadorg1=true;
   bloqueadorg2=true;
+
+  private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
+  private readonly _intl = inject(MatDatepickerIntl);
+  private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
+  readonly dateFormatString = computed(() => {
+    if (this._locale() === 'ja-JP') {
+      return 'YYYY/MM/DD';
+    } else if (this._locale() === 'es-Es') {
+      return 'DD/MM/YYYY';
+    }
+    return '';
+  });
   
   constructor(public dialogRef: MatDialogRef<CategoriadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -72,6 +100,49 @@ export class CategoriadlgComponent {
       
       //this.selectedCategory2=true;
       
+  }
+
+  onPaste(event: ClipboardEvent) {
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text/plain') || '';
+    
+    // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
+    const cleanText = pastedText.replace(/[^\d]/g, '');
+    
+    // Formatear según diferentes patrones de entrada
+    let formattedDate = '';
+    
+    // Caso 1: DDMMYYYY (8 dígitos)
+    if (cleanText.length === 8) {
+        const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
+        const month = cleanText.substring(2, 4);
+        const year = cleanText.substring(4, 8);
+        formattedDate = `${year}-${month}-${day}`; // Formato YYYY-MM-DD que entiende el datepicker
+    }
+    // Caso 2: DD/MM/YYYY (con separadores)
+    else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+        const [day, month, year] = pastedText.split('/');
+        formattedDate = `${year}-${month}-${day}`;
+    }
+
+    console.log(formattedDate);
+    console.log(Date.parse(formattedDate));
+    
+    
+    // Caso 3: Otros formatos podrían agregarse aquí
+    
+    if (formattedDate) {
+        const fechaControl = this.formularioCategoria.get('fecha');
+        fechaControl?.patchValue(formattedDate);
+        
+        // Forzar la actualización del datepicker si es necesario
+        setTimeout(() => {
+            fechaControl?.updateValueAndValidity();
+        });
+    }
+    
+    // Si no es válido, marca error
+  //  this.fechaControl.setErrors({ invalidDate: true });
   }
   poner_datos(){
     console.log(this.data);

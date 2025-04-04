@@ -1,0 +1,15 @@
+.container{
+    display: flex;
+    align-items:center;
+    align-content:center;
+    justify-content:center;
+    width: 100%;
+    height: 100%;
+}
+@media (max-width: 600px) {
+
+    .pdf-container,
+    .pdf-iframe {
+        height: 60vh; // Menor altura en pantallas pequeñas
+    }
+}

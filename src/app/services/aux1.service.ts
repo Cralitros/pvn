@@ -32,6 +32,10 @@ export class Aux1Service {
   get(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
+
+  getPdf() {
+    return this.http.get(this.apiUrl, { responseType: 'blob' });
+  }
   getid(id: any): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/${id}`);
   }

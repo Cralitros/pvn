@@ -20,9 +20,13 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Personal } from '../../modelos/personal';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import {MatMenuModule} from '@angular/material/menu';
 
 import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
+
 import * as XLSX from 'xlsx';
+import { MatDialog } from '@angular/material/dialog';
+import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
 
 @Component({
   selector: 'app-tabla',
@@ -48,7 +52,8 @@ import * as XLSX from 'xlsx';
     InputsComponent,
     MatFormFieldModule,
     MatSortModule,
-    MatButtonModule],
+    MatButtonModule,
+    MatMenuModule],
 
   
 })
@@ -90,7 +95,8 @@ export class  TablaComponent {
   constructor(private sctabla: CargatablaService,
     private das: ConversiontablaService,
     private router: Router,
-    private mservice:MaestrosserviceService
+    private mservice:MaestrosserviceService,
+    public dialog: MatDialog
   ) {
 
   }
@@ -414,4 +420,16 @@ export class  TablaComponent {
     XLSX.writeFile(workbook, 'my-excel-file.xlsx');
   }
 
+  contrato(element:any){
+    const dialogRef = this.dialog.open(PdfviewComponent, {
+      width: '700px',
+      height:'950px',
+      data: {
+        persona:element
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+    
+    });
+  }
 }
