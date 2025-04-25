@@ -35,7 +35,7 @@
         </th>
         <td mat-cell *matCellDef="let element">
           <ng-container *ngIf="!column.isAction"> <!-- Check if it's not an action column -->
-            {{column.cell(element)}}
+            {{datos(column.cell(element),column)}}
           </ng-container>
           <ng-container *ngIf="column.isAction"> <!-- If it's an action column, render buttons -->
             <div class="buttons">

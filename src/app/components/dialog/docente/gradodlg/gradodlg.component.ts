@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import Swal from 'sweetalert2';
 
 export const MY_DATE_FORMATS = {
@@ -28,6 +28,12 @@ export const MY_DATE_FORMATS = {
     monthYearA11yLabel: 'MMMM YYYY',
   },
 };
+
+interface Fila {
+  grado: string;
+  fecha: Date;
+  titulo:string;
+}
 
 @Component({
   selector: 'app-gradodlg',
@@ -64,16 +70,16 @@ export const MY_DATE_FORMATS = {
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'es-Es' }, // Opcional: configura localidad
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
-    
+
   ]
 })
 
 export class GradodlgComponent {
-  formularioGrado?: FormGroup| any= null;
-  departamentos?:Grado[] ;
-  funcion:any;
-  fnc:boolean=true;
-  grados = ["Bachiller", "Licenciatura","Maestro","Doctor"];
+  formularioGrado?: FormGroup | any = null;
+  departamentos?: Grado[];
+  funcion: any;
+  fnc: boolean = true;
+  grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor"];
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _intl = inject(MatDatepickerIntl);
@@ -90,64 +96,64 @@ export class GradodlgComponent {
   constructor(public dialogRef: MatDialogRef<GradodlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr:MaestrosserviceService){
-      
-      
-      
+    private cgdepr: MaestrosserviceService) {
+
+
+
   }
   onPaste(event: ClipboardEvent) {
     event.preventDefault();
     const pastedText = event.clipboardData?.getData('text/plain') || '';
-    
+
     // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
     const cleanText = pastedText.replace(/[^\d]/g, '');
-    
+
     // Formatear según diferentes patrones de entrada
     let formattedDate = '';
-    
+
     // Caso 1: DDMMYYYY (8 dígitos)
     if (cleanText.length === 8) {
-        const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
-        const month = cleanText.substring(2, 4);
-        const year = cleanText.substring(4, 8);
-        formattedDate = `${year}-${month}-${day}`; // Formato YYYY-MM-DD que entiende el datepicker
+      const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
+      const month = cleanText.substring(2, 4);
+      const year = cleanText.substring(4, 8);
+      formattedDate = `${year}-${month}-${day}`; // Formato YYYY-MM-DD que entiende el datepicker
     }
     // Caso 2: DD/MM/YYYY (con separadores)
     else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-        const [day, month, year] = pastedText.split('/');
-        formattedDate = `${year}-${month}-${day}`;
+      const [day, month, year] = pastedText.split('/');
+      formattedDate = `${year}-${month}-${day}`;
     }
 
     console.log(formattedDate);
     console.log(Date.parse(formattedDate));
-    
-    
+
+
     // Caso 3: Otros formatos podrían agregarse aquí
-    
+
     if (formattedDate) {
-        const fechaControl = this.formularioGrado.get('fecha_obtencion');
-        fechaControl?.patchValue(formattedDate);
-        
-        // Forzar la actualización del datepicker si es necesario
-        setTimeout(() => {
-            fechaControl?.updateValueAndValidity();
-        });
+      const fechaControl = this.formularioGrado.get('fecha_obtencion');
+      fechaControl?.patchValue(formattedDate);
+
+      // Forzar la actualización del datepicker si es necesario
+      setTimeout(() => {
+        fechaControl?.updateValueAndValidity();
+      });
     }
-    
+
     // Si no es válido, marca error
-  //  this.fechaControl.setErrors({ invalidDate: true });
+    //  this.fechaControl.setErrors({ invalidDate: true });
   }
-  poner_datos(){
+  poner_datos() {
     console.log(this.data);
-    
+
     this.formularioGrado.setValue({
-      id:this.data.valores.id,
+      id: this.data.valores.id,
       grado: this.data.valores.grado,
       revalidado: this.data.valores.revalidado,
       lugar_obtencion: this.data.valores.lugar_obtencion,
-      fecha_obtencion:  this.data.valores.fecha_obtencion,
-      codigoDocente:  this.data.valores.codigoDocente,
-      profesion:  this.data.valores.profesion,
+      fecha_obtencion: this.data.valores.fecha_obtencion,
+      codigoDocente: this.data.valores.codigoDocente,
+      profesion: this.data.valores.profesion,
     });
     //this.form.value.id=this.data.valores.id;
   }
@@ -155,48 +161,48 @@ export class GradodlgComponent {
   ngOnInit(): void {
     console.log(this.data);
     this.formularioGrado = this.formBuilder.group({
-      id:[''],
+      id: [''],
       grado: [''],
       revalidado: [''],
       lugar_obtencion: [''],
-      fecha_obtencion:  [''],
-      codigoDocente:  [''],
-      profesion:  [''],
+      fecha_obtencion: [''],
+      codigoDocente: [''],
+      profesion: [''],
     });
     this.cgdepr.ponerurl("docentesgrado");
-    this.cgdepr.get().subscribe(data=>{
+    this.cgdepr.get().subscribe(data => {
       console.log(data);
-      this.departamentos=data;
+      this.departamentos = data;
     });
-    if(this.data.modo==1){
-      this.funcion="Editar";
-      this.fnc=false;
+    if (this.data.modo == 1) {
+      this.funcion = "Editar";
+      this.fnc = false;
       this.poner_datos();
 
-    }else{
-      this.funcion="Añadir"
+    } else {
+      this.funcion = "Añadir"
       this.poner_codigo();
-      this.fnc=true;
+      this.fnc = true;
     }
 
   }
-  poner_codigo(){
+  poner_codigo() {
     this.formularioGrado.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
   }
-  add_grado() {    
-    let body={
-      id:this.formularioGrado.value?.id,
+  add_grado() {
+    let body = {
+      id: this.formularioGrado.value?.id,
       grado: this.formularioGrado.value?.grado,
       revalidado: this.formularioGrado.value?.revalidado,
       lugar_obtencion: this.formularioGrado.value?.lugar_obtencion,
-      fecha_obtencion:  this.formularioGrado.value?.fecha_obtencion,
-      codigoDocente:  this.formularioGrado.value?.codigoDocente,
-      profesion:  this.formularioGrado.value?.profesion,
+      fecha_obtencion: this.formularioGrado.value?.fecha_obtencion,
+      codigoDocente: this.formularioGrado.value?.codigoDocente,
+      profesion: this.formularioGrado.value?.profesion,
     }
     this.cgdepr.ponerurl("docentesgrado")
     if (this.formularioGrado?.valid) {
-      if(this.fnc==true){
-        this.cgdepr.add(body).subscribe(data=>{
+      if (this.fnc == true) {
+        this.cgdepr.add(body).subscribe(data => {
           console.log("agregado");
           Swal.fire({
             title: "Agregado",
@@ -205,8 +211,8 @@ export class GradodlgComponent {
           });
           this.dialogRef.close(this.formularioGrado.value);
         })
-      }else{
-        this.cgdepr.update(body.codigoDocente,body).subscribe(data=>{
+      } else {
+        this.cgdepr.update(body.codigoDocente, body).subscribe(data => {
           console.log("actualizado");
           Swal.fire({
             title: "Actualizado",
@@ -227,7 +233,37 @@ export class GradodlgComponent {
     this.dialogRef.close();
   }
 
- 
+
+  // Columnas a mostrar
+  columnas: string[] = ['grado','titulo', 'fecha', 'acciones'];
+
+  // Datos de la tabla (usando MatTableDataSource)
+  dataSource = new MatTableDataSource<Fila>([]);
+  // En tu componente:
+  opcionesSelect = [
+    { value: '', label: 'Seleccione', disabled: false },
+    { value: 'Bachiller', label: 'Bachiller', disabled: false },
+    { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
+    { value: 'Maestro', label: 'Maestro', disabled: false },
+    { value: 'Doctor', label: 'Doctor', disabled: false }
+  ];
+//grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor"];
+  // Método para agregar una fila
+  agregarFila() {
+    const nuevaFila: Fila = {
+      grado: '1',
+      fecha: new Date(), // Edad aleatoria entre 18 y 67
+      titulo:'d'
+    };
+
+    // Actualiza el dataSource con la nueva fila
+    this.dataSource.data = [...this.dataSource.data, nuevaFila];
+  }
+
+  eliminar(element: any) {
+    console.log(element);
+
+  }
 
 }
 

@@ -5,19 +5,22 @@ import { SafeUrlPipe } from './safe-url.pipe';
 import { Aux1Service } from '../../../services/aux1.service';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Subscription } from 'rxjs';
+import { Subscription, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { saveAs } from 'file-saver';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
 
 @Component({
   selector: 'app-pdfview',
   standalone: true,
-  imports: [],
+  imports: [ MatIconModule,MatButtonModule],
   templateUrl: './pdfview.component.html',
   styleUrl: './pdfview.component.scss'
 })
 export class PdfviewComponent {
 
-  pdfSrc: SafeResourceUrl | null| undefined ;
+  pdfSrc:  any ;
   private subscription: Subscription | null = null;
   private apiUrl =  environment.direccion;
 
@@ -37,7 +40,7 @@ export class PdfviewComponent {
   }
 
   loadPdf() {
-    const url = `${this.apiUrl}docentes/contrato/${this.data.persona.codigo}`; // Ajusta la URL según tu API
+    const url = `${this.apiUrl}docentes/contrato/${this.data.persona.codigo}/${localStorage.getItem('dni')}`; // Ajusta la URL según tu API
     console.log('Solicitando PDF para código:', this.data.codigo);
 
     console.log(url);
@@ -76,5 +79,29 @@ export class PdfviewComponent {
       URL.revokeObjectURL(this.pdfSrc as string);
     }
   }
+  
+  /**********WORD */
+  generarContratoDocx() {
+    console.log(`${this.apiUrl}docentes/contratow/${this.data.persona.codigo}`);
+    
+    const url = `${this.apiUrl}docentes/contratow/${this.data.persona.codigo}`; // Ajusta la URL según tu API
+    /*return this.http.get(url, {
+      params: { codigo: this.data.persona.codigo },
+      responseType: 'blob' // Importante para recibir archivos
+    }).pipe(
+      tap((blob: Blob) => {
+        saveAs(blob, `contrato_docente_${this.data.persona.codigo}.docx`);
+      })
+    );*/
+    this.http.get(url, {
+      params: { codigo: this.data.persona.codigo },
+      responseType: 'blob'
+    }).subscribe((blob: Blob) => {
+      saveAs(blob, `contrato_docente_${this.data.persona.codigo}.docx`);
+      alert('El archivo ha sido descargado. Ábrelo desde tu carpeta de descargas.');
+    });
+  }
+
+
 
 }

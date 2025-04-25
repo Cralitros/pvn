@@ -10,7 +10,7 @@
 
         <div class="form">
             <mat-form-field class="example-full-width calendario">
-                <mat-label>Fecha</mat-label>
+                <mat-label>Fecha contrato</mat-label>
                 <input matInput [matDatepicker]="picker2" formControlName="fecha" (paste)="onPaste($event)">
                 <mat-hint>DD/MM/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
@@ -34,7 +34,16 @@
             <mat-select formControlName="categoria">
                 <mat-option>Seleccionar categoria</mat-option>
                 @for (categoria of categorias; track categoria) {
-                <mat-option [value]="categoria">{{categoria}}</mat-option>
+                <mat-checkbox [(ngModel)]="categoria.seleccionada" [ngModelOptions]="{standalone: true}" class="mch">
+                        <mat-form-field class="example-full-width calendario" class="cal">
+                            <mat-label>{{categoria.nombre}}</mat-label>
+                            <input matInput [matDatepicker]="picker2" [(ngModel)]="categoria.fecha" 
+                                   [ngModelOptions]="{standalone: true}" (paste)="onPaste($event)">
+                            <mat-hint>DD/MM/YYYY</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                        </mat-form-field>
+                </mat-checkbox>
                 }
             </mat-select>
         </mat-form-field>
@@ -73,6 +82,7 @@
                 <mat-checkbox formControlName="chk2">Investigación</mat-checkbox><br>
                 <mat-checkbox formControlName="chk3">Desempeño administrativo</mat-checkbox><br>
                 <mat-checkbox formControlName="chk4">Capacitación continua</mat-checkbox><br>
+                <mat-checkbox formControlName="chk5">No Aplica</mat-checkbox><br>
             </section>
         </div>
         <mat-form-field class="example-full-width">

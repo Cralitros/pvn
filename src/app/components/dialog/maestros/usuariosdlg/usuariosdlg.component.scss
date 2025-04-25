@@ -24,7 +24,17 @@
 
 .myTooltip {
     .mdc-tooltip__surface {
-      max-width: 350px;
-      padding: 5px;
+        max-width: 350px;
+        padding: 5px;
     }
-  }
+}
+
+.rg2{
+    margin-left: 10px;
+
+}
+.rgroup{
+    display: flex; /* or inline-flex */
+    flex-direction:  column ;
+
+}

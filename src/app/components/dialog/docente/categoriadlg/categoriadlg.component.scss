@@ -194,3 +194,20 @@
     position: relative;
     left: 135px;
 }
+
+.cnt{
+    display: flex;
+    flex-direction:column;
+}
+
+.mch{
+    position: relative;
+    margin-left: -20px;
+    scale: 0.8;
+}
+.cal{
+    position: relative;
+    margin-left: -10px;
+    width: 180px;
+    
+}

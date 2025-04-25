@@ -20,13 +20,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Personal } from '../../modelos/personal';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
-import {MatMenuModule} from '@angular/material/menu';
+import { MatMenuModule } from '@angular/material/menu';
 
-import {MatSort, Sort, MatSortModule} from '@angular/material/sort';
+import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 
 import * as XLSX from 'xlsx';
 import { MatDialog } from '@angular/material/dialog';
 import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-tabla',
@@ -55,9 +56,9 @@ import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
     MatButtonModule,
     MatMenuModule],
 
-  
+
 })
-export class  TablaComponent {
+export class TablaComponent {
   @Input() columns: Column[] = [];
   @Input() fila: any;
   @Input() dataSource = new MatTableDataSource<any>([]);
@@ -65,7 +66,7 @@ export class  TablaComponent {
   @Input() report: any;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort?: MatSort|any;
+  @ViewChild(MatSort) sort?: MatSort | any;
 
   displayedColumns: string[] = [];
 
@@ -95,7 +96,7 @@ export class  TablaComponent {
   constructor(private sctabla: CargatablaService,
     private das: ConversiontablaService,
     private router: Router,
-    private mservice:MaestrosserviceService,
+    private mservice: MaestrosserviceService,
     public dialog: MatDialog
   ) {
 
@@ -106,7 +107,7 @@ export class  TablaComponent {
 
   }
 
-  tabla(){
+  tabla() {
     this.displayedColumns = this.columns.map(c => c.columnDef);
 
     this.columnsToDisplayWithExpand = [...this.displayedColumns, 'expandedDetail'];
@@ -118,7 +119,7 @@ export class  TablaComponent {
     });
 
   }
-  refresh(){
+  refresh() {
     this.tabla();
   }
   toggleFilter(event: any) {
@@ -153,9 +154,26 @@ export class  TablaComponent {
   }
 
   deleteElement(element: any): void {
+    console.log(element);
+
     // Lógica para eliminar el elemento
+    Swal.fire({
+      title: `¿Deseas eliminar a ${element.nombres}?`,
+      text: "Sí eliminas, no se podrá revertir el cambio.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "¡Si!,¡Eliminar!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.delete.emit(element);
+
+      }
+    });
+
     console.log('Delete', element);
-    this.delete.emit(element);
+    //this.delete.emit(element);
   }
   dpintar = false;
   dataClickedData(row: any) {
@@ -232,8 +250,8 @@ export class  TablaComponent {
     return rowIndex === this.fila;
 
   }
-   // Debounce function using arrow function to retain 'this' context
-   debounce(func: Function, wait: number) {
+  // Debounce function using arrow function to retain 'this' context
+  debounce(func: Function, wait: number) {
     let timeout: any;
     return (...args: any[]) => {
       clearTimeout(timeout);
@@ -263,7 +281,7 @@ export class  TablaComponent {
         }
         return flatString;
       };
-  
+
       const flattenedData = flattenObject(data);
       return flattenedData.includes(filter); // Búsqueda rápida en la cadena plana
     };
@@ -386,14 +404,14 @@ export class  TablaComponent {
     this.arreglo = this.arreglo!.filter(obj => !obj.hasOwnProperty(key));
   }
 
-  mover(selectedRow:any,tip:any){
+  mover(selectedRow: any, tip: any) {
     console.log(selectedRow);
 
-    this.router.navigate([`/dashboard/${tip}`], { 
+    this.router.navigate([`/dashboard/${tip}`], {
       queryParams: { selectedRow }
     });
   }
-  reporte(){
+  reporte() {
     console.log(this.report);
 
     this.mservice.reporte();
@@ -416,20 +434,48 @@ export class  TablaComponent {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.dataSource.data);
     const workbook: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-  
+
     XLSX.writeFile(workbook, 'my-excel-file.xlsx');
   }
 
-  contrato(element:any){
+  contrato(element: any) {
     const dialogRef = this.dialog.open(PdfviewComponent, {
       width: '700px',
-      height:'950px',
+      height: '950px',
       data: {
-        persona:element
+        persona: element
       }
     });
     dialogRef.afterClosed().subscribe(result => {
-    
+
     });
+  }
+  datos(element: any, title: any) {
+    let cadena = '';
+    if (title.columnDef == 'categoria') {
+      console.log(title);
+      console.log(JSON.parse(element));
+      let parseElement = JSON.parse(element);
+      parseElement.forEach((el: any) => {
+        if (el.seleccionada) {
+          cadena += el.nombre + " - Asignado:" + this.fechaformat(el.fecha) + "\n";
+        }
+      });
+
+      return cadena;
+    }
+
+    return element;
+  }
+  fechaformat(fechaParam?: Date | string) {
+    // Si no se proporciona fecha, usa la actual
+    const fecha = fechaParam ? new Date(fechaParam) : new Date();
+
+    // Obtener día, mes y año
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
+    const anio = fecha.getFullYear();
+
+    return `${dia}/${mes}/${anio}`;
   }
 }

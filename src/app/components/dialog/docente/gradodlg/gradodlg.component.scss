@@ -169,3 +169,23 @@
     position: relative;
     top: 50px;
 }
+.tabla{
+    padding-left: 20px;
+    padding-bottom: 20px;
+}
+.iconos{
+    display: flex;
+    gap: 10px;
+    flex-direction: row;
+}
+.db:hover{
+    background-color: red;
+    cursor: pointer;
+}
+.eb:hover{
+    background-color: yellow;
+    cursor: pointer;
+}
+input[type="text"] {
+    width: 100px;
+}

@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit{
       })
     ).subscribe(data=>{
       console.log("******************");
-      
+      localStorage.setItem("dni",data.dni);
       console.log(data);
       Swal.fire({
         title: "¡Bienvenido!",

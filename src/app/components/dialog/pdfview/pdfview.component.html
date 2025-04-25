@@ -1,3 +1,10 @@
 <div class="container">
+    <div class="buttons-container">
+        <button mat-stroked-button (click)="generarContratoDocx()">
+            <mat-icon aria-hidden="false" aria-label="Example description icon" fontIcon="description"></mat-icon>
+            A word
+        </button>
+    </div>
+
     <iframe [src]="pdfSrc " width="90%" height="90%" style="border: none;"></iframe>
 </div>

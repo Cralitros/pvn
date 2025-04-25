@@ -95,14 +95,17 @@
             </div>
         </mat-form-field>
 
-        <mat-form-field class="example-full-width">
-            <mat-label>Cargo</mat-label>
-            <input matInput formControlName="cargo" placeholder="Cargo">
+        <div class="rg2">
+            <mat-radio-group formControlName="cargo" class="rgroup">
+                <mat-radio-button *ngFor="let cargo of cargos | keyvalue" [value]="cargo.key">
+                  {{ cargo.value }}
+                </mat-radio-button>
+            </mat-radio-group>
             <div class="example-full-width mensaje"
                 *ngIf="formulario?.get('cargo')?.invalid && formulario?.get('cargo')?.touched">
                 Cargo es requerido.
             </div>
-        </mat-form-field>
+        </div>
 
 
         <div mat-dialog-actions class="buttons">

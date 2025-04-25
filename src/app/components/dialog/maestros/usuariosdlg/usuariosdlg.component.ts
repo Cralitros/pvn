@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import {MatRadioModule} from '@angular/material/radio';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -21,7 +22,8 @@ import Swal from 'sweetalert2';
     MatInputModule,
     MatButtonModule,
     MatSelectModule,
-    MatTooltipModule    
+    MatTooltipModule,
+    MatRadioModule  
   ],
   templateUrl: './usuariosdlg.component.html',
   styleUrl: './usuariosdlg.component.scss'
@@ -39,6 +41,10 @@ export class UsuariosdlgComponent {
     {"nivel":3,"descripcion":
       "-Acceso a Reportes.\n"},
   ];
+  cargos: { [key: string]: string } = {
+    "1": "Jefe departamento",
+    "2": "Secretaria",
+  };
   rol:any[]=["Administrador","Data entry","Lector"];
   constructor(public dialogRef: MatDialogRef<UsuariosdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, Inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
@@ -38,6 +38,7 @@ export const MY_DATE_FORMATS = {
   standalone: true,
   imports: [
     MatFormFieldModule,
+    FormsModule,
     CommonModule,
     ReactiveFormsModule,
     MatInputModule,
@@ -67,18 +68,34 @@ export class CategoriadlgComponent {
   condiciones?: Condiciones[];
   funcion:any;
   fnc:boolean=true;
-  categorias = ["Principal", "Asociado","Auxiliar","Contratado","Profesor visitante","Instructor","Jefe de prácticas"];
+  //categorias = ["Principal", "Asociado","Auxiliar","Contratado","Profesor visitante","Instructor","Jefe de prácticas"];
   tipos = ["Nuevo", "Reincorporado","Regular","Otro departamento"];
   dedicacion = ["TC", "TPA","TPC"];
   lab = ["Si", "No"];
-  categoriasdap = ["Ordinario", "Contratado", "Extraordinario","Honoris Causa","Honorarios"];
+  categoriasdap = ["Ordinario", "Contratado", "Extraordinario","Honoris Causa","Honorarios",'No aplica'];
   condicionesdap = ["Activo", "Inactivo"];
   extraordinarios: string[] = ['Emérito', 'Tenure Track', 'Visitante'];
   inactivos: string[] = ['Jubildado', 'Fallecido', 'Renuncia'];
   ratificado: string[] = ['Ratificado', 'No ratificado'];
-  tipoRatificado: string[] = ['Desempeño Academico', 'Investigación','Desempeño administrativo','Capacitación continua'];
+  tipoRatificado: string[] = ['Desempeño Academico', 'Investigación','Desempeño administrativo','Capacitación continua','No aplica'];
   bloqueadorg1=true;
   bloqueadorg2=true;
+
+  categorias = [
+    { nombre: 'Principal', seleccionada: false, fecha: null },
+    { nombre: 'Asociado', seleccionada: false, fecha: null },
+    { nombre: 'Auxiliar', seleccionada: false, fecha: null },
+    { nombre: 'Contratado', seleccionada: false, fecha: null },
+    { nombre: 'Profesor visitante', seleccionada: false, fecha: null },
+    { nombre: 'Instructor', seleccionada: false, fecha: null },
+    { nombre: 'Jefe de prácticas', seleccionada: false, fecha: null }
+  ];
+
+  trackByNombre(index: number, item: any) {
+    return item.nombre;
+  }
+  
+  toppings = new FormControl<string[]>([]);
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _intl = inject(MatDatepickerIntl);
@@ -174,7 +191,7 @@ export class CategoriadlgComponent {
       id:this.data.valores.id,
       tipo: this.data.valores.tipo,
       fecha: this.data.valores.fecha,
-      categoria: this.data.valores.categoria,
+      categoria: JSON.parse(this.data.valores.categoria),
       condiciondap:  d2,
       codigoDocente:  this.data.valores.codigoDocente,
       dedicacion:  this.data.valores.dedicacion,
@@ -187,8 +204,10 @@ export class CategoriadlgComponent {
       chk2: ratificado.chk2,
       chk3: ratificado.chk3,
       chk4: ratificado.chk4,
+      chk5: ratificado.chk5,
     });
     let event={value:ratificado.ratificado}
+    this.categorias=JSON.parse(this.data.valores.categoria);
     this.onCategoryChangeRatificado(event);
     //this.form.value.id=this.data.valores.id;
     
@@ -217,6 +236,7 @@ export class CategoriadlgComponent {
       chk2:[''],
       chk3:[''],
       chk4:[''],
+      chk5:[''],
       
     });
 
@@ -263,20 +283,23 @@ export class CategoriadlgComponent {
     this.formularioCategoria.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
   }
   add_grado() {   
+    let categ=this.categorias;
     console.log(this.formularioCategoria.value);
     let ratificado= {ratificado:this.formularioCategoria.value?.ratificado, 
       chk1:this.formularioCategoria.value?.chk1==undefined ||this.formularioCategoria.value?.chk1==""?false:this.formularioCategoria.value?.chk1,
       chk2:this.formularioCategoria.value?.chk2==undefined||this.formularioCategoria.value?.chk2==""?false:this.formularioCategoria.value?.chk2,
       chk3:this.formularioCategoria.value?.chk3==undefined||this.formularioCategoria.value?.chk3==""?false:this.formularioCategoria.value?.chk3,
       chk4:this.formularioCategoria.value?.chk4==undefined||this.formularioCategoria.value?.chk4==""?false:this.formularioCategoria.value?.chk4,
+      chk5:this.formularioCategoria.value?.chk5==undefined||this.formularioCategoria.value?.chk5==""?false:this.formularioCategoria.value?.chk5,
     }
+    
     let ratificadoString = JSON.stringify(ratificado);
 
     let body={
       id:this.formularioCategoria.value?.id,
       tipo: this.formularioCategoria.value?.tipo,
       fecha: this.formularioCategoria.value?.fecha,
-      categoria: this.formularioCategoria.value?.categoria,
+      categoria: JSON.stringify(this.categorias),
       condiciondap:  this.formularioCategoria.value?.condiciondap,
       codigoDocente:  this.formularioCategoria.value?.codigoDocente,
       dedicacion:  this.formularioCategoria.value?.dedicacion,
@@ -361,13 +384,14 @@ export class CategoriadlgComponent {
       this.formularioCategoria.get('chk2')?.enable();
       this.formularioCategoria.get('chk3')?.enable();
       this.formularioCategoria.get('chk4')?.enable();
+      this.formularioCategoria.get('chk5')?.enable();
       //this.selectedCategory3="Inactivo";
     }else{
       this.formularioCategoria.get('chk1')?.disable();
       this.formularioCategoria.get('chk2')?.disable();
       this.formularioCategoria.get('chk3')?.disable();
       this.formularioCategoria.get('chk4')?.disable();
-
+      this.formularioCategoria.get('chk5')?.disable();
     }
 
   }
