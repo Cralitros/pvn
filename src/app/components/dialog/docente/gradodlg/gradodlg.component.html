@@ -7,7 +7,7 @@
             </mat-form-field>
         </div>
 
-        <div class="form">
+        <!--<div class="form">
             <mat-form-field class="example-full-width nac">
                 <mat-label>Grado</mat-label>
                 <mat-select formControlName="grado">
@@ -17,7 +17,7 @@
                     }
                 </mat-select>
             </mat-form-field>
-        </div>
+        </div>-->
         <div class="form">
             <mat-form-field class="example-full-width">
                 <mat-label>Profesión</mat-label>
@@ -49,7 +49,7 @@
 
         </div>
         <div class="form tabla">
-            <button mat-raised-button color="primary" (click)="agregarFila()">
+            <button mat-raised-button color="primary" (click)="agregarFilaTabla()">
                 Agregar Fila
             </button>
 
@@ -60,32 +60,32 @@
                 <ng-container matColumnDef="grado">
                     <th mat-header-cell *matHeaderCellDef> Grado </th>
                     <td mat-cell *matCellDef="let element; let i = index">
-                        <select name="select">
-                            <option *ngFor="let opcion of opcionesSelect" [value]="opcion.value"
-                            [disabled]="opcion.disabled">
-                            {{opcion.label}}</option>
-                        </select>
+                        <select [formControl]="element.get('grade')">
+                            <option *ngFor="let opcion of opcionesSelect" [value]="opcion.value" [disabled]="opcion.disabled">
+                              {{opcion.label}}
+                            </option>
+                          </select>
                     </td>
                 </ng-container>
                 <ng-container matColumnDef="titulo">
                     <th mat-header-cell *matHeaderCellDef> Titulo </th>
-                    <td mat-cell *matCellDef="let element">
-                        <input type="text" name="Titulo" />
+                    <td mat-cell *matCellDef="let element; let i = index">
+                        <input type="text" [formControl]="element.get('titulo')" />
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="fecha">
                     <th mat-header-cell *matHeaderCellDef> Fecha </th>
-                    <td mat-cell *matCellDef="let element">
-                        <input type="date" name="bday" />
+                    <td mat-cell *matCellDef="let element; let i = index">
+                        <input type="date" [formControl]="element.get('fecha')" />
                     </td>
                 </ng-container>
                 
                 <ng-container matColumnDef="acciones">
                     <th mat-header-cell *matHeaderCellDef> Acciones </th>
-                    <td mat-cell *matCellDef="let element">
+                    <td mat-cell *matCellDef="let element; let i=index">
                         <div class="iconos">
-                            <button class="db" (click)="eliminar(element)">
+                            <button class="db" (click)="eliminarFila(i)">
                                 <mat-icon aria-hidden="false" aria-label="Example home icon"
                                     fontIcon="delete_forever"></mat-icon>
                             </button>

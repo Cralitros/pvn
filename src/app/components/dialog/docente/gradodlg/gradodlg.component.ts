@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, Inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -63,6 +63,7 @@ interface Fila {
     MatButtonModule,
     MatPaginatorModule,
     MatTableModule,
+    FormsModule 
 
   ],
   templateUrl: './gradodlg.component.html',
@@ -148,7 +149,7 @@ export class GradodlgComponent {
 
     this.formularioGrado.setValue({
       id: this.data.valores.id,
-      grado: this.data.valores.grado,
+      gradosTabla: this.data.valores.gradosTabla,
       revalidado: this.data.valores.revalidado,
       lugar_obtencion: this.data.valores.lugar_obtencion,
       fecha_obtencion: this.data.valores.fecha_obtencion,
@@ -158,11 +159,33 @@ export class GradodlgComponent {
     //this.form.value.id=this.data.valores.id;
   }
 
+  get filasArray(): FormArray {
+    return this.formularioGrado.get('gradosTabla') as FormArray;
+  }
+  
+  agregarFilaTabla() {
+    const fila:any = this.formBuilder.group({
+      grade: [''],
+      titulo: [''],
+      fecha: ['']
+    });
+    this.filasArray.push(fila);
+    console.log(this.filasArray);
+    this.dataSource.data = [...this.dataSource.data, fila];
+    //this.dataSource.data = [...this.dataSource.data, nuevaFila];
+    
+    //this.dataSource.data = [...this.dataSource.data, fila];
+  }
+  
+  eliminarFila(index: number) {
+    this.filasArray.removeAt(index);
+  }
+
   ngOnInit(): void {
     console.log(this.data);
     this.formularioGrado = this.formBuilder.group({
       id: [''],
-      grado: [''],
+      gradosTabla: this.formBuilder.array([]),
       revalidado: [''],
       lugar_obtencion: [''],
       fecha_obtencion: [''],
@@ -192,7 +215,7 @@ export class GradodlgComponent {
   add_grado() {
     let body = {
       id: this.formularioGrado.value?.id,
-      grado: this.formularioGrado.value?.grado,
+      gradosTabla: this.formularioGrado.value?.gradosTabla,
       revalidado: this.formularioGrado.value?.revalidado,
       lugar_obtencion: this.formularioGrado.value?.lugar_obtencion,
       fecha_obtencion: this.formularioGrado.value?.fecha_obtencion,
