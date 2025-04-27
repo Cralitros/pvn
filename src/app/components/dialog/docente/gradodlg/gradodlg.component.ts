@@ -215,7 +215,7 @@ export class GradodlgComponent {
   add_grado() {
     let body = {
       id: this.formularioGrado.value?.id,
-      gradosTabla: this.formularioGrado.value?.gradosTabla,
+      grado: this.formularioGrado.value?.gradosTabla,
       revalidado: this.formularioGrado.value?.revalidado,
       lugar_obtencion: this.formularioGrado.value?.lugar_obtencion,
       fecha_obtencion: this.formularioGrado.value?.fecha_obtencion,
