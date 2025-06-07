@@ -33,7 +33,7 @@
             <app-inputs [campo]="column" (seleccionado)="filtroinput($event)"></app-inputs>
           </div>
         </th>
-        <td mat-cell *matCellDef="let element">
+        <td mat-cell *matCellDef="let element" class="pre-formatted">
           <ng-container *ngIf="!column.isAction"> <!-- Check if it's not an action column -->
             {{datos(column.cell(element),column)}}
           </ng-container>

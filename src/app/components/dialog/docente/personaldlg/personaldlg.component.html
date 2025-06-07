@@ -79,7 +79,9 @@
                     <div class="form">
                         <mat-form-field class="example-full-width calendario">
                             <mat-label>Fecha nacimiento</mat-label>
-                            <input matInput [matDatepicker]="picker2" formControlName="fecha_nacimiento" (paste)="onPaste($event,'fecha_nacimiento')">
+                            <input matInput [matDatepicker]="picker2" formControlName="fecha_nacimiento" 
+                                (paste)="onPaste($event,'fecha_nacimiento')"
+                                (input)="onDateInput($event, 'fecha_nacimiento')">
                             <mat-hint>DD/MM/YYYY</mat-hint>
                             <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                             <mat-datepicker #picker2></mat-datepicker>
@@ -165,7 +167,9 @@
                     <div class="form">
                         <mat-form-field class="example-full-width calendario">
                             <mat-label>Fecha CV</mat-label>
-                            <input matInput [matDatepicker]="picker" formControlName="fecha_cv" (paste)="onPaste($event,'fecha_cv')">
+                            <input matInput [matDatepicker]="picker" formControlName="fecha_cv" 
+                                (paste)="onPaste($event,'fecha_cv')"
+                                (input)="onDateInput($event, 'fecha_cv')">
                             <mat-hint>DD/MM/YYYY</mat-hint>
                             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                             <mat-datepicker #picker></mat-datepicker>

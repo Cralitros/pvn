@@ -30,9 +30,11 @@ export const MY_DATE_FORMATS = {
 };
 
 interface Fila {
-  grado: string;
-  fecha: Date;
-  titulo:string;
+  grade: string;
+  titulo: string;
+  fecha: string;
+  lugar: string;
+  revalidado: boolean;
 }
 
 @Component({
@@ -63,7 +65,7 @@ interface Fila {
     MatButtonModule,
     MatPaginatorModule,
     MatTableModule,
-    FormsModule 
+    FormsModule
 
   ],
   templateUrl: './gradodlg.component.html',
@@ -77,7 +79,7 @@ interface Fila {
 
 export class GradodlgComponent {
   formularioGrado?: FormGroup | any = null;
-  departamentos?: Grado[];
+  grado_obt?: Grado[];
   funcion: any;
   fnc: boolean = true;
   grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor"];
@@ -99,7 +101,15 @@ export class GradodlgComponent {
     private formBuilder: FormBuilder,
     private cgdepr: MaestrosserviceService) {
 
-
+    this.opcionesSelect = [
+      { value: '', label: 'Seleccione', disabled: false },
+      { value: 'Bachiller', label: 'Bachiller', disabled: false },
+      { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
+      { value: 'Maestro', label: 'Maestro', disabled: false },
+      { value: 'Doctor', label: 'Doctor', disabled: false },
+      { value: 'Post Doctorado', label: 'Doctor', disabled: false },
+      { value: 'PHD.', label: 'Doctor', disabled: false }
+    ];
 
   }
   onPaste(event: ClipboardEvent) {
@@ -146,60 +156,157 @@ export class GradodlgComponent {
   }
   poner_datos() {
     console.log(this.data);
+    console.log("*************");
 
-    this.formularioGrado.setValue({
+    console.log(this.grado_obt);
+
+
+    // Parsear el string JSON a un array de objetos
+    const gradosArray = JSON.parse(this.data.valores.grado);
+
+    // Limpiar el FormArray existente
+    while (this.filasArray.length !== 0) {
+      this.filasArray.removeAt(0);
+    }
+    if (gradosArray.length > 0) {
+      for (let i = 0; i < gradosArray.length; i++) {
+        this.agregarFilaTabla(false, gradosArray[i]);
+      }
+
+    }
+
+    // Establecer los otros valores del formulario
+    this.formularioGrado.patchValue({
       id: this.data.valores.id,
-      gradosTabla: this.data.valores.gradosTabla,
-      revalidado: this.data.valores.revalidado,
-      lugar_obtencion: this.data.valores.lugar_obtencion,
-      fecha_obtencion: this.data.valores.fecha_obtencion,
-      codigoDocente: this.data.valores.codigoDocente,
-      profesion: this.data.valores.profesion,
+      codigoDocente: this.data.valores.codigoDocente
     });
-    //this.form.value.id=this.data.valores.id;
+    // Agregar cada grado al FormArray
+    /* gradosArray.forEach((grado: any) => {
+       const formGroup = this.formBuilder.group({
+         grade: [grado.grade],
+         titulo: [grado.titulo],
+         fecha: [grado.fecha],
+         lugar: [grado.lugar],
+         revalidado: [grado.revalidado]
+       });
+       this.filasArray.push(formGroup);
+     });
+ 
+     // Actualizar el dataSource con los FormGroups del FormArray
+     this.dataSource.data = this.filasArray.controls.map(control => control.value);
+ 
+     // Establecer los otros valores del formulario
+     this.formularioGrado.patchValue({
+       id: this.data.valores.id,
+       codigoDocente: this.data.valores.codigoDocente
+     });*/
   }
 
   get filasArray(): FormArray {
     return this.formularioGrado.get('gradosTabla') as FormArray;
   }
-  
-  agregarFilaTabla() {
-    const fila:any = this.formBuilder.group({
-      grade: [''],
-      titulo: [''],
-      fecha: ['']
-    });
+
+  no_add_fila = true;
+  agregarFilaTabla(manual: boolean, datos?: any) {
+    let fila: any;
+
+    if (!this.fnc && !manual) {
+      console.log("da");
+      console.log(datos);
+
+
+      fila = this.formBuilder.group({
+        grade: [datos.grade],
+        titulo: [datos.titulo],
+        fecha: [datos.fecha],
+        lugar: [datos.lugar],
+        revalidado: [Boolean(datos.revalidado)],
+        conservar:[Boolean(datos.conservar)],
+      });
+
+    } else {
+      fila = this.formBuilder.group({
+        grade: [''],
+        titulo: [''],
+        fecha: [''],
+        lugar: [''],
+        revalidado: [false],
+        conservar:[true],
+      });
+
+    }
+
     this.filasArray.push(fila);
     console.log(this.filasArray);
     this.dataSource.data = [...this.dataSource.data, fila];
     //this.dataSource.data = [...this.dataSource.data, nuevaFila];
-    
+
     //this.dataSource.data = [...this.dataSource.data, fila];
   }
-  
-  eliminarFila(index: number) {
-    this.filasArray.removeAt(index);
+  elemento(datos: any) {
+    console.log(datos);
+    return datos;
   }
 
+  eliminarFila(index: number) {
+    this.filasArray.removeAt(index);
+    // 2. Actualizar el dataSource
+    for(let i=0;i<this.filasArray.length;i++){
+      this.agregarFilaTabla(false, this.filasArray.value[i])
+      //this.dataSource.data = [...this.dataSource.data, fila];
+    }
+   // this.dataSource.data = this.filasArray.controls.map(control => control.value);
+  }
+  
+  private sincronizarDataSource() {
+    const datosActuales = [];
+    
+    // Recorremos el FormArray manualmente
+    for (let i = 0; i < this.filasArray.length; i++) {
+        const control = this.filasArray.at(i);
+        datosActuales.push({
+            grade: control.get('grade')?.value,
+            titulo: control.get('titulo')?.value,
+            fecha: control.get('fecha')?.value,
+            lugar: control.get('lugar')?.value,
+            revalidado: control.get('revalidado')?.value,
+            conservar: control.get('conservar')?.value,
+        });
+    }
+    
+    this.dataSource.data = datosActuales;
+}
   ngOnInit(): void {
+    this.opcionesSelect = [
+      { value: '', label: 'Seleccione', disabled: false },
+      { value: 'Bachiller', label: 'Bachiller', disabled: false },
+      { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
+      { value: 'Maestro', label: 'Maestro', disabled: false },
+      { value: 'Doctor', label: 'Doctor', disabled: false },
+      { value: 'Post Doctorado', label: 'Post Doctor', disabled: false },
+      { value: 'PHD.', label: 'PHD.', disabled: false }
+    ];
+
     console.log(this.data);
     this.formularioGrado = this.formBuilder.group({
       id: [''],
       gradosTabla: this.formBuilder.array([]),
-      revalidado: [''],
+      /*revalidado: [''],
       lugar_obtencion: [''],
-      fecha_obtencion: [''],
+      fecha_obtencion: [''],*/
       codigoDocente: [''],
-      profesion: [''],
+      //    profesion: [''],
     });
+
     this.cgdepr.ponerurl("docentesgrado");
     this.cgdepr.get().subscribe(data => {
       console.log(data);
-      this.departamentos = data;
+      this.grado_obt = data;
     });
     if (this.data.modo == 1) {
       this.funcion = "Editar";
       this.fnc = false;
+      //this.poner_codigo();
       this.poner_datos();
 
     } else {
@@ -208,6 +315,11 @@ export class GradodlgComponent {
       this.fnc = true;
     }
 
+
+  }
+
+  ngAfterViewInit() {
+
   }
   poner_codigo() {
     this.formularioGrado.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
@@ -215,12 +327,12 @@ export class GradodlgComponent {
   add_grado() {
     let body = {
       id: this.formularioGrado.value?.id,
-      grado: this.formularioGrado.value?.gradosTabla,
-      revalidado: this.formularioGrado.value?.revalidado,
-      lugar_obtencion: this.formularioGrado.value?.lugar_obtencion,
-      fecha_obtencion: this.formularioGrado.value?.fecha_obtencion,
+      grado: this.filasArray.value.filter((item: any) => item.conservar),
+      /* revalidado: this.formularioGrado.value?.revalidado,
+       lugar_obtencion: this.formularioGrado.value?.lugar_obtencion,
+       fecha_obtencion: this.formularioGrado.value?.fecha_obtencion,*/
       codigoDocente: this.formularioGrado.value?.codigoDocente,
-      profesion: this.formularioGrado.value?.profesion,
+      //      profesion: this.formularioGrado.value?.profesion,
     }
     this.cgdepr.ponerurl("docentesgrado")
     if (this.formularioGrado?.valid) {
@@ -258,35 +370,25 @@ export class GradodlgComponent {
 
 
   // Columnas a mostrar
-  columnas: string[] = ['grado','titulo', 'fecha', 'acciones'];
+  columnas: string[] = ['conservar','grado', 'titulo', 'fecha', 'lugar', 'revalidado'];
 
   // Datos de la tabla (usando MatTableDataSource)
   dataSource = new MatTableDataSource<Fila>([]);
+
   // En tu componente:
   opcionesSelect = [
     { value: '', label: 'Seleccione', disabled: false },
     { value: 'Bachiller', label: 'Bachiller', disabled: false },
     { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
     { value: 'Maestro', label: 'Maestro', disabled: false },
-    { value: 'Doctor', label: 'Doctor', disabled: false }
+    { value: 'Doctor', label: 'Doctor', disabled: false },
+    { value: 'Doctor', label: 'Doctor', disabled: false },
+    { value: 'Post Doctorado', label: 'Doctor', disabled: false },
+    { value: 'PHD.', label: 'Doctor', disabled: false }
   ];
-//grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor"];
-  // Método para agregar una fila
-  agregarFila() {
-    const nuevaFila: Fila = {
-      grado: '1',
-      fecha: new Date(), // Edad aleatoria entre 18 y 67
-      titulo:'d'
-    };
 
-    // Actualiza el dataSource con la nueva fila
-    this.dataSource.data = [...this.dataSource.data, nuevaFila];
-  }
 
-  eliminar(element: any) {
-    console.log(element);
 
-  }
 
 }
 

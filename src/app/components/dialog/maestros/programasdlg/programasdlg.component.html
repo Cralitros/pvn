@@ -14,7 +14,7 @@
             <mat-select formControlName="facultad" (selectionChange)="onCategoryChangeFacultad($event)">
                 <mat-option>Seleccionar unidad</mat-option>
                 @for (facultad of facultades; track facultad) {
-                <mat-option [value]="facultad">{{facultad.nombre}}</mat-option>
+                <mat-option [value]="facultad.id">{{facultad.nombre}}</mat-option>
                 }
             </mat-select>
             <div class="example-full-width mensaje" *ngIf="formulario?.get('facultad')?.invalid && formulario?.get('facultad')?.touched">
@@ -27,7 +27,7 @@
             <mat-select formControlName="escuela" (selectionChange)="onCategoryChangeEscuela($event)">
                 <mat-option>Seleccionar Departamento</mat-option>
                 @for (escuela of escuelas; track escuela) {
-                <mat-option [value]="escuela">{{escuela.nombre}}</mat-option>
+                <mat-option [value]="escuela.id">{{escuela.nombre}}</mat-option>
                 }
             </mat-select>
             <div class="example-full-width mensaje" *ngIf="formulario?.get('escuela')?.invalid && formulario?.get('escuela')?.touched">

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Inject, signal, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Condiciones } from '../../../modelos/condiciones';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
@@ -82,14 +82,14 @@ export const MY_DATE_FORMATS = {
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'es-Es' }, // Opcional: configura localidad
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
-    
+
   ]
 })
 export class PersonaldlgComponent {
 
   formulario1?: FormGroup | any = null;
   formulario2?: FormGroup | any = null;
-  fechaNacimientoControl?:FormControl;
+  fechaNacimientoControl?: FormControl;
 
   formularioLaboral?: FormGroup | any = null;
   formularioCategoria?: FormGroup | any = null;
@@ -151,7 +151,7 @@ export class PersonaldlgComponent {
       pasaporte: this.data.valores.pasaporte,
       nombres: this.data.valores.nombres,
       apellidos: this.data.valores.apellidos,
-      fecha_nacimiento: this.data.valores.fecha_nacimiento,
+      fecha_nacimiento:   new Date(this.data.valores.fecha_nacimiento + 'T00:00:00'), 
       departamento: JSON.parse(this.data.valores.lugar_nacimiento).departamento,
       provincia: JSON.parse(this.data.valores.lugar_nacimiento).provincia,
       distrito: JSON.parse(this.data.valores.lugar_nacimiento).distrito,
@@ -162,7 +162,7 @@ export class PersonaldlgComponent {
       estado_civil: this.data.valores.estado_civil,
       numero_hijos: this.data.valores.numero_hijos,
       nacionalidad: this.data.valores.nacionalidad,
-      fecha_cv: this.data.valores.fecha_cv,
+      fecha_cv: new Date(this.data.valores.fecha_cv+ 'T00:00:00'),
       especialidad: this.data.valores.especialidad,
     });
 
@@ -181,10 +181,70 @@ export class PersonaldlgComponent {
     // Aplica validación sin resetear el valor (porque estamos en edición)
     this.actualizarValidacionCuenta(this.data.valores.banco, true);
   }
+  // Agrega esta función en tu componente o en un archivo de utilidades
+  dateFormatValidator(format: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null; // No validar si está vacío (usar Validators.required si es obligatorio)
+      }
 
+      // Verificar si ya es un objeto Date (cuando se selecciona del datepicker)
+      if (control.value instanceof Date) {
+        return null;
+      }
+
+      // Validar el formato manual ingresado
+      const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+      const matches = control.value.match(datePattern);
+
+      if (!matches) {
+        return { invalidFormat: true };
+      }
+
+      const day = parseInt(matches[1], 10);
+      const month = parseInt(matches[2], 10) - 1; // Los meses en JS son 0-11
+      const year = parseInt(matches[3], 10);
+
+      // Validar que la fecha sea válida
+      const date = new Date(year, month, day);
+      if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month ||
+        date.getDate() !== day
+      ) {
+        return { invalidDate: true };
+      }
+
+      return null;
+    };
+  }
+  onDateInput(event: any, fieldName: string) {
+    const value = event.target.value;
+    const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const matches = value.match(datePattern);
+    
+    if (matches) {
+      const day = parseInt(matches[1], 10);
+      const month = parseInt(matches[2], 10) - 1;
+      const year = parseInt(matches[3], 10);
+      const date = new Date(year, month, day);
+      
+      if (
+        date.getFullYear() === year &&
+        date.getMonth() === month &&
+        date.getDate() === day
+      ) {
+        this.formulario1.get(fieldName)?.setValue(date);
+      }
+    }
+  }
   ngOnInit(): void {
 
-    this.fechaNacimientoControl = new FormControl('', [Validators.required]);
+    this.fechaNacimientoControl = new FormControl('',
+      [
+        Validators.required,
+        this.dateFormatValidator('DD/MM/YYYY')
+      ]);
 
     this.formulario1 = this.formBuilder.group({
       codigo: ['', Validators.required],
@@ -259,48 +319,44 @@ export class PersonaldlgComponent {
 
   }
 
-  onPaste(event: ClipboardEvent,campo:string) {
+  onPaste(event: ClipboardEvent, campo: string) {
     event.preventDefault();
     const pastedText = event.clipboardData?.getData('text/plain') || '';
-    
+
     // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
     const cleanText = pastedText.replace(/[^\d]/g, '');
-    
-    // Formatear según diferentes patrones de entrada
-    let formattedDate = '';
-    
+
+    let fecha: Date | null = null;
+
     // Caso 1: DDMMYYYY (8 dígitos)
     if (cleanText.length === 8) {
-        const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
-        const month = cleanText.substring(2, 4);
-        const year = cleanText.substring(4, 8);
-        formattedDate = `${year}-${month}-${day}`; // Formato YYYY-MM-DD que entiende el datepicker
+      const day = parseInt(cleanText.substring(0, 2), 10);
+      const month = parseInt(cleanText.substring(2, 4), 10) - 1; // mesIndex: 0-11
+      const year = parseInt(cleanText.substring(4, 8), 10);
+      fecha = new Date(year, month, day);
     }
-    // Caso 2: DD/MM/YYYY (con separadores)
+    // Caso 2: DD/MM/YYYY
     else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-        const [day, month, year] = pastedText.split('/');
-        formattedDate = `${year}-${month}-${day}`;
+      const [dayStr, monthStr, yearStr] = pastedText.split('/');
+      const day = parseInt(dayStr, 10);
+      const month = parseInt(monthStr, 10) - 1;
+      const year = parseInt(yearStr, 10);
+      fecha = new Date(year, month, day);
     }
 
-    console.log(formattedDate);
-    console.log(Date.parse(formattedDate));
-    
-    
-    // Caso 3: Otros formatos podrían agregarse aquí
-    
-    if (formattedDate) {
-        const fechaControl = this.formulario1.get(campo);
-        fechaControl?.patchValue(formattedDate);
-        
-        // Forzar la actualización del datepicker si es necesario
-        setTimeout(() => {
-            fechaControl?.updateValueAndValidity();
-        });
+    console.log(fecha); // Para verificar en consola
+
+    if (fecha) {
+      const fechaControl = this.formulario1.get(campo);
+      fechaControl?.patchValue(fecha);
+
+      // Forzar la actualización del datepicker si es necesario
+      setTimeout(() => {
+        fechaControl?.updateValueAndValidity();
+      });
     }
-    
-    // Si no es válido, marca error
-  //  this.fechaControl.setErrors({ invalidDate: true });
   }
+
 
   // Agrega este método a la clase:
   actualizarValidacionCuenta(selectedBanco: string, isEditMode: boolean = false) {
@@ -314,7 +370,7 @@ export class PersonaldlgComponent {
       cuentaControl?.patchValue('0000000000');
       // }
     } else {
-    //  cuentaControl?.patchValue('');
+      //  cuentaControl?.patchValue('');
       cuentaControl?.setValidators([Validators.required]);
       // No forzamos setValue('') para no perder datos al editar
     }

@@ -4,4 +4,5 @@ export interface Column {
     cell: (element: any) => string;
     isAction?: boolean;  // Añadir esta propiedad para identificar columnas de acción
     esPersonal?:boolean;
+    cssClass?: string; // Añade esta línea
   }

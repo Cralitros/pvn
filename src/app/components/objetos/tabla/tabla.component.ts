@@ -113,6 +113,8 @@ export class TablaComponent {
     this.columnsToDisplayWithExpand = [...this.displayedColumns, 'expandedDetail'];
 
     this.sctabla.data$.subscribe(data => {
+      console.log(data,"infor llegado*****************************");
+      
       this.dataSource.data = data;
       this.dataSource.sort = this.sort;
       this.dataSrc2 = data;

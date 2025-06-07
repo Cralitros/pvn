@@ -19,6 +19,8 @@ import { GradodlgComponent } from '../../dialog/docente/gradodlg/gradodlg.compon
 import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
 
+
+
 @Component({
   selector: 'app-grado',
   standalone: true,
@@ -44,10 +46,10 @@ export class GradoComponent {
   columns: Column[] = [
     { columnDef: 'id', header: 'No.', cell: (element: Grado) => `${element.id}` },
     { columnDef: 'codigo', header: 'Codigo Docente', cell: (element: Grado) => `${element.codigoDocente}` },
-    { columnDef: 'grado', header: 'Grado', cell: (element: Grado) => `${element.grado}` },
-    { columnDef: 'revalidado', header: 'Revalidado', cell: (element: Grado) => `${element.revalidado}` },
+    { columnDef: 'grado', header: 'Grado', cell: (element: Grado) => this.separar_data(element.grado), cssClass: 'pre-formatted'}, // Añade esta propiedad  },
+   /* { columnDef: 'revalidado', header: 'Revalidado', cell: (element: Grado) => `${element.revalidado}` },
     { columnDef: 'lugar_obtencion', header: 'Lugar obtencion', cell: (element: Grado) => `${element.lugar_obtencion}` },
-    { columnDef: 'fecha_obtencion', header: 'Fecha obtencion', cell: (element: Grado) => `${element.fecha_obtencion}` },
+    { columnDef: 'fecha_obtencion', header: 'Fecha obtencion', cell: (element: Grado) => `${element.fecha_obtencion}` },*/
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
   ];
 
@@ -140,7 +142,7 @@ export class GradoComponent {
           console.log(data2);
           
             const dialogRef = this.dialog.open(GradodlgComponent, {
-              width: '500px',
+              width: '810px',
               height: '550px',
               data: {
                 title: `Agregar ${this.titulo}`,
@@ -190,18 +192,19 @@ export class GradoComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(GradodlgComponent, {
-      width: '580px',
+      width: '810px',
       height: '550px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
           id: this.cartabla.dataSeleccionada.id,
           grado: this.cartabla.dataSeleccionada.grado,
-          revalidado: this.cartabla.dataSeleccionada.revalidado,
+          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente
+         /* revalidado: this.cartabla.dataSeleccionada.revalidado,
           lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,
           fecha_obtencion: this.cartabla.dataSeleccionada.fecha_obtencion,
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
-          profesion: this.cartabla.dataSeleccionada.profesion,
+          profesion: this.cartabla.dataSeleccionada.profesion,*/
 
         },
         modo: 1
@@ -225,6 +228,18 @@ export class GradoComponent {
       });
       this.cargartabla();
     })
+  }
+
+  separar_data(elemento:any){
+    let dat_tojson=JSON.parse(elemento);
+    //console.log(dat_tojson);
+    let  cadena="";
+
+    for(let i=0;i<dat_tojson.length;i++){
+      cadena+=`-Grado: ${dat_tojson[i].grade}\n-Titulo: ${dat_tojson[i].titulo}\n-Fecha: ${dat_tojson[i].fecha}\n-Lugar: ${dat_tojson[i].lugar}\n-Revalidado: ${dat_tojson[i].revalidado}\n----------------------------------\n`
+    }
+    return cadena;
+
   }
 
 }

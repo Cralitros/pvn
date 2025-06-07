@@ -119,47 +119,77 @@ export class CategoriadlgComponent {
       
   }
 
-  onPaste(event: ClipboardEvent) {
+  onPaste(event: ClipboardEvent, campo: string) {
     event.preventDefault();
     const pastedText = event.clipboardData?.getData('text/plain') || '';
-    
+
     // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
     const cleanText = pastedText.replace(/[^\d]/g, '');
-    
-    // Formatear según diferentes patrones de entrada
-    let formattedDate = '';
-    
+
+    let fecha: Date | null = null;
+
     // Caso 1: DDMMYYYY (8 dígitos)
     if (cleanText.length === 8) {
-        const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
-        const month = cleanText.substring(2, 4);
-        const year = cleanText.substring(4, 8);
-        formattedDate = `${year}-${month}-${day}`; // Formato YYYY-MM-DD que entiende el datepicker
+      const day = parseInt(cleanText.substring(0, 2), 10);
+      const month = parseInt(cleanText.substring(2, 4), 10) - 1; // mesIndex: 0-11
+      const year = parseInt(cleanText.substring(4, 8), 10);
+      fecha = new Date(year, month, day);
     }
-    // Caso 2: DD/MM/YYYY (con separadores)
+    // Caso 2: DD/MM/YYYY
     else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-        const [day, month, year] = pastedText.split('/');
-        formattedDate = `${year}-${month}-${day}`;
+      const [dayStr, monthStr, yearStr] = pastedText.split('/');
+      const day = parseInt(dayStr, 10);
+      const month = parseInt(monthStr, 10) - 1;
+      const year = parseInt(yearStr, 10);
+      fecha = new Date(year, month, day);
     }
 
-    console.log(formattedDate);
-    console.log(Date.parse(formattedDate));
-    
-    
-    // Caso 3: Otros formatos podrían agregarse aquí
-    
-    if (formattedDate) {
-        const fechaControl = this.formularioCategoria.get('fecha');
-        fechaControl?.patchValue(formattedDate);
+    console.log(fecha); // Para verificar en consola
+
+    if (fecha) {
+      let  fechaControl;
+      if(campo=='Principal'){
+        let grupo=this.formularioCategoria.get("categoria") as FormGroup;
+        console.log(grupo);
+        //console.log(grupo);
+        // 2. Obtener el control específico de "Principal"
+        const controlPrincipal = grupo.value;
+        console.log(controlPrincipal);
+        console.log(controlPrincipal[0]);
+        controlPrincipal[0].fecha='2025-04-16T05:00:00.000Z'
+        fechaControl =grupo.get('0')?.value;
+        console.log(fechaControl);
         
-        // Forzar la actualización del datepicker si es necesario
-        setTimeout(() => {
-            fechaControl?.updateValueAndValidity();
-        });
+      }else{
+        fechaControl = this.formularioCategoria.get(campo);
+      }
+      fechaControl?.patchValue(fecha);
+
+      // Forzar la actualización del datepicker si es necesario
+      setTimeout(() => {
+        fechaControl?.updateValueAndValidity();
+      });
     }
+  }
+  onDateInput(event: any, fieldName: string) {
+    const value = event.target.value;
+    const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const matches = value.match(datePattern);
     
-    // Si no es válido, marca error
-  //  this.fechaControl.setErrors({ invalidDate: true });
+    if (matches) {
+      const day = parseInt(matches[1], 10);
+      const month = parseInt(matches[2], 10) - 1;
+      const year = parseInt(matches[3], 10);
+      const date = new Date(year, month, day);
+      
+      if (
+        date.getFullYear() === year &&
+        date.getMonth() === month &&
+        date.getDate() === day
+      ) {
+        this.formularioCategoria.get(fieldName)?.setValue(date);
+      }
+    }
   }
   poner_datos(){
     console.log(this.data);
@@ -190,7 +220,7 @@ export class CategoriadlgComponent {
     this.formularioCategoria.setValue({
       id:this.data.valores.id,
       tipo: this.data.valores.tipo,
-      fecha: this.data.valores.fecha,
+      fecha: new Date(this.data.valores.fecha + 'T00:00:00'),
       categoria: JSON.parse(this.data.valores.categoria),
       condiciondap:  d2,
       codigoDocente:  this.data.valores.codigoDocente,

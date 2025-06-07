@@ -78,6 +78,63 @@ export class DocentecursodlgComponent {
     });
     //this.form.value.id=this.data.valores.id;
   }
+  onDateInput(event: any, fieldName: string) {
+    const value = event.target.value;
+    const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const matches = value.match(datePattern);
+    
+    if (matches) {
+      const day = parseInt(matches[1], 10);
+      const month = parseInt(matches[2], 10) - 1;
+      const year = parseInt(matches[3], 10);
+      const date = new Date(year, month, day);
+      
+      if (
+        date.getFullYear() === year &&
+        date.getMonth() === month &&
+        date.getDate() === day
+      ) {
+        this.formularioGrado.get(fieldName)?.setValue(date);
+      }
+    }
+  }
+  onPaste(event: ClipboardEvent, campo: string) {
+    event.preventDefault();
+    const pastedText = event.clipboardData?.getData('text/plain') || '';
+
+    // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
+    const cleanText = pastedText.replace(/[^\d]/g, '');
+
+    let fecha: Date | null = null;
+
+    // Caso 1: DDMMYYYY (8 dígitos)
+    if (cleanText.length === 8) {
+      const day = parseInt(cleanText.substring(0, 2), 10);
+      const month = parseInt(cleanText.substring(2, 4), 10) - 1; // mesIndex: 0-11
+      const year = parseInt(cleanText.substring(4, 8), 10);
+      fecha = new Date(year, month, day);
+    }
+    // Caso 2: DD/MM/YYYY
+    else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      const [dayStr, monthStr, yearStr] = pastedText.split('/');
+      const day = parseInt(dayStr, 10);
+      const month = parseInt(monthStr, 10) - 1;
+      const year = parseInt(yearStr, 10);
+      fecha = new Date(year, month, day);
+    }
+
+    console.log(fecha); // Para verificar en consola
+
+    if (fecha) {
+      const fechaControl = this.formularioGrado.get(campo);
+      fechaControl?.patchValue(fecha);
+
+      // Forzar la actualización del datepicker si es necesario
+      setTimeout(() => {
+        fechaControl?.updateValueAndValidity();
+      });
+    }
+  }
 
   ngOnInit(): void {
     console.log(this.data);
@@ -124,8 +181,8 @@ export class DocentecursodlgComponent {
   add_grado() {
     let body = {
       id: this.formularioGrado.value?.id,
-      fecha_inicio: this.formularioGrado.value?.fecha_inicio,
-      fecha_fin: this.formularioGrado.value?.fecha_fin,
+      fecha_inicio: new Date(this.formularioGrado.value?.fecha_inicio + 'T00:00:00'),
+      fecha_fin: new Date(this.formularioGrado.value?.fecha_fin + 'T00:00:00'),
       codigoCurso: this.formularioGrado.value?.codigoCurso,
       codigoDocente: this.formularioGrado.value?.codigoDocente,
       modalidad: this.formularioGrado.value?.modalidad,

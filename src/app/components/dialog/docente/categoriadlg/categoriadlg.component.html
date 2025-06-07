@@ -11,7 +11,9 @@
         <div class="form">
             <mat-form-field class="example-full-width calendario">
                 <mat-label>Fecha contrato</mat-label>
-                <input matInput [matDatepicker]="picker2" formControlName="fecha" (paste)="onPaste($event)">
+                <input matInput [matDatepicker]="picker2" formControlName="fecha" 
+                    (paste)="onPaste($event,'fecha')"
+                    (input)="onDateInput($event, 'fecha')">
                 <mat-hint>DD/MM/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                 <mat-datepicker #picker2></mat-datepicker>
@@ -38,7 +40,7 @@
                         <mat-form-field class="example-full-width calendario" class="cal">
                             <mat-label>{{categoria.nombre}}</mat-label>
                             <input matInput [matDatepicker]="picker2" [(ngModel)]="categoria.fecha" 
-                                   [ngModelOptions]="{standalone: true}" (paste)="onPaste($event)">
+                                   [ngModelOptions]="{standalone: true}" (paste)="onPaste($event,categoria.nombre)">
                             <mat-hint>DD/MM/YYYY</mat-hint>
                             <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                             <mat-datepicker #picker2></mat-datepicker>

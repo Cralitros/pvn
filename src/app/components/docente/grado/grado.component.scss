@@ -1,9 +1,15 @@
-.button-add{
+.button-add {
     margin-top: 10px;
     margin-left: 10px;
     margin-bottom: 10px;
 }
-.contenedortabla{
+
+.contenedortabla {
     margin-left: 10px;
     margin-right: 10px;
+}
+
+.pre-formatted {
+    white-space: pre-wrap;
+    /* Esto respetará los saltos de línea */
 }
