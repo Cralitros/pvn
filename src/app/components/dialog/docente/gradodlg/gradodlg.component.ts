@@ -35,6 +35,7 @@ interface Fila {
   fecha: string;
   lugar: string;
   revalidado: boolean;
+  fechaRevalidado: string;
 }
 
 @Component({
@@ -82,7 +83,7 @@ export class GradodlgComponent {
   grado_obt?: Grado[];
   funcion: any;
   fnc: boolean = true;
-  grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor"];
+  grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor","Segunda Especialidad","Otros"];
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _intl = inject(MatDatepickerIntl);
@@ -221,7 +222,8 @@ export class GradodlgComponent {
         fecha: [datos.fecha],
         lugar: [datos.lugar],
         revalidado: [Boolean(datos.revalidado)],
-        conservar:[Boolean(datos.conservar)],
+        fechaRevalidado: [datos.fechaRevalidado],
+        conservar: [Boolean(datos.conservar)],
       });
 
     } else {
@@ -230,13 +232,32 @@ export class GradodlgComponent {
         titulo: [''],
         fecha: [''],
         lugar: [''],
+        fechaRevalidado: [''],
         revalidado: [false],
-        conservar:[true],
+        conservar: [true],
       });
 
     }
 
     this.filasArray.push(fila);
+    // Deshabilitar o habilitar fechaRevalidado según el valor inicial de revalidado
+    const revalidadoControl = fila.get('revalidado');
+    const fechaRevalidadoControl = fila.get('fechaRevalidado');
+
+    // Establecer estado inicial
+    if (!revalidadoControl?.value) {
+      fechaRevalidadoControl?.disable();
+    }
+
+    // Suscribirse a los cambios del checkbox
+    revalidadoControl?.valueChanges.subscribe((checked: boolean) => {
+      if (checked) {
+        fechaRevalidadoControl?.enable();
+      } else {
+        fechaRevalidadoControl?.disable();
+        fechaRevalidadoControl?.reset(); // Opcional: limpia la fecha si se desmarca
+      }
+    });
     console.log(this.filasArray);
     this.dataSource.data = [...this.dataSource.data, fila];
     //this.dataSource.data = [...this.dataSource.data, nuevaFila];
@@ -251,31 +272,32 @@ export class GradodlgComponent {
   eliminarFila(index: number) {
     this.filasArray.removeAt(index);
     // 2. Actualizar el dataSource
-    for(let i=0;i<this.filasArray.length;i++){
+    for (let i = 0; i < this.filasArray.length; i++) {
       this.agregarFilaTabla(false, this.filasArray.value[i])
       //this.dataSource.data = [...this.dataSource.data, fila];
     }
-   // this.dataSource.data = this.filasArray.controls.map(control => control.value);
+    // this.dataSource.data = this.filasArray.controls.map(control => control.value);
   }
-  
+
   private sincronizarDataSource() {
     const datosActuales = [];
-    
+
     // Recorremos el FormArray manualmente
     for (let i = 0; i < this.filasArray.length; i++) {
-        const control = this.filasArray.at(i);
-        datosActuales.push({
-            grade: control.get('grade')?.value,
-            titulo: control.get('titulo')?.value,
-            fecha: control.get('fecha')?.value,
-            lugar: control.get('lugar')?.value,
-            revalidado: control.get('revalidado')?.value,
-            conservar: control.get('conservar')?.value,
-        });
+      const control = this.filasArray.at(i);
+      datosActuales.push({
+        grade: control.get('grade')?.value,
+        titulo: control.get('titulo')?.value,
+        fecha: control.get('fecha')?.value,
+        lugar: control.get('lugar')?.value,
+        revalidado: control.get('revalidado')?.value,
+        fechaRevalidado: control.get('fechaRevalidado')?.value,
+        conservar: control.get('conservar')?.value,
+      });
     }
-    
+
     this.dataSource.data = datosActuales;
-}
+  }
   ngOnInit(): void {
     this.opcionesSelect = [
       { value: '', label: 'Seleccione', disabled: false },
@@ -370,7 +392,7 @@ export class GradodlgComponent {
 
 
   // Columnas a mostrar
-  columnas: string[] = ['conservar','grado', 'titulo', 'fecha', 'lugar', 'revalidado'];
+  columnas: string[] = ['conservar', 'grado', 'titulo', 'fecha', 'lugar', 'revalidado', 'fechaRevalidado'];
 
   // Datos de la tabla (usando MatTableDataSource)
   dataSource = new MatTableDataSource<Fila>([]);

@@ -14,10 +14,11 @@ import { CargatablaService } from '../../../services/cargatabla.service';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Subject } from 'rxjs';
 import { DptdlgComponent } from '../../dialog/maestros/dptdlg/dptdlg.component';
 import { AfpsdlgComponent } from '../../dialog/maestros/afpsdlg/afpsdlg.component';
 import Swal from 'sweetalert2';
+import { Tablas, TipoTablaService } from '../../../services/tipo-tabla.service';
 
 @Component({
   selector: 'app-afps',
@@ -29,15 +30,17 @@ import Swal from 'sweetalert2';
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    TablaComponent, 
-    MatPaginatorModule, 
+    TablaComponent,
+    MatPaginatorModule,
     MatTableModule
   ],
   templateUrl: './afps.component.html',
   styleUrl: './afps.component.scss'
 })
 export class AfpsComponent {
-  tablaDepartamento:Afp[]=[];
+  tipotabla = "m"
+
+  tablaDepartamento: Afp[] = [];
   columns: Column[] = [
     { columnDef: 'id', header: 'No.', cell: (element: Afp) => `${element.id}` },
     { columnDef: 'nombre', header: 'Nombre AFP', cell: (element: Afp) => `${element.nombre}` },
@@ -46,21 +49,25 @@ export class AfpsComponent {
 
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
-  tipo="afps";
-  titulo="AFP";
+  tipo = "afps";
+  titulo = "AFP";
+  private destroy$ = new Subject<void>();
+  private readonly TABLA: Tablas = 'AFP'; // Definimos el tipo de tabla
 
   @Output() titulos = new EventEmitter<any>();
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice:MaestrosserviceService,
-    private cartabla:ConversiontablaService,
-    public dialog: MatDialog
+    private mservice: MaestrosserviceService,
+    private cartabla: ConversiontablaService,
+    public dialog: MatDialog,
+    private mensajeService: TipoTablaService
   ) {
-    
+
+
     this.cargartabla();
     console.log(this.tablaDepartamento);
-    
+
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
       nombre: ['', Validators.required]
@@ -69,56 +76,68 @@ export class AfpsComponent {
   }
   ngOnInit(): void {
     this.cargartabla();
-   }
+    // Simulación de carga de datos
+    const datosTabla = { id: 1, nombre: 'Tabla AFP' };
+    
+    // Enviar datos a través del servicio
+    this.mensajeService.enviarDatos(this.TABLA, datosTabla);
+  }
 
-  async cargartabla(){
+  async cargartabla() {
     this.mservice.ponerurl("afps");
     const source$ = this.mservice.get();
-    const finalNumber:any = await lastValueFrom(source$);
-  
+    const finalNumber: any = await lastValueFrom(source$);
+
     this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento=this.cartabla.array;
+    this.tablaDepartamento = this.cartabla.array;
     this.sctabla.setData(this.tablaDepartamento);
   }
-  dialogo(){
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    // Opcional: Limpiar el canal cuando el componente se destruye
+    this.mensajeService.limpiarCanal(this.TABLA);
+  }
+  dialogo() {
     const dialogRef = this.dialog.open(AfpsdlgComponent, {
       width: '290px',
-      height:'350px',
+      height: '350px',
       data: {
         title: `Agregar ${this.titulo}`,
-        valores:{},
-        modo:0
+        valores: {},
+        modo: 0
       }
     });
     dialogRef.afterClosed().subscribe(result => {
       //if (result) {
-        this.cargartabla();
-     // }
+      this.cargartabla();
+      // }
     });
   }
-  editar(element: any){
+  editar(element: any) {
     const dialogRef = this.dialog.open(AfpsdlgComponent, {
       width: '250px',
-      height:'350px',
+      height: '350px',
       data: {
         title: `Editar ${this.titulo}`,
-        valores:{ 
+        valores: {
           id: this.cartabla.dataSeleccionada.id,
-          nombre:this.cartabla.dataSeleccionada.nombre,
+          nombre: this.cartabla.dataSeleccionada.nombre,
         },
-        modo:1     
+        modo: 1
       }
     });
     dialogRef.afterClosed().subscribe(result => {
-     // if (result) {
-        this.cargartabla();
-    //  }
+      // if (result) {
+      this.cargartabla();
+      //  }
     });
 
   }
-  eliminar(element: any){
-    console.log("dep",element);
-    this.mservice.delete(element.id).subscribe(data=>{
+  eliminar(element: any) {
+    console.log("dep", element);
+    this.mservice.delete(element.id).subscribe(data => {
       console.log("Eliminado");
       Swal.fire({
         title: "Eliminado",

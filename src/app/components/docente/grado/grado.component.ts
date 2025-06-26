@@ -142,7 +142,7 @@ export class GradoComponent {
           console.log(data2);
           
             const dialogRef = this.dialog.open(GradodlgComponent, {
-              width: '810px',
+              width: '940px',
               height: '550px',
               data: {
                 title: `Agregar ${this.titulo}`,
@@ -192,7 +192,7 @@ export class GradoComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(GradodlgComponent, {
-      width: '810px',
+      width: '940px',
       height: '550px',
       data: {
         title: `Editar ${this.titulo}`,

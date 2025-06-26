@@ -39,7 +39,8 @@ export class NacionalidadComponent {
   tablaDepartamento: Nacionalidad[] = [];
   columns: Column[] = [
     { columnDef: 'id', header: 'No.', cell: (element: Nacionalidad) => `${element.id}` },
-    { columnDef: 'nombre', header: 'Nombre Departamento', cell: (element: Nacionalidad) => `${element.nombre}` },
+    { columnDef: 'nombre', header: 'Nacionalidad', cell: (element: Nacionalidad) => `${element.nombre}` },
+    { columnDef: 'pais', header: 'Pais', cell: (element: Nacionalidad) => `${element.pais}` },
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
   ];
 
@@ -104,6 +105,7 @@ export class NacionalidadComponent {
         valores: {
           id: this.cartabla.dataSeleccionada.id,
           nombre: this.cartabla.dataSeleccionada.nombre,
+          pais:this.cartabla.dataSeleccionada.pais,
         },
         modo: 1
       }

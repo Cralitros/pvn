@@ -512,7 +512,8 @@ export class PersonaldlgComponent {
       this.saux2.getid(event).subscribe(data => {
         console.log(data);
         this.provincias = data;
-        this.onSelectChangeProvincia(data);
+        const provincia = this.provincias.find(p => p.nombre === this.data.valores.lugarNacimiento.provincia);
+        this.onSelectChangeProvincia(provincia);
       });
     } else {
       this.saux2.getid(event.value).subscribe(data => {
@@ -527,9 +528,12 @@ export class PersonaldlgComponent {
     console.log(event);
 
     if (this.data.modo == 1 && !event.value) {
-      this.saux3.getid(event[0].Distritos[0].provincia_id).subscribe(data => {
+
+      //const nombresDistritos = event.Distritos.map((distrito:any) => distrito.nombre);
+      this.distritos=event.Distritos;
+      /*this.saux3.getid(event[0].Distritos[0].provincia_id).subscribe(data => {
         this.distritos = data;
-      });
+      });*/
     } else {
       this.saux3.getid(event.value).subscribe(data => {
         this.distritos = data;

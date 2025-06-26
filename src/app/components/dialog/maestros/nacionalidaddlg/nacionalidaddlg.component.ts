@@ -62,6 +62,7 @@ export class NacionalidaddlgComponent {
     this.formulario.setValue({
       id: this.data.valores.id,
       nombre: this.data.valores.nombre,
+      pais:this.data.valores.pais,
 
     });
     //this.form.value.id=this.data.valores.id;
@@ -71,6 +72,7 @@ export class NacionalidaddlgComponent {
     this.formulario = this.formBuilder.group({
       id: [''],
       nombre: ['', Validators.required],
+      pais: ['', Validators.required],
     });
     this.cgdepr.ponerurl("nacionalidad");
     this.cgdepr.get().subscribe(data=>{
@@ -92,6 +94,7 @@ export class NacionalidaddlgComponent {
     let body={
       id:this.formulario.value?.id,
       nombre:this.formulario.value.nombre,
+      pais:this.formulario.value.pais,
 
     }
     this.cgdepr.ponerurl("nacionalidad")
