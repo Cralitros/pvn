@@ -140,30 +140,36 @@ export class PersonaldlgComponent {
 
 
   }
+  validar_dato(dato: any) {
+    if (dato == undefined)
+      return "";
+    return dato;
+  }
   poner_datos() {
     console.log(this.data);
     this.selectedValue = JSON.parse(this.data.valores.lugar_nacimiento).departamento;
     this.onSelectChangeDepartamento(this.selectedValue);
     this.formulario1.setValue({
-      codigo: this.data.valores.codigo,
-      digito: this.data.valores.digito,
-      dni: this.data.valores.dni,
-      pasaporte: this.data.valores.pasaporte,
-      nombres: this.data.valores.nombres,
-      apellidos: this.data.valores.apellidos,
-      fecha_nacimiento:   new Date(this.data.valores.fecha_nacimiento + 'T00:00:00'), 
+      codigo: this.validar_dato(this.data.valores.codigo),
+      digito: this.validar_dato(this.data.valores.digito),
+      dni: this.validar_dato(this.data.valores.dni),
+      pasaporte: this.validar_dato(this.data.valores.pasaporte),
+      nombres: this.validar_dato(this.data.valores.nombres),
+      apellidos: this.validar_dato(this.data.valores.apellidos),
+      fecha_nacimiento: new Date(this.data.valores.fecha_nacimiento + 'T00:00:00'),
       departamento: JSON.parse(this.data.valores.lugar_nacimiento).departamento,
       provincia: JSON.parse(this.data.valores.lugar_nacimiento).provincia,
       distrito: JSON.parse(this.data.valores.lugar_nacimiento).distrito,
       sexo: this.data.valores.sexo,
-      domicilio: this.data.valores.domicilio,
-      telefono: this.data.valores.telefono,
-      celular: this.data.valores.celular,
-      estado_civil: this.data.valores.estado_civil,
-      numero_hijos: this.data.valores.numero_hijos,
-      nacionalidad: this.data.valores.nacionalidad,
-      fecha_cv: new Date(this.data.valores.fecha_cv+ 'T00:00:00'),
-      especialidad: this.data.valores.especialidad,
+      domicilio: this.validar_dato(this.data.valores.domicilio),
+      telefono: this.validar_dato(this.data.valores.telefono),
+      celular: this.validar_dato(this.data.valores.celular),
+      estado_civil: this.validar_dato(this.data.valores.estado_civil),
+      numero_hijos: this.validar_dato(this.data.valores.numero_hijos),
+      nacionalidad: this.validar_dato(this.data.valores.nacionalidad.nombre),
+      pais: this.validar_dato(this.data.valores.nacionalidad.pais),
+      fecha_cv: new Date(this.data.valores.fecha_cv + 'T00:00:00'),
+      especialidad: this.validar_dato(this.data.valores.especialidad),
     });
 
     this.formulario2 = this.formBuilder.group({
@@ -222,13 +228,13 @@ export class PersonaldlgComponent {
     const value = event.target.value;
     const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const matches = value.match(datePattern);
-    
+
     if (matches) {
       const day = parseInt(matches[1], 10);
       const month = parseInt(matches[2], 10) - 1;
       const year = parseInt(matches[3], 10);
       const date = new Date(year, month, day);
-      
+
       if (
         date.getFullYear() === year &&
         date.getMonth() === month &&
@@ -264,6 +270,7 @@ export class PersonaldlgComponent {
       estado_civil: ['', Validators.required],
       numero_hijos: ['', Validators.required],
       nacionalidad: ['', Validators.required],
+      pais: ['', Validators.required],
       fecha_cv: ['', Validators.required],
       especialidad: ['', Validators.required],
     });
@@ -317,6 +324,10 @@ export class PersonaldlgComponent {
       this.actualizarValidacionCuenta(selectedBanco, this.data.modo === 1);
     });
 
+    this.formulario2.get('pais')?.valueChanges.subscribe((selectedPais: any) => {
+      this.actualizarNacionalidad(selectedPais, this.data.modo === 1);
+    });
+
   }
 
   onPaste(event: ClipboardEvent, campo: string) {
@@ -357,7 +368,11 @@ export class PersonaldlgComponent {
     }
   }
 
+  actualizarNacionalidad(selectedPais: any, isEditMode: boolean = false) {
+    console.log(selectedPais);
+    
 
+  }
   // Agrega este método a la clase:
   actualizarValidacionCuenta(selectedBanco: string, isEditMode: boolean = false) {
     const cuentaControl = this.formulario2.get('cuenta');
@@ -428,6 +443,7 @@ export class PersonaldlgComponent {
       estado_civil: this.formulario1.value.estado_civil,
       numero_hijos: this.formulario1.value.numero_hijos,
       nacionalidad: this.formulario1.value.nacionalidad,
+      pais: this.formulario1.value.pais,
       banco: this.formulario2.value.banco,
       cuenta: this.formulario2.value.cuenta,
       afp: this.formulario2.value.afp,
@@ -530,7 +546,7 @@ export class PersonaldlgComponent {
     if (this.data.modo == 1 && !event.value) {
 
       //const nombresDistritos = event.Distritos.map((distrito:any) => distrito.nombre);
-      this.distritos=event.Distritos;
+      this.distritos = event.Distritos;
       /*this.saux3.getid(event[0].Distritos[0].provincia_id).subscribe(data => {
         this.distritos = data;
       });*/

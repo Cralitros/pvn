@@ -9,7 +9,7 @@ export interface Personal{
     celular: string;
     estado_civil: string;
     numero_hijos: string;
-    nacionalidad: string;
+    pais: string;
     sexo:string;
     dni: string;
     pasaporte: string;
@@ -27,4 +27,5 @@ export interface Personal{
     idDepartamento:string;
     idProvincia:string;
     idDistrito:string;
+    idNacionalidad:string;
 }
