@@ -15,7 +15,11 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } f
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import Swal from 'sweetalert2';
+import { Nacionalidad } from '../../../modelos/nacionalidad';
+import { Aux1Service } from '../../../../services/aux1.service';
+
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -42,17 +46,6 @@ interface Fila {
   selector: 'app-gradodlg',
   standalone: true,
   imports: [
-    MatFormFieldModule,
-    CommonModule,
-    ReactiveFormsModule,
-    MatInputModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    CommonModule,
-    ReactiveFormsModule,
-    MatInputModule,
-    MatButtonModule,
     MatSelectModule,
     MatTabsModule,
     MatDatepickerModule,
@@ -66,6 +59,7 @@ interface Fila {
     MatButtonModule,
     MatPaginatorModule,
     MatTableModule,
+    MatAutocompleteModule,
     FormsModule
 
   ],
@@ -81,6 +75,7 @@ interface Fila {
 export class GradodlgComponent {
   formularioGrado?: FormGroup | any = null;
   grado_obt?: Grado[];
+  paises?:Nacionalidad[];
   funcion: any;
   fnc: boolean = true;
   grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor","Segunda Especialidad","Otros"];
@@ -100,7 +95,8 @@ export class GradodlgComponent {
   constructor(public dialogRef: MatDialogRef<GradodlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService) {
+    private cgdepr: MaestrosserviceService,
+    private aux12:Aux1Service) {
 
     this.opcionesSelect = [
       { value: '', label: 'Seleccione', disabled: false },
@@ -116,13 +112,10 @@ export class GradodlgComponent {
   onPaste(event: ClipboardEvent) {
     event.preventDefault();
     const pastedText = event.clipboardData?.getData('text/plain') || '';
-
     // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
     const cleanText = pastedText.replace(/[^\d]/g, '');
-
     // Formatear según diferentes patrones de entrada
     let formattedDate = '';
-
     // Caso 1: DDMMYYYY (8 dígitos)
     if (cleanText.length === 8) {
       const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
@@ -135,33 +128,19 @@ export class GradodlgComponent {
       const [day, month, year] = pastedText.split('/');
       formattedDate = `${year}-${month}-${day}`;
     }
-
-    console.log(formattedDate);
-    console.log(Date.parse(formattedDate));
-
-
     // Caso 3: Otros formatos podrían agregarse aquí
-
     if (formattedDate) {
       const fechaControl = this.formularioGrado.get('fecha_obtencion');
       fechaControl?.patchValue(formattedDate);
-
       // Forzar la actualización del datepicker si es necesario
       setTimeout(() => {
         fechaControl?.updateValueAndValidity();
       });
     }
-
     // Si no es válido, marca error
     //  this.fechaControl.setErrors({ invalidDate: true });
   }
   poner_datos() {
-    console.log(this.data);
-    console.log("*************");
-
-    console.log(this.grado_obt);
-
-
     // Parsear el string JSON a un array de objetos
     const gradosArray = JSON.parse(this.data.valores.grado);
 
@@ -179,28 +158,10 @@ export class GradodlgComponent {
     // Establecer los otros valores del formulario
     this.formularioGrado.patchValue({
       id: this.data.valores.id,
-      codigoDocente: this.data.valores.codigoDocente
+      codigoDocente: this.data.valores.codigoDocente,
+      maximo_grado:this.data.valores.maximo_grado,
+      pais_grado:this.data.valores.pais_grado,
     });
-    // Agregar cada grado al FormArray
-    /* gradosArray.forEach((grado: any) => {
-       const formGroup = this.formBuilder.group({
-         grade: [grado.grade],
-         titulo: [grado.titulo],
-         fecha: [grado.fecha],
-         lugar: [grado.lugar],
-         revalidado: [grado.revalidado]
-       });
-       this.filasArray.push(formGroup);
-     });
- 
-     // Actualizar el dataSource con los FormGroups del FormArray
-     this.dataSource.data = this.filasArray.controls.map(control => control.value);
- 
-     // Establecer los otros valores del formulario
-     this.formularioGrado.patchValue({
-       id: this.data.valores.id,
-       codigoDocente: this.data.valores.codigoDocente
-     });*/
   }
 
   get filasArray(): FormArray {
@@ -225,6 +186,7 @@ export class GradodlgComponent {
         fechaRevalidado: [datos.fechaRevalidado],
         conservar: [Boolean(datos.conservar)],
       });
+      
 
     } else {
       fila = this.formBuilder.group({
@@ -313,23 +275,19 @@ export class GradodlgComponent {
     console.log(this.data);
     this.formularioGrado = this.formBuilder.group({
       id: [''],
-      gradosTabla: this.formBuilder.array([]),
-      /*revalidado: [''],
-      lugar_obtencion: [''],
-      fecha_obtencion: [''],*/
+      gradosTabla: this.formBuilder.array([]),      
       codigoDocente: [''],
-      //    profesion: [''],
+      maximo_grado:[''],
+      pais_grado:[''],
     });
 
     this.cgdepr.ponerurl("docentesgrado");
     this.cgdepr.get().subscribe(data => {
-      console.log(data);
       this.grado_obt = data;
     });
     if (this.data.modo == 1) {
       this.funcion = "Editar";
       this.fnc = false;
-      //this.poner_codigo();
       this.poner_datos();
 
     } else {
@@ -338,7 +296,16 @@ export class GradodlgComponent {
       this.fnc = true;
     }
 
+    this.pais();
 
+  }
+  pais(){
+     //ponerurl();
+    this.aux12.ponerurl("nacionalidad");
+    this.aux12.get().subscribe(data=>{
+      console.log(data);
+      this.paises=data;
+    });
   }
 
   ngAfterViewInit() {
@@ -355,6 +322,8 @@ export class GradodlgComponent {
        lugar_obtencion: this.formularioGrado.value?.lugar_obtencion,
        fecha_obtencion: this.formularioGrado.value?.fecha_obtencion,*/
       codigoDocente: this.formularioGrado.value?.codigoDocente,
+      maximo_grado:this.formularioGrado.value?.maximo_grado,
+      pais_grado:this.formularioGrado.value?.pais_grado,
       //      profesion: this.formularioGrado.value?.profesion,
     }
     this.cgdepr.ponerurl("docentesgrado")

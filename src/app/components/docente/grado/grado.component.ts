@@ -145,7 +145,7 @@ export class GradoComponent {
           
             const dialogRef = this.dialog.open(GradodlgComponent, {
               width: '940px',
-              height: '550px',
+              height: '700px',
               data: {
                 title: `Agregar ${this.titulo}`,
                 valores: { laboral },
@@ -198,13 +198,15 @@ export class GradoComponent {
     
     const dialogRef = this.dialog.open(GradodlgComponent, {
       width: '940px',
-      height: '550px',
+      height: '700px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
           id: this.cartabla.dataSeleccionada.id,
           grado: this.cartabla.dataSeleccionada.grado,
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
+          maximo_grado:this.cartabla.dataSeleccionada.maximo_grado,
+          pais_grado:this.cartabla.dataSeleccionada.pais_grado,
           docente:element.Docente
          /* revalidado: this.cartabla.dataSeleccionada.revalidado,
           lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,

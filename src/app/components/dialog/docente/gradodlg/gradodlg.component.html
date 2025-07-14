@@ -9,12 +9,28 @@
 
         <div class="form tabla">
             <h2>Docente: {{data.valores.docente.nombres}} {{data.valores.docente.apellidos}}</h2>
+            <div class="grados">
+                <mat-form-field>
+                    <mat-label>Maximo grado</mat-label>
+                    <mat-select formControlName="maximo_grado">
+                        <mat-option *ngFor="let opcion of opcionesSelect" [value]="opcion.value">{{opcion.label}}</mat-option>
+        
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>Pais grado</mat-label>
+                    <mat-select formControlName="pais_grado">
+                        <mat-option *ngFor="let opcion of paises" [value]="opcion.pais">{{opcion.pais}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
             <button mat-raised-button color="primary" (click)="agregarFilaTabla(true)">
                 Agregar Fila
             </button>
 
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-             
+
 
                 <ng-container matColumnDef="conservar">
                     <th mat-header-cell *matHeaderCellDef>CONSERVAR</th>
@@ -28,9 +44,10 @@
                     <th mat-header-cell *matHeaderCellDef> Grado </th>
                     <td mat-cell *matCellDef="let element; let i = index">
                         <select [formControl]="elemento(element.get('grade'))">
-                        <!--<select [formControl]="filasArray.at(i).get('grade')">-->
-                            <option *ngFor="let opcion of opcionesSelect" [value]="opcion.value" [disabled]="opcion.disabled">
-                              {{opcion.label}}
+                            <!--<select [formControl]="filasArray.at(i).get('grade')">-->
+                            <option *ngFor="let opcion of opcionesSelect" [value]="opcion.value"
+                                [disabled]="opcion.disabled">
+                                {{opcion.label}}
                             </option>
                         </select>
                     </td>
@@ -62,7 +79,7 @@
                         <input type="checkbox" [formControl]="element.get('revalidado')" />
                     </td>
                 </ng-container>
-                
+
                 <ng-container matColumnDef="fechaRevalidado">
                     <th mat-header-cell *matHeaderCellDef> Fecha Revalidado </th>
                     <td mat-cell *matCellDef="let element; let i = index">
@@ -75,10 +92,11 @@
                 <!-- Filas de datos -->
                 <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
             </table>
+
         </div>
     </div>
     <div>
-        
+
     </div>
     <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
         (click)="add_grado()">Agregar</button>
