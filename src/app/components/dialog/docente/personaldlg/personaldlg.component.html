@@ -92,24 +92,46 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <mat-form-field class="example-full-width nac">
-                                            <mat-label>Sexo</mat-label>
-                                            <mat-select formControlName="sexo">
-                                                <mat-option>Seleccionar Sexo</mat-option>
-                                                @for (sexo of sexos; track sexo) {
-                                                <mat-option [value]="sexo">{{sexo}}</mat-option>
-                                                }
-                                            </mat-select>
-                                            <div class="combo"
-                                                *ngIf="formulario1?.get('sexo')?.invalid && formulario1?.get('sexo')?.touched">
-                                                Sexo es requerido.
+                                        <div class="contenedor">
+                                            <mat-form-field class="example-full-width nac">
+                                                <mat-label>Sexo</mat-label>
+                                                <mat-select formControlName="sexo">
+                                                    <mat-option>Seleccionar Sexo</mat-option>
+                                                    @for (sexo of sexos; track sexo) {
+                                                    <mat-option [value]="sexo">{{sexo}}</mat-option>
+                                                    }
+                                                </mat-select>
+                                                <div class="combo"
+                                                    *ngIf="formulario1?.get('sexo')?.invalid && formulario1?.get('sexo')?.touched">
+                                                    Sexo es requerido.
+                                                </div>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="example-full-width edad">
+                                                <mat-label>Edad</mat-label>
+                                                <input matInput formControlName="edad" placeholder="Edad">
+                                            </mat-form-field>
+                                            <div class="example-full-width mensaje"
+                                                *ngIf="formulario1?.get('edad')?.invalid && formulario1?.get('edad')?.touched">
+                                                DNI es requerido.
                                             </div>
-                                        </mat-form-field>
+                                        </div>
                                     </td>
                                     <td>
 
                                     </td>
 
+                                </tr>
+                                <tr>
+                                    <td><mat-checkbox class="example-margin example-full-width" formControlName="fallecimiento">¿El docente falleció?</mat-checkbox></td>
+                                    <td><mat-form-field class="example-full-width calendario">
+                                            <mat-label>Fecha de fallecimiento</mat-label>
+                                            <input matInput [matDatepicker]="picker" formControlName="fecha_fallecimiento">
+                                            <mat-hint>DD/MM/YYYY</mat-hint>
+                                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                                            <mat-datepicker #picker></mat-datepicker>
+                                        </mat-form-field>
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td><mat-form-field class="example-full-width nacionalidad">
@@ -118,7 +140,7 @@
                                                 <mat-option>Seleccionar Pais</mat-option>
                                                 @for (nacionalidad of nacionalidades; track nacionalidad) {
                                                 <mat-option
-                                                    [value]="nacionalidad.pais">{{nacionalidad.pais}}</mat-option>
+                                                    [value]="naciona(nacionalidad)">{{nacionalidad.pais}}</mat-option>
                                                 }
                                             </mat-select>
                                             <div class="combo"
@@ -129,8 +151,8 @@
                                     <td>
                                         <mat-form-field class="example-full-width">
                                             <mat-label>Nacionalidad</mat-label>
-                                            
-                                            <input matInput formControlName="nacionalidad" placeholder="Nacionalidad"  >
+
+                                            <input matInput formControlName="nacionalidad" placeholder="Nacionalidad">
                                         </mat-form-field>
                                         <div class="example-full-width mensaje"
                                             *ngIf="formulario1?.get('nacionalidad')?.invalid && formulario1?.get('nacionalidad')?.touched && data.modo==1">
@@ -312,11 +334,14 @@
                             Especilidad es requerido.
                         </div>
                     </div>
+                    <div class="form">
+                        <button class="btn-sgte btm" mat-raised-button color="primary" type="submit"
+                            (click)="siguiente(1)">Siguiente</button>
+                    </div>
 
                 </div>
             </form>
-            <button class="btn-sgte btm" mat-raised-button color="primary" type="submit"
-                (click)="siguiente(1)">Siguiente</button>
+
 
         </mat-tab>
         <mat-tab label="Bancario">

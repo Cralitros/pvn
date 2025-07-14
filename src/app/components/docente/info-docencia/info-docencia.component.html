@@ -1,0 +1,102 @@
+<form [formGroup]="formulario1" (ngSubmit)="onSubmit()">
+    <div class="formulario-grid">
+        <mat-form-field appearance="fill">
+            <mat-label>Código</mat-label>
+            <input matInput formControlName="codigo" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Categoría</mat-label>
+            <input matInput formControlName="categoria" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Dedicación</mat-label>
+            <input matInput formControlName="dedicacion" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Inicio de dictado</mat-label>
+            <input matInput type="date" formControlName="inicioDictado">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Fin de dictado</mat-label>
+            <input matInput type="date" formControlName="finDictado" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Modo de ingreso</mat-label>
+            <input matInput formControlName="modoIngreso" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Departamento</mat-label>
+            <input matInput formControlName="departamento" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Lugar de dictado</mat-label>
+            <input matInput formControlName="lugarDictado" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>País de dictado</mat-label>
+            <input matInput formControlName="paisDictado" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Días de permanencia</mat-label>
+            <input matInput type="number" formControlName="diasPermanencia" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Labor administrativa</mat-label>
+            <input matInput formControlName="laborAdministrativa" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Rol anterior</mat-label>
+            <input matInput formControlName="rolAnterior" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Comisión especial</mat-label>
+            <input matInput formControlName="comisionEspecial">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Emisión de carné</mat-label>
+            <input matInput formControlName="emisionCarne">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Préstamo</mat-label>
+            <input matInput formControlName="prestamo" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Sanciones</mat-label>
+            <input matInput formControlName="sanciones" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Observaciones DAP</mat-label>
+            <textarea matInput formControlName="observaDAP" required></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Histórico ratifica</mat-label>
+            <input matInput formControlName="historicoRatifica" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Felicitación encuesta</mat-label>
+            <input matInput formControlName="felicitacionEncuesta" required>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="submit" [disabled]="formulario1.invalid">
+            Guardar
+        </button>
+    </div>
+</form>

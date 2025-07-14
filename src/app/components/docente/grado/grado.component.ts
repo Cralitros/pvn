@@ -133,6 +133,8 @@ export class GradoComponent {
     let laboral: any;
     this.mservice.ponerurl("docentes/cod");
     this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
+      console.log("******************************************");
+      
       console.log(data);
       laboral = data;
       if (data.length > 0) {//verifica si existe el docente
@@ -191,6 +193,9 @@ export class GradoComponent {
     });*/
   }
   editar(element: any) {
+    console.log("******************************************");
+    console.log(element);
+    
     const dialogRef = this.dialog.open(GradodlgComponent, {
       width: '940px',
       height: '550px',
@@ -199,7 +204,8 @@ export class GradoComponent {
         valores: {
           id: this.cartabla.dataSeleccionada.id,
           grado: this.cartabla.dataSeleccionada.grado,
-          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente
+          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
+          docente:element.Docente
          /* revalidado: this.cartabla.dataSeleccionada.revalidado,
           lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,
           fecha_obtencion: this.cartabla.dataSeleccionada.fecha_obtencion,

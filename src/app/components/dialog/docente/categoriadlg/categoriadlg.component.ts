@@ -64,6 +64,7 @@ export const MY_DATE_FORMATS = {
 })
 export class CategoriadlgComponent {
   formularioCategoria?: FormGroup| any= null;
+  formularioHistorico?: FormGroup| any= null;
   departamentos?:Categoria[] ;
   condiciones?: Condiciones[];
   funcion:any;
@@ -270,6 +271,16 @@ export class CategoriadlgComponent {
       
     });
 
+    this.formularioHistorico= this.formBuilder.group({
+      contratado:[''],
+      auxiliar: [''],
+      asociado: [''],
+      principal: [''],
+      categoriaDAP:  [''],
+      jubilacion:  [''],
+      dedicacion:  [''],
+      
+    });
     /*this.saux1.ponerurl("categoria");
     this.saux1.get().subscribe(data => {
       this.condiciones = data;

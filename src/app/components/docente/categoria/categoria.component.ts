@@ -146,7 +146,7 @@ export class CategoriaComponent {
           console.log(data2);
 
           const dialogRef = this.dialog.open(CategoriadlgComponent, {
-            width: '500px',
+            width: '1000px',
             height: '750px',
             data: {
               title: `Agregar ${this.titulo}`,
@@ -179,7 +179,7 @@ export class CategoriaComponent {
       categoriadap:  this.formularioCategoria.value?.categoriadap */
   editar(element: any) {
     const dialogRef = this.dialog.open(CategoriadlgComponent, {
-      width: '500px',
+      width: '1000px',
       height: '750px',
       data: {
         title: `Editar ${this.titulo}`,

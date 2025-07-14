@@ -112,7 +112,7 @@ export class PersonalComponent {
   dialogo(){
     const dialogRef = this.dialog.open(PersonaldlgComponent, {
       width: '550px',
-      height:'950px',
+      height:'1000px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -131,7 +131,7 @@ export class PersonalComponent {
     
     const dialogRef = this.dialog.open(PersonaldlgComponent, {
       width: '550px',
-      height:'950px',
+      height:'1000px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 
@@ -150,6 +150,8 @@ export class PersonalComponent {
           dni: this.cartabla.dataSeleccionada.dni,
           pasaporte:this.cartabla.dataSeleccionada.pasaporte,
           fecha_nacimiento:this.cartabla.dataSeleccionada.fecha_nacimiento,
+          fallecimiento: this.cartabla.dataSeleccionada.fallecimiento,
+          fecha_fallecimiento: this.cartabla.dataSeleccionada.fecha_fallecimiento,
           lugar_nacimiento: this.cartabla.dataSeleccionada.lugar_nacimiento,
           lugarNacimiento: this.cartabla.dataSeleccionada.lugarNacimiento,
           banco:this.cartabla.dataSeleccionada.banco,

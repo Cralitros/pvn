@@ -1,132 +1,181 @@
-<form [formGroup]="formularioCategoria" class="formulario">
-    <div class="general">
+<table>
+    <tr>
+        <td>
+            <form [formGroup]="formularioCategoria" class="formulario">
+                <div class="general">
 
-        <div class="form">
-            <mat-form-field class="example-full-width">
-                <mat-label>Codigo docente</mat-label>
-                <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
-            </mat-form-field>
-        </div>
+                    <div class="form">
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Codigo docente</mat-label>
+                            <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
+                        </mat-form-field>
+                    </div>
 
-        <div class="form">
-            <mat-form-field class="example-full-width calendario">
-                <mat-label>Fecha contrato</mat-label>
-                <input matInput [matDatepicker]="picker2" formControlName="fecha" 
-                    (paste)="onPaste($event,'fecha')"
-                    (input)="onDateInput($event, 'fecha')">
-                <mat-hint>DD/MM/YYYY</mat-hint>
-                <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-                <mat-datepicker #picker2></mat-datepicker>
-            </mat-form-field>
-
-        </div>
-
-        <mat-form-field class="example-full-width">
-            <mat-label>Tipo</mat-label>
-            <mat-select formControlName="tipo">
-                <mat-option>Seleccionar tipo</mat-option>
-                @for (tipo of tipos; track tipo) {
-                <mat-option [value]="tipo">{{tipo}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-
-        <mat-form-field class="example-full-width">
-            <mat-label>Categoria</mat-label>
-            <mat-select formControlName="categoria">
-                <mat-option>Seleccionar categoria</mat-option>
-                @for (categoria of categorias; track categoria) {
-                <mat-checkbox [(ngModel)]="categoria.seleccionada" [ngModelOptions]="{standalone: true}" class="mch">
-                        <mat-form-field class="example-full-width calendario" class="cal">
-                            <mat-label>{{categoria.nombre}}</mat-label>
-                            <input matInput [matDatepicker]="picker2" [(ngModel)]="categoria.fecha" 
-                                   [ngModelOptions]="{standalone: true}" (paste)="onPaste($event,categoria.nombre)">
+                    <div class="form">
+                        <mat-form-field class="example-full-width calendario">
+                            <mat-label>Fecha contrato</mat-label>
+                            <input matInput [matDatepicker]="picker2" formControlName="fecha"
+                                (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
                             <mat-hint>DD/MM/YYYY</mat-hint>
                             <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                             <mat-datepicker #picker2></mat-datepicker>
                         </mat-form-field>
-                </mat-checkbox>
-                }
-            </mat-select>
-        </mat-form-field>
 
-        <mat-form-field class="example-full-width">
-            <mat-label>Dedicacion</mat-label>
-            <mat-select formControlName="dedicacion">
-                <mat-option>Seleccionar dedicacion</mat-option>
-                @for (dedi of dedicacion; track dedi) {
-                <mat-option [value]="dedi">{{dedi}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
+                    </div>
 
-        <mat-form-field class="example-full-width">
-            <mat-label>Labor administrativa</mat-label>
-            <mat-select formControlName="labor">
-                <mat-option>Seleccionar si tiene labor</mat-option>
-                @for (labi of lab; track labi) {
-                <mat-option [value]="labi">{{labi}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field class="example-full-width">
-            <mat-label>Ratificado</mat-label>
-            <mat-select formControlName="ratificado" (selectionChange)="onCategoryChangeRatificado($event)">
-                <mat-option>Seleccionar</mat-option>
-                @for (ra of ratificado; track ra) {
-                <mat-option [value]="ra">{{ra}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-        <div class="example-full-width chkgrp">
-            <section class="example-section">
-                <mat-checkbox formControlName="chk1">Desempeño Académico</mat-checkbox><br>
-                <mat-checkbox formControlName="chk2">Investigación</mat-checkbox><br>
-                <mat-checkbox formControlName="chk3">Desempeño administrativo</mat-checkbox><br>
-                <mat-checkbox formControlName="chk4">Capacitación continua</mat-checkbox><br>
-                <mat-checkbox formControlName="chk5">No Aplica</mat-checkbox><br>
-            </section>
-        </div>
-        <mat-form-field class="example-full-width">
-            <mat-label>Categoria DAP</mat-label>
-            <mat-select formControlName="categoriadap" (selectionChange)="onCategoryChange($event)">
-                <mat-option>Seleccionar Categoria</mat-option>
-                @for (categoriadap of categoriasdap; track categoriadap) {
-                <mat-option [value]="categoriadap">{{categoriadap}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Tipo</mat-label>
+                        <mat-select formControlName="tipo">
+                            <mat-option>Seleccionar tipo</mat-option>
+                            @for (tipo of tipos; track tipo) {
+                            <mat-option [value]="tipo">{{tipo}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
 
-        <mat-form-field class="example-full-width">
-            <mat-label>Condiciones DAP</mat-label>
-            <mat-select formControlName="condiciondap" (selectionChange)="onCategoryChange2($event)">
-                <mat-option>Seleccionar condicion</mat-option>
-                @for (condiciondap of condicionesdap; track condiciondap) {
-                <mat-option [value]="condiciondap">{{condiciondap}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Categoria</mat-label>
+                        <mat-select formControlName="categoria">
+                            <mat-option>Seleccionar categoria</mat-option>
+                            @for (categoria of categorias; track categoria) {
+                            <mat-checkbox [(ngModel)]="categoria.seleccionada" [ngModelOptions]="{standalone: true}"
+                                class="mch">
+                                <mat-form-field class="example-full-width calendario" class="cal">
+                                    <mat-label>{{categoria.nombre}}</mat-label>
+                                    <input matInput [matDatepicker]="picker2" [(ngModel)]="categoria.fecha"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (paste)="onPaste($event,categoria.nombre)">
+                                    <mat-hint>DD/MM/YYYY</mat-hint>
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker2></mat-datepicker>
+                                </mat-form-field>
+                            </mat-checkbox>
+                            }
+                        </mat-select>
+                    </mat-form-field>
 
-        <div class="rg1">
-            <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group "
-                formControlName="rg1">
-                @for (extraordinario of extraordinarios; track extraordinario) {
-                <mat-radio-button class="example-radio-button"
-                    [value]="extraordinario">{{extraordinario}}</mat-radio-button>
-                }
-            </mat-radio-group>
-        </div>
-        <div class="rg2">
-            <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group"
-                formControlName="rg2">
-                @for (inactivo of inactivos; track inactivo) {
-                <mat-radio-button class="example-radio-button" [value]="inactivo">{{inactivo}}</mat-radio-button>
-                }
-            </mat-radio-group>
-        </div>
-        <br>
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Dedicacion</mat-label>
+                        <mat-select formControlName="dedicacion">
+                            <mat-option>Seleccionar dedicacion</mat-option>
+                            @for (dedi of dedicacion; track dedi) {
+                            <mat-option [value]="dedi">{{dedi}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
 
-    </div>
-    <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
-        (click)="add_grado()">{{funcion}}</button>
-</form>
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Labor administrativa</mat-label>
+                        <mat-select formControlName="labor">
+                            <mat-option>Seleccionar si tiene labor</mat-option>
+                            @for (labi of lab; track labi) {
+                            <mat-option [value]="labi">{{labi}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Ratificado</mat-label>
+                        <mat-select formControlName="ratificado" (selectionChange)="onCategoryChangeRatificado($event)">
+                            <mat-option>Seleccionar</mat-option>
+                            @for (ra of ratificado; track ra) {
+                            <mat-option [value]="ra">{{ra}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                    <div class="example-full-width chkgrp">
+                        <section class="example-section">
+                            <mat-checkbox formControlName="chk1">Desempeño Académico</mat-checkbox><br>
+                            <mat-checkbox formControlName="chk2">Investigación</mat-checkbox><br>
+                            <mat-checkbox formControlName="chk3">Desempeño administrativo</mat-checkbox><br>
+                            <mat-checkbox formControlName="chk4">Capacitación continua</mat-checkbox><br>
+                            <mat-checkbox formControlName="chk5">No Aplica</mat-checkbox><br>
+                        </section>
+                    </div>
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Categoria DAP</mat-label>
+                        <mat-select formControlName="categoriadap" (selectionChange)="onCategoryChange($event)">
+                            <mat-option>Seleccionar Categoria</mat-option>
+                            @for (categoriadap of categoriasdap; track categoriadap) {
+                            <mat-option [value]="categoriadap">{{categoriadap}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Condiciones DAP</mat-label>
+                        <mat-select formControlName="condiciondap" (selectionChange)="onCategoryChange2($event)">
+                            <mat-option>Seleccionar condicion</mat-option>
+                            @for (condiciondap of condicionesdap; track condiciondap) {
+                            <mat-option [value]="condiciondap">{{condiciondap}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+
+                    <div class="rg1">
+                        <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group "
+                            formControlName="rg1">
+                            @for (extraordinario of extraordinarios; track extraordinario) {
+                            <mat-radio-button class="example-radio-button"
+                                [value]="extraordinario">{{extraordinario}}</mat-radio-button>
+                            }
+                        </mat-radio-group>
+                    </div>
+                    <div class="rg2">
+                        <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group"
+                            formControlName="rg2">
+                            @for (inactivo of inactivos; track inactivo) {
+                            <mat-radio-button class="example-radio-button"
+                                [value]="inactivo">{{inactivo}}</mat-radio-button>
+                            }
+                        </mat-radio-group>
+                    </div>
+                    <br>
+
+                </div>
+                <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
+                    (click)="add_grado()">{{funcion}}</button>
+            </form>
+        </td>
+        <td>
+            <h3>Historico</h3>
+            <form [formGroup]="formularioHistorico" class="formulario">
+                <div class="form">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>contratado</mat-label>
+                        <input matInput formControlName="contratado" placeholder="contratado">
+                    </mat-form-field>
+                </div>
+                <div class="form">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Auxiliar</mat-label>
+                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
+                    </mat-form-field>
+                </div>
+                <div class="form">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Asociado</mat-label>
+                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
+                    </mat-form-field>
+                </div>
+                <div class="form">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Principal</mat-label>
+                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
+                    </mat-form-field>
+                </div>
+                <div class="form">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Categoria</mat-label>
+                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
+                    </mat-form-field>
+                </div>
+                <div class="form">
+                    <mat-form-field class="example-full-width">
+                        <mat-label>Condicion</mat-label>
+                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
+                    </mat-form-field>
+                </div>
+            </form>
+        </td>
+    </tr>
+</table>

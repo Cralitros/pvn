@@ -8,6 +8,7 @@
         </div>
 
         <div class="form tabla">
+            <h2>Docente: {{data.valores.docente.nombres}} {{data.valores.docente.apellidos}}</h2>
             <button mat-raised-button color="primary" (click)="agregarFilaTabla(true)">
                 Agregar Fila
             </button>
@@ -75,6 +76,9 @@
                 <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
             </table>
         </div>
+    </div>
+    <div>
+        
     </div>
     <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
         (click)="add_grado()">Agregar</button>

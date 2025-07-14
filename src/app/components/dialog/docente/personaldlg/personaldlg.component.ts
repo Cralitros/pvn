@@ -36,7 +36,7 @@ import Swal from 'sweetalert2';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
 
 import { MAT_DATE_FORMATS, MAT_DATE_LOCALE, DateAdapter } from '@angular/material/core';
-
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 export const MY_DATE_FORMATS = {
@@ -77,7 +77,8 @@ export const MY_DATE_FORMATS = {
     MatPaginatorModule,
     MatTableModule,
     Tabla2Component,
-    GradoComponent
+    GradoComponent,
+    MatCheckboxModule
   ],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'es-Es' }, // Opcional: configura localidad
@@ -90,6 +91,7 @@ export class PersonaldlgComponent {
   formulario1?: FormGroup | any = null;
   formulario2?: FormGroup | any = null;
   fechaNacimientoControl?: FormControl;
+  fechaFallecimientoControl?: FormControl;
 
   formularioLaboral?: FormGroup | any = null;
   formularioCategoria?: FormGroup | any = null;
@@ -156,6 +158,8 @@ export class PersonaldlgComponent {
       pasaporte: this.validar_dato(this.data.valores.pasaporte),
       nombres: this.validar_dato(this.data.valores.nombres),
       apellidos: this.validar_dato(this.data.valores.apellidos),
+      fallecimiento: this.validar_dato(this.data.valores.fallecimiento),
+      fecha_fallecimiento: new Date(this.data.valores.fecha_fallecimiento + 'T00:00:00'),
       fecha_nacimiento: new Date(this.data.valores.fecha_nacimiento + 'T00:00:00'),
       departamento: JSON.parse(this.data.valores.lugar_nacimiento).departamento,
       provincia: JSON.parse(this.data.valores.lugar_nacimiento).provincia,
@@ -170,6 +174,7 @@ export class PersonaldlgComponent {
       pais: this.validar_dato(this.data.valores.nacionalidad.pais),
       fecha_cv: new Date(this.data.valores.fecha_cv + 'T00:00:00'),
       especialidad: this.validar_dato(this.data.valores.especialidad),
+      edad: this.obtener_edad(new Date(this.data.valores.fecha_nacimiento + 'T00:00:00')),
     });
 
     this.formulario2 = this.formBuilder.group({
@@ -186,6 +191,18 @@ export class PersonaldlgComponent {
     // Aplicar validación según el banco seleccionado
     // Aplica validación sin resetear el valor (porque estamos en edición)
     this.actualizarValidacionCuenta(this.data.valores.banco, true);
+  }
+  obtener_edad(fechaNacimiento: any) {
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+
+    return edad;
   }
   // Agrega esta función en tu componente o en un archivo de utilidades
   dateFormatValidator(format: string): ValidatorFn {
@@ -249,9 +266,14 @@ export class PersonaldlgComponent {
     this.fechaNacimientoControl = new FormControl('',
       [
         Validators.required,
-        this.dateFormatValidator('DD/MM/YYYY')
+        this.dateFormatValidator('DD/MM/YYYY'),
       ]);
 
+
+    this.fechaFallecimientoControl = new FormControl(
+      { value: '', disabled: true },
+      [this.dateFormatValidator('DD/MM/YYYY')]
+    );
     this.formulario1 = this.formBuilder.group({
       codigo: ['', Validators.required],
       digito: ['', Validators.required],
@@ -259,6 +281,8 @@ export class PersonaldlgComponent {
       pasaporte: [''],
       nombres: ['', Validators.required],
       apellidos: ['', Validators.required],
+      fallecimiento: [''],
+      fecha_fallecimiento: this.fechaFallecimientoControl,
       fecha_nacimiento: this.fechaNacimientoControl,
       departamento: ['', Validators.required],
       provincia: ['', Validators.required],
@@ -273,6 +297,7 @@ export class PersonaldlgComponent {
       pais: ['', Validators.required],
       fecha_cv: ['', Validators.required],
       especialidad: ['', Validators.required],
+      edad: ['']
     });
 
     this.formulario2 = this.formBuilder.group({
@@ -324,9 +349,20 @@ export class PersonaldlgComponent {
       this.actualizarValidacionCuenta(selectedBanco, this.data.modo === 1);
     });
 
-    this.formulario2.get('pais')?.valueChanges.subscribe((selectedPais: any) => {
+    this.formulario1.get('pais')?.valueChanges.subscribe((selectedPais: any) => {
       this.actualizarNacionalidad(selectedPais, this.data.modo === 1);
     });
+
+    this.formulario1.get('fallecimiento')?.valueChanges.subscribe((checked: boolean) => {
+      const checkControl = this.formulario1.get('fecha_fallecimiento');
+      if (checked) {
+        checkControl.enable(); // Habilitar si está marcado
+      } else {
+        checkControl.disable(); // Deshabilitar si se desmarca
+        checkControl.reset();   // (Opcional) limpiar el campo
+      }
+    });
+
 
   }
 
@@ -368,9 +404,54 @@ export class PersonaldlgComponent {
     }
   }
 
+  nacionalidadSeleccionada = [];
+  naciona(datos: any) {
+    //console.log(datos);
+    this.nacionalidadSeleccionada = datos;
+    return datos.pais;
+
+
+  }
+  paisSeleccionado: any = "";
   actualizarNacionalidad(selectedPais: any, isEditMode: boolean = false) {
-    console.log(selectedPais);
-    
+    const departamentoControl = this.formulario1.get('departamento');
+    const provinciaControl = this.formulario1.get('provincia');
+    const distritoControl = this.formulario1.get('distrito');
+    const nombres = this.nacionalidades?.map(n => {
+      if (selectedPais == n.pais) {
+        return n;
+      }
+      return "";
+    });
+
+    if (selectedPais !== 'Perú') {
+      departamentoControl?.clearValidators();
+      provinciaControl?.clearValidators();
+      distritoControl?.clearValidators();
+
+      departamentoControl?.patchValue('');
+      provinciaControl?.patchValue('');
+      distritoControl?.patchValue('');
+      // Deshabilitar los controles
+      departamentoControl?.disable();
+      provinciaControl?.disable();
+      distritoControl?.disable();
+    } else {
+      // Deshabilitar los controles
+      departamentoControl?.enable();
+      provinciaControl?.enable();
+      distritoControl?.enable();
+    }
+    //console.log(nombres);
+    const valor: any = nombres?.find(item => item && typeof item === 'object');
+    console.log(valor);
+    this.paisSeleccionado = valor;
+    /*const pais = nombres?.find(p => p.trim() !== "");
+    console.log(pais);*/
+    this.formulario1.get('nacionalidad')?.patchValue(valor.nombre);
+    departamentoControl?.updateValueAndValidity();
+    provinciaControl?.updateValueAndValidity();
+    distritoControl?.updateValueAndValidity();
 
   }
   // Agrega este método a la clase:
@@ -436,13 +517,15 @@ export class PersonaldlgComponent {
       apellidos: this.formulario1.value.apellidos,
       fecha_nacimiento: this.formulario1.value.fecha_nacimiento,
       lugar_nacimiento: JSON.stringify(data),
+      fallecimiento: this.formulario1.value.fallecimiento,
+      fecha_fallecimiento: this.formulario1.value.fecha_fallecimiento,
       sexo: this.formulario1.value.sexo,
       domicilio: this.formulario1.value.domicilio,
       telefono: this.formulario1.value.telefono,
       celular: this.formulario1.value.celular,
       estado_civil: this.formulario1.value.estado_civil,
       numero_hijos: this.formulario1.value.numero_hijos,
-      nacionalidad: this.formulario1.value.nacionalidad,
+      //nacionalidad: this.formulario1.value.nacionalidad,
       pais: this.formulario1.value.pais,
       banco: this.formulario2.value.banco,
       cuenta: this.formulario2.value.cuenta,
@@ -455,6 +538,7 @@ export class PersonaldlgComponent {
       idDepartamento: this.formulario1.value.departamento,
       idProvincia: this.formulario1.value.provincia,
       idDistrito: this.formulario1.value.distrito,
+      idNacionalidad: this.paisSeleccionado.id,
       especialidad: this.formulario1.value.especialidad,
     }
     this.cgdepr.ponerurl("docentes")

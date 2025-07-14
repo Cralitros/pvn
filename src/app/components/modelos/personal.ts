@@ -13,6 +13,8 @@ export interface Personal{
     sexo:string;
     dni: string;
     pasaporte: string;
+    fallecimiento: string;
+    fecha_fallecimiento: string;
     fecha_nacimiento: string;
     lugar_nacimiento: string;
     lugarNacimiento:any;

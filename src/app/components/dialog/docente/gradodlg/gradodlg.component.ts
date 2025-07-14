@@ -306,7 +306,8 @@ export class GradodlgComponent {
       { value: 'Maestro', label: 'Maestro', disabled: false },
       { value: 'Doctor', label: 'Doctor', disabled: false },
       { value: 'Post Doctorado', label: 'Post Doctor', disabled: false },
-      { value: 'PHD.', label: 'PHD.', disabled: false }
+      { value: 'PHD.', label: 'PHD.', disabled: false },
+      { value: '2da. Especialidad', label: '2da. Especialidad', disabled: false },
     ];
 
     console.log(this.data);

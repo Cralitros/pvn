@@ -162,7 +162,7 @@
 }
 
 .add-bnt-grado {
-   
+
     left: 370px;
 }
 
@@ -186,28 +186,35 @@
 .example-radio-button {
     margin: -5px;
 }
-.rg1{
+
+.rg1 {
     position: relative;
     left: 20px;
 }
-.rg2{
+
+.rg2 {
     position: relative;
     left: 135px;
 }
 
-.cnt{
+.cnt {
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
 }
 
-.mch{
+.mch {
     position: relative;
     margin-left: -20px;
     scale: 0.8;
 }
-.cal{
+
+.cal {
     position: relative;
     margin-left: -10px;
     width: 180px;
-    
+
+}
+
+td {
+    width: 500px;
 }

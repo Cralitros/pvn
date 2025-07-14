@@ -23,6 +23,7 @@ import { AfpsComponent } from './components/maestros/afps/afps.component';
 import { PlanComponent } from './components/maestros/plan/plan.component';
 import { NacionalidadComponent } from './components/maestros/nacionalidad/nacionalidad.component';
 import { AreasComponent } from './components/maestros/areas/areas.component';
+import { InfoDocenciaComponent } from './components/docente/info-docencia/info-docencia.component';
 
 
 export const routes: Routes = [
@@ -50,6 +51,7 @@ export const routes: Routes = [
             { path: 'afps', component: AfpsComponent,title: "AFP" , canActivate:[deslogueoGuard]},
             { path: 'plan', component: PlanComponent,title: "Plan Académico" , canActivate:[deslogueoGuard]},
             { path: 'area', component: AreasComponent,title: "Áreas" , canActivate:[deslogueoGuard]},
+            { path: 'infoDocentes', component: InfoDocenciaComponent,title: "Informacion Docentes" , canActivate:[deslogueoGuard]},
            
         ],canActivate:[deslogueoGuard]
     },
