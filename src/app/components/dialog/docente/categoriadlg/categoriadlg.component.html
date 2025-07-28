@@ -136,46 +136,86 @@
                     (click)="add_grado()">{{funcion}}</button>
             </form>
         </td>
-        <td>
-            <h3>Historico</h3>
-            <form [formGroup]="formularioHistorico" class="formulario">
-                <div class="form">
-                    <mat-form-field class="example-full-width">
-                        <mat-label>contratado</mat-label>
-                        <input matInput formControlName="contratado" placeholder="contratado">
-                    </mat-form-field>
-                </div>
-                <div class="form">
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Auxiliar</mat-label>
-                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
-                    </mat-form-field>
-                </div>
-                <div class="form">
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Asociado</mat-label>
-                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
-                    </mat-form-field>
-                </div>
-                <div class="form">
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Principal</mat-label>
-                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
-                    </mat-form-field>
-                </div>
-                <div class="form">
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Categoria</mat-label>
-                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
-                    </mat-form-field>
-                </div>
-                <div class="form">
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Condicion</mat-label>
-                        <input matInput formControlName="auxiliar" placeholder="auxiliar">
-                    </mat-form-field>
-                </div>
-            </form>
+        <td class="contenedortd">
+            <div class="contenedor">
+                <h2 class="titulo2"><u>Histórico</u></h2>
+                <form [formGroup]="formularioHistorico" class="formulario">
+                    <table>
+                        <tr>
+                            <td>
+                                <mat-form-field class="example-full-width calendario">
+                                    <mat-label>Fecha contratado</mat-label>
+                                    <input matInput [matDatepicker]="picker3" formControlName="contratado"
+                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
+                                    <mat-hint>DD/MM/YYYY</mat-hint>
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker3"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker3></mat-datepicker>
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="example-full-width calendario">
+                                    <mat-label>Fecha auxiliar</mat-label>
+                                    <input matInput [matDatepicker]="picker4" formControlName="auxiliar"
+                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
+                                    <mat-hint>DD/MM/YYYY</mat-hint>
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker4"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker4></mat-datepicker>
+                                </mat-form-field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <mat-form-field class="example-full-width calendario">
+                                    <mat-label>Fecha asociado</mat-label>
+                                    <input matInput [matDatepicker]="picker5" formControlName="asociado"
+                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
+                                    <mat-hint>DD/MM/YYYY</mat-hint>
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker5"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker5></mat-datepicker>
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="example-full-width calendario">
+                                    <mat-label>Fecha principal</mat-label>
+                                    <input matInput [matDatepicker]="picker6" formControlName="principal"
+                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
+                                    <mat-hint>DD/MM/YYYY</mat-hint>
+                                    <mat-datepicker-toggle matIconSuffix [for]="picker6"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker6></mat-datepicker>
+                                </mat-form-field>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Categoria Jubilación</mat-label>
+                                    <mat-select formControlName="categoriaJubilacion"
+                                        (selectionChange)="onCategoryChange2($event)">
+                                        <mat-option>Seleccionar categoria</mat-option>
+                                        @for (condiciondap of categorias; track condiciondap) {
+                                        <mat-option [value]="condiciondap.nombre">{{condiciondap.nombre}}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field class="example-full-width">
+                                    <mat-label>Dedicación Jubilación</mat-label>
+                                    <mat-select formControlName="dedicacionJubilacion"
+                                        (selectionChange)="onCategoryChange2($event)">
+                                        <mat-option>Seleccionar dedicación</mat-option>
+                                        @for (condiciondap of dedicacion; track condiciondap) {
+                                        <mat-option [value]="condiciondap">{{condiciondap}}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </td>
+                        </tr>
+                    </table>
+
+
+                </form>
+            </div>
         </td>
     </tr>
 </table>

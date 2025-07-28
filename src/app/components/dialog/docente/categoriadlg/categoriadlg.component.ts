@@ -82,6 +82,9 @@ export class CategoriadlgComponent {
   bloqueadorg1=true;
   bloqueadorg2=true;
 
+  cateJubilacion=['Principal','Asociado','Auxiliar','Contratado'];
+  
+
   categorias = [
     { nombre: 'Principal', seleccionada: false, fecha: null },
     { nombre: 'Asociado', seleccionada: false, fecha: null },
@@ -89,7 +92,9 @@ export class CategoriadlgComponent {
     { nombre: 'Contratado', seleccionada: false, fecha: null },
     { nombre: 'Profesor visitante', seleccionada: false, fecha: null },
     { nombre: 'Instructor', seleccionada: false, fecha: null },
-    { nombre: 'Jefe de prácticas', seleccionada: false, fecha: null }
+    { nombre: 'Jefe de prácticas', seleccionada: false, fecha: null },
+    { nombre: 'Ayudante de docencia', seleccionada: false, fecha: null },
+    { nombre: 'Asistente de docencia', seleccionada: false, fecha: null },
   ];
 
   trackByNombre(index: number, item: any) {
@@ -237,6 +242,16 @@ export class CategoriadlgComponent {
       chk4: ratificado.chk4,
       chk5: ratificado.chk5,
     });
+
+    this.formularioHistorico.setValue({
+      contratado:new Date(this.data.valores.contratado),
+      auxiliar:new Date(this.data.valores.auxiliar),
+      principal:new Date(this.data.valores.principal),
+      asociado:new Date(this.data.valores.asociado),
+      dedicacionJubilacion:this.data.valores.dedicacionJubilacion,
+      categoriaJubilacion:this.data.valores.categoriaJubilacion,
+    });
+    
     let event={value:ratificado.ratificado}
     this.categorias=JSON.parse(this.data.valores.categoria);
     this.onCategoryChangeRatificado(event);
@@ -276,9 +291,8 @@ export class CategoriadlgComponent {
       auxiliar: [''],
       asociado: [''],
       principal: [''],
-      categoriaDAP:  [''],
-      jubilacion:  [''],
-      dedicacion:  [''],
+      categoriaJubilacion:  [''],
+      dedicacionJubilacion:  [''],
       
     });
     /*this.saux1.ponerurl("categoria");
@@ -347,6 +361,12 @@ export class CategoriadlgComponent {
       labor:  this.formularioCategoria.value?.labor,
       categoriadap:  this.formularioCategoria.value?.categoriadap,
       ratificado: ratificadoString,
+      hContratado:this.formularioHistorico.value?.contratado,
+      hAuxiliar:this.formularioHistorico.value?.auxiliar,
+      hPrincipal:this.formularioHistorico.value?.principal,
+      hAsociado:this.formularioHistorico.value?.asociado,
+      dedicacionJubilacion:this.formularioHistorico.value?.dedicacionJubilacion,
+      categoriaJubilacion:this.formularioHistorico.value?.categoriaJubilacion,
     }
     console.log(body);
     if(body.categoriadap=='Extraordinario'){

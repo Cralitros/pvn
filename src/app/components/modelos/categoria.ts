@@ -9,4 +9,12 @@ export interface Categoria{
     dedicacion:string;
     labor:string;
     categoriadap:string;
+    hContratado:Date;
+    hAuxiliar:Date;
+    hPrincipal:Date;
+    hAsociado:Date;
+    categoriaJubilacion:string;
+    dedicacionJubilacion:string;
+    categoriaDAP?:string;
+    condicionDAP?:string;
 }

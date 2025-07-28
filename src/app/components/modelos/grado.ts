@@ -6,4 +6,9 @@ export interface Grado{
     fecha_obtencion:string;
     codigoDocente:string;
     profesion:string;
+    bgac:boolean;
+    bga:string;
+    prestamoc:boolean;
+    prestamo:string;
+
 }

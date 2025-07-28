@@ -29,6 +29,8 @@ export class InvestigadlgComponent {
   departamentos?: Investigador[];
   funcion: any;
   fnc: boolean = true;
+  grupo=["Carlos Monge Medrano","María Rostworowski","No aplica"];
+  nivel=["I","II","III","IV","V","VI","VII","No aplica"];
   constructor(public dialogRef: MatDialogRef<InvestigadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
@@ -51,7 +53,14 @@ export class InvestigadlgComponent {
       rol: this.data.valores.rol,
       reconocimiento: this.data.valores.reconocimiento,
       contenido: this.data.valores.contenido,
-      codigoDocente: this.data.valores.codigoDocente
+      codigoDocente: this.data.valores.codigoDocente,
+      ri: this.data.valores.ri,
+      pibpdu: this.data.valores.pibpdu,
+      gadi: this.data.valores.gadi,
+      sei: this.data.valores.sei,
+      gadd: this.data.valores.gadd,
+      gadit: this.data.valores.gadit,
+      dfi: this.data.valores.dfi,
 
     });
     //this.form.value.id=this.data.valores.id;
@@ -71,6 +80,13 @@ export class InvestigadlgComponent {
       reconocimiento: [''],
       contenido: [''],
       codigoDocente: [''],
+      ri: [''],
+      pibpdu: [''],
+      gadi: [''],
+      sei: [''],
+      gadd: [''],
+      gadit: [''],
+      dfi: [''],
 
     });
     this.cgdepr.ponerurl("docentesinvestiga");
@@ -105,8 +121,14 @@ export class InvestigadlgComponent {
       rol: this.formulario.value?.rol,
       reconocimiento: this.formulario.value?.reconocimiento,
       contenido: this.formulario.value?.contenido,
-      codigoDocente: this.formulario.value?.codigoDocente
-
+      codigoDocente: this.formulario.value?.codigoDocente,
+      ri: this.formulario.value?.ri,
+      pibpdu: this.formulario.value?.pibpdu,
+      gadi: this.formulario.value?.gadi,
+      sei: this.formulario.value?.sei,
+      gadd: this.formulario.value?.gadd,
+      gadit: this.formulario.value?.gadit,
+      dfi: this.formulario.value?.dfi,
     }
     this.cgdepr.ponerurl("docentesinvestiga")
     if (this.formulario?.valid) {

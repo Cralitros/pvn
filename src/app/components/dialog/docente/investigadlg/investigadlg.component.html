@@ -1,64 +1,149 @@
 <div class="contenido">
     <h1 class="titulo">{{funcion}}</h1>
-        
-    <form [formGroup]="formulario">
+
+    <form [formGroup]="formulario" class="formulario">
         <div class="general">
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Codigo docente</mat-label>
-                    <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>ORCID</mat-label>
-                    <input matInput formControlName="orcid" placeholder="ORCID">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>RENACYT</mat-label>
-                    <input matInput formControlName="renacyt" placeholder="RENACYT">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Grupo</mat-label>
-                    <input matInput formControlName="grupo" placeholder="Grupo">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Nivel</mat-label>
-                    <input matInput formControlName="nivel" placeholder="Nivel">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Registro</mat-label>
-                    <input matInput formControlName="registro" placeholder="Registro">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Rol</mat-label>
-                    <input matInput formControlName="rol" placeholder="Rol">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Reconocimiento</mat-label>
-                    <input matInput formControlName="reconocimiento" placeholder="Reconocimiento">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Observación</mat-label>
-                    <input matInput formControlName="contenido" placeholder="Observación">
-                </mat-form-field>
-            </div>
+            <table>
+                <tr>
+                    <td>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Codigo docente</mat-label>
+                            <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>ORCID</mat-label>
+                            <input matInput formControlName="orcid" placeholder="ORCID">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>RENACYT</mat-label>
+                            <input matInput formControlName="renacyt" placeholder="RENACYT">
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <mat-form-field>
+                            <mat-label>Grupo</mat-label>
+                            <mat-select formControlName="grupo">
+                                @for (food of grupo; track food) {
+                                <mat-option [value]="food">{{food}}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field>
+                            <mat-label>Nivel</mat-label>
+                            <mat-select formControlName="nivel">
+                                @for (food of nivel; track food) {
+                                <mat-option [value]="food">{{food}}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Registro</mat-label>
+                            <input matInput formControlName="registro" placeholder="Registro">
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Rol</mat-label>
+                            <input matInput formControlName="rol" placeholder="Rol">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Reconocimiento</mat-label>
+                            <input matInput formControlName="reconocimiento" placeholder="Reconocimiento">
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width">
+                            <mat-label>Observación</mat-label>
+                            <input matInput formControlName="contenido" placeholder="Observación">
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr></tr>
+            </table>
         </div>
-        
+
+        <br>
+        <hr>
+
+        <div class="general">
+            <table>
+                <tr>
+                    <td>
+                        <h3>RECONOCIMIENTO</h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <mat-form-field class="example-full-width  input">
+                            <mat-label>Reconocimiento a la investigación</mat-label>
+                            <textarea formControlName="ri" matInput
+                                placeholder="Reconocimieno a la investigacion"></textarea>
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width  input">
+                            <mat-label>Premio a la innovación</mat-label>
+                            <textarea formControlName="pibpdu" matInput placeholder="Premio a la innovación"></textarea>
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <mat-form-field class="example-full-width  input">
+                            <mat-label>Ganador de alto desempeño en investigacion 3 años (DAP)</mat-label>
+                            <textarea formControlName="gadi" matInput
+                                placeholder="Ganador de alto desempeño en investigacion 3 años (DAP)"></textarea>
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width  input">
+                            <mat-label>Semestre de estudios</mat-label>
+                            <textarea formControlName="sei" matInput placeholder="Semestre de estudios"></textarea>
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <mat-form-field class="example-full-width  input">
+                            <mat-label>Ganador de alto desempeño en docencia 2 años (DAP)</mat-label>
+                            <textarea formControlName="gadd" matInput
+                                placeholder="Ganador de alto desempeño en docencia 2 años (DAP)"></textarea>
+                        </mat-form-field>
+                    </td>
+                    <td>
+                        <mat-form-field class="example-full-width  input">
+                            <mat-label>Ganador de alto desempeño en investigacion 3 años (DAP)</mat-label>
+                            <textarea formControlName="gadit" matInput
+                                placeholder="Ganador de alto desempeño en investigacion 3 años (DAP)"></textarea>
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <mat-form-field class="example-full-width  input">
+                            <mat-label>Direccion de fomento de la investigacion</mat-label>
+                            <textarea formControlName="dfi" matInput
+                                placeholder="Direccion de fomento de la investigacion"></textarea>
+                        </mat-form-field>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </form>
     <div mat-dialog-actions class="buttons">
         <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>

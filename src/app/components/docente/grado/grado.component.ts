@@ -46,10 +46,10 @@ export class GradoComponent {
   columns: Column[] = [
     { columnDef: 'id', header: 'No.', cell: (element: Grado) => `${element.id}` },
     { columnDef: 'codigo', header: 'Codigo Docente', cell: (element: Grado) => `${element.codigoDocente}` },
-    { columnDef: 'grado', header: 'Grado', cell: (element: Grado) => this.separar_data(element.grado), cssClass: 'pre-formatted'}, // Añade esta propiedad  },
-   /* { columnDef: 'revalidado', header: 'Revalidado', cell: (element: Grado) => `${element.revalidado}` },
-    { columnDef: 'lugar_obtencion', header: 'Lugar obtencion', cell: (element: Grado) => `${element.lugar_obtencion}` },
-    { columnDef: 'fecha_obtencion', header: 'Fecha obtencion', cell: (element: Grado) => `${element.fecha_obtencion}` },*/
+    { columnDef: 'grado', header: 'Grado', cell: (element: Grado) => this.separar_data(element.grado), cssClass: 'pre-formatted' }, // Añade esta propiedad  },
+    /* { columnDef: 'revalidado', header: 'Revalidado', cell: (element: Grado) => `${element.revalidado}` },
+     { columnDef: 'lugar_obtencion', header: 'Lugar obtencion', cell: (element: Grado) => `${element.lugar_obtencion}` },
+     { columnDef: 'fecha_obtencion', header: 'Fecha obtencion', cell: (element: Grado) => `${element.fecha_obtencion}` },*/
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
   ];
 
@@ -134,7 +134,7 @@ export class GradoComponent {
     this.mservice.ponerurl("docentes/cod");
     this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
       console.log("******************************************");
-      
+
       console.log(data);
       laboral = data;
       if (data.length > 0) {//verifica si existe el docente
@@ -142,22 +142,22 @@ export class GradoComponent {
         this.mservice.ponerurl("docentesgrado");
         this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
           console.log(data2);
-          
-            const dialogRef = this.dialog.open(GradodlgComponent, {
-              width: '940px',
-              height: '700px',
-              data: {
-                title: `Agregar ${this.titulo}`,
-                valores: { laboral },
-                modo: 0
-              }
-            });
-            dialogRef.afterClosed().subscribe(result => {
-              //if (result) {
-              this.cargartabla();
-              // }
-            });
-          
+
+          const dialogRef = this.dialog.open(GradodlgComponent, {
+            width: '1000px',
+            height: '750px',
+            data: {
+              title: `Agregar ${this.titulo}`,
+              valores: { laboral },
+              modo: 0
+            }
+          });
+          dialogRef.afterClosed().subscribe(result => {
+            //if (result) {
+            this.cargartabla();
+            // }
+          });
+
 
         });
         /* const dialogRef = this.dialog.open(LaboraldlgComponent, {
@@ -195,24 +195,28 @@ export class GradoComponent {
   editar(element: any) {
     console.log("******************************************");
     console.log(element);
-    
+
     const dialogRef = this.dialog.open(GradodlgComponent, {
-      width: '940px',
-      height: '700px',
+      width: '1000px',
+      height: '750px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
           id: this.cartabla.dataSeleccionada.id,
           grado: this.cartabla.dataSeleccionada.grado,
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
-          maximo_grado:this.cartabla.dataSeleccionada.maximo_grado,
-          pais_grado:this.cartabla.dataSeleccionada.pais_grado,
-          docente:element.Docente
-         /* revalidado: this.cartabla.dataSeleccionada.revalidado,
-          lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,
-          fecha_obtencion: this.cartabla.dataSeleccionada.fecha_obtencion,
-          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
-          profesion: this.cartabla.dataSeleccionada.profesion,*/
+          maximo_grado: this.cartabla.dataSeleccionada.maximo_grado,
+          pais_grado: this.cartabla.dataSeleccionada.pais_grado,
+          bgac: this.cartabla.dataSeleccionada.bgac,
+          bga: this.cartabla.dataSeleccionada.bga,
+          prestamoc: this.cartabla.dataSeleccionada.prestamoc,
+          prestamo: this.cartabla.dataSeleccionada.prestamo,
+          docente: element.Docente
+          /* revalidado: this.cartabla.dataSeleccionada.revalidado,
+           lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,
+           fecha_obtencion: this.cartabla.dataSeleccionada.fecha_obtencion,
+           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
+           profesion: this.cartabla.dataSeleccionada.profesion,*/
 
         },
         modo: 1
@@ -238,13 +242,13 @@ export class GradoComponent {
     })
   }
 
-  separar_data(elemento:any){
-    let dat_tojson=JSON.parse(elemento);
+  separar_data(elemento: any) {
+    let dat_tojson = JSON.parse(elemento);
     //console.log(dat_tojson);
-    let  cadena="";
+    let cadena = "";
 
-    for(let i=0;i<dat_tojson.length;i++){
-      cadena+=`-Grado: ${dat_tojson[i].grade}\n-Titulo: ${dat_tojson[i].titulo}\n-Fecha: ${dat_tojson[i].fecha}\n-Lugar: ${dat_tojson[i].lugar}\n-Revalidado: ${dat_tojson[i].revalidado}\n----------------------------------\n`
+    for (let i = 0; i < dat_tojson.length; i++) {
+      cadena += `-Grado: ${dat_tojson[i].grade}\n-Titulo: ${dat_tojson[i].titulo}\n-Fecha: ${dat_tojson[i].fecha}\n-Lugar: ${dat_tojson[i].lugar}\n-Revalidado: ${dat_tojson[i].revalidado}\n----------------------------------\n`
     }
     return cadena;
 

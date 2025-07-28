@@ -137,7 +137,7 @@ export class CategoriaComponent {
     this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
       console.log(data);
       console.log("categoria");
-      
+
       laboral = data;
       if (data[0].DocenteCategoria.length == 0) {//verifica si existe el docente
 
@@ -193,7 +193,13 @@ export class CategoriaComponent {
           dedicacion: this.cartabla.dataSeleccionada.dedicacion,
           labor: this.cartabla.dataSeleccionada.labor,
           categoriadap: this.cartabla.dataSeleccionada.categoriadap,
-          ratificado:this.cartabla.dataSeleccionada.ratificado,
+          ratificado: this.cartabla.dataSeleccionada.ratificado,
+          contratado: this.cartabla.dataSeleccionada.hContratado,
+          auxiliar:this.cartabla.dataSeleccionada.hAuxiliar,
+          principal: this.cartabla.dataSeleccionada.hPrincipal,
+          asociado: this.cartabla.dataSeleccionada.hAsociado,
+          dedicacionJubilacion: this.cartabla.dataSeleccionada.dedicacionJubilacion,
+          categoriaJubilacion: this.cartabla.dataSeleccionada.categoriaJubilacion,
         },
         modo: 1
       }

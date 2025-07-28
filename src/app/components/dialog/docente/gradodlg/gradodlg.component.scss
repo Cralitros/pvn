@@ -189,3 +189,10 @@
 input[type="text"] {
     width: 100px;
 }
+.divs{
+    display: flex;
+    flex-direction: column;
+}
+.col{
+    width: 400px;
+}

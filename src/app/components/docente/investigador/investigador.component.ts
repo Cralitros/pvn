@@ -157,8 +157,8 @@ export class InvestigadorComponent {
           console.log(data2);
           if (data2.length == 0) {
             const dialogRef = this.dialog.open(InvestigadlgComponent, {
-              width: '500px',
-              height: '550px',
+              width: '800px',
+              height: '900px',
               data: {
                 title: `Agregar ${this.titulo}`,
                 valores: { laboral },
@@ -178,8 +178,8 @@ export class InvestigadorComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(InvestigadlgComponent, {
-      width: '500px',
-      height: '550px',
+      width: '800px',
+      height: '900px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
@@ -192,7 +192,14 @@ export class InvestigadorComponent {
           rol: this.cartabla.dataSeleccionada.rol,
           reconocimiento: this.cartabla.dataSeleccionada.reconocimiento,
           contenido: this.cartabla.dataSeleccionada.contenido,
-          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente
+          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
+          ri: this.cartabla.dataSeleccionada.ri,
+          pibpdu: this.cartabla.dataSeleccionada.pibpdu,
+          gadi: this.cartabla.dataSeleccionada.gadi,
+          sei: this.cartabla.dataSeleccionada.sei,
+          gadd: this.cartabla.dataSeleccionada.gadd,
+          gadit: this.cartabla.dataSeleccionada.gadit,
+          dfi: this.cartabla.dataSeleccionada.dfi,
         },
         modo: 1
       }

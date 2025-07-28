@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, Inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,6 +19,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import Swal from 'sweetalert2';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
 import { Aux1Service } from '../../../../services/aux1.service';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 
 export const MY_DATE_FORMATS = {
@@ -60,7 +61,8 @@ interface Fila {
     MatPaginatorModule,
     MatTableModule,
     MatAutocompleteModule,
-    FormsModule
+    FormsModule,
+    MatCheckboxModule
 
   ],
   templateUrl: './gradodlg.component.html',
@@ -79,6 +81,8 @@ export class GradodlgComponent {
   funcion: any;
   fnc: boolean = true;
   grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor","Segunda Especialidad","Otros"];
+  bgaControl?: FormControl;
+  prestamosControl?: FormControl;
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _intl = inject(MatDatepickerIntl);
@@ -161,7 +165,25 @@ export class GradodlgComponent {
       codigoDocente: this.data.valores.codigoDocente,
       maximo_grado:this.data.valores.maximo_grado,
       pais_grado:this.data.valores.pais_grado,
+      bgac:this.data.valores.bgac,
+      bga:this.data.valores.bga,
+      prestamoc:this.data.valores.prestamoc,
+      prestamo:this.data.valores.prestamo,
     });
+
+    // Habilita o deshabilita el campo 'bga' según el valor de 'bgac'
+    if (this.data.valores.bgac === true) {
+      this.formularioGrado.get('bga')?.enable();
+    } else {
+      this.formularioGrado.get('bga')?.disable();
+    }
+
+    // Habilita o deshabilita el campo 'bga' según el valor de 'prestamoc'
+    if (this.data.valores.prestamoc === true) {
+      this.formularioGrado.get('prestamo')?.enable();
+    } else {
+      this.formularioGrado.get('prestamo')?.disable();
+    }
   }
 
   get filasArray(): FormArray {
@@ -273,13 +295,27 @@ export class GradodlgComponent {
     ];
 
     console.log(this.data);
+
+    this.bgaControl = new FormControl(
+      { value:'',disabled: true },
+    );
+    this.prestamosControl = new FormControl(
+      { value:'',disabled: true },
+    );
+
+
     this.formularioGrado = this.formBuilder.group({
       id: [''],
       gradosTabla: this.formBuilder.array([]),      
       codigoDocente: [''],
       maximo_grado:[''],
       pais_grado:[''],
+      bgac:[''],
+      bga:this.bgaControl,
+      prestamoc:[''],
+      prestamo:this.prestamosControl,
     });
+
 
     this.cgdepr.ponerurl("docentesgrado");
     this.cgdepr.get().subscribe(data => {
@@ -297,6 +333,26 @@ export class GradodlgComponent {
     }
 
     this.pais();
+
+    this.formularioGrado.get('bgac')?.valueChanges.subscribe((checked: boolean) => {
+       const checkControl = this.formularioGrado.get('bga');
+      if (checked) {
+        checkControl.enable(); // Habilitar si está marcado
+      } else {
+        checkControl.disable(); // Deshabilitar si se desmarca
+        checkControl.reset();   // (Opcional) limpiar el campo
+      }
+    });
+
+    this.formularioGrado.get('prestamoc')?.valueChanges.subscribe((checked: boolean) => {
+       const checkControl = this.formularioGrado.get('prestamo');
+      if (checked) {
+        checkControl.enable(); // Habilitar si está marcado
+      } else {
+        checkControl.disable(); // Deshabilitar si se desmarca
+        checkControl.reset();   // (Opcional) limpiar el campo
+      }
+    });
 
   }
   pais(){
@@ -324,6 +380,10 @@ export class GradodlgComponent {
       codigoDocente: this.formularioGrado.value?.codigoDocente,
       maximo_grado:this.formularioGrado.value?.maximo_grado,
       pais_grado:this.formularioGrado.value?.pais_grado,
+      bgac:this.formularioGrado.value?.bgac,
+      bga:this.formularioGrado.value?.bga,
+      prestamoc:this.formularioGrado.value?.prestamoc,
+      prestamo:this.formularioGrado.value?.prestamo,
       //      profesion: this.formularioGrado.value?.profesion,
     }
     this.cgdepr.ponerurl("docentesgrado")
