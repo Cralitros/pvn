@@ -1,0 +1,121 @@
+<form [formGroup]="formularioInfo" class="formulario">
+    <div class="general">
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Codigo docente</mat-label>
+                <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
+            </mat-form-field>
+        </div>
+
+        <table>
+            <tr>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Categoria actual</mat-label>
+                        <mat-select name="categoria" formControlName="categoria">
+                            @for (categoria of categoria_actual; track categoria) {
+                            <mat-option [value]="categoria">{{categoria}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Dedicacion</mat-label>
+                        <mat-select name="dedicacion" formControlName="dedicacion">
+                            @for (d of dedicacion; track d) {
+                            <mat-option [value]="d">{{d}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Rango de dictado</mat-label>
+                        <mat-date-range-input [rangePicker]="picker">
+                            <input matStartDate formControlName="inicio_dictado" placeholder="Inicio dictado">
+                            <input matEndDate formControlName="fin_dictado" placeholder="Fin dictado">
+                        </mat-date-range-input>
+
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker></mat-date-range-picker>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Modo ingreso</mat-label>
+                        <mat-select name="modo_ingreso" formControlName="modo_ingreso">
+                            @for (ing of ingreso; track ing) {
+                            <mat-option [value]="ing">{{ing}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Profesor perteneciente a:</mat-label>
+                        <mat-select name="departamento" formControlName="departamento">
+                            @for (ua of unidades_academicas; track ua) {
+                            <mat-option [value]="ua.nombre">{{ua.nombre}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Labor administrativa</mat-label>
+                        <mat-select name="labor_administrativa" formControlName="labor_administrativa">
+                            @for (la of labor_adminsitrativa; track la) {
+                            <mat-option [value]="la">{{la}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Lugar dictado</mat-label>
+                        <mat-select name="lugar_dictado" formControlName="lugar_dictado">
+                            @for (ld of lugar_dictado; track ld) {
+                            <mat-option [value]="ld">{{ld}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Pais dictado</mat-label>
+                        <mat-select name="pais_dictado" formControlName="pais_dictado">
+                            @for (pd of pais_dictado; track pd) {
+                            <mat-option [value]="pd.pais">{{pd.pais}}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+
+            </tr>
+            <tr>
+
+            </tr>
+            <tr>
+
+            </tr>
+            <tr>
+
+            </tr>
+        </table>
+
+
+
+
+    </div>
+    <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
+        (click)="add_grado()">Agregar</button>
+</form>

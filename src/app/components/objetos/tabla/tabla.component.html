@@ -54,7 +54,7 @@
                     <mat-icon>picture_as_pdf</mat-icon>
                     <span>Contrato general</span>
                   </button>
-                  
+
                   <!--<button mat-menu-item disabled>
                     <mat-icon>voicemail</mat-icon>
                     <span>Check voice mail</span>
@@ -94,6 +94,8 @@
       (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
     <button class="btncss" *ngIf="tipo=='docentes'" mat-button
       (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+      (click)="mover(selectedRow.codigo, 'infoDocentes')">Info. Docentes</button>
     <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
 
   </div>
