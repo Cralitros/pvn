@@ -80,9 +80,6 @@ export class GradoComponent {
     this.formulario = this.formBuilder.group({
       codigo: ['']
     });
-  }
-
-  ngAfterViewInit() {
     this.route.queryParams.subscribe((params: any) => {
       // const tipo = params['tipo'];
       const data = params['selectedRow'];
@@ -92,30 +89,30 @@ export class GradoComponent {
         this.buscar(data);
       });
     });
+  }
+
+  ngAfterViewInit() {
+
 
   }
   async buscar(data: any) {
     if (this.tablaDepartamento.length == 0) {
       this.formulario?.setValue({ 'codigo': data });
-      //this.cartabla.dataSeleccionada = item;
       this.dialogo();
-
+      return;
     }
-    for (let item of await this.tablaDepartamento) {
-      console.log(item);
-      if (item.codigoDocente == data) {
-        console.log("encontrado");
-        this.formulario?.setValue({ 'codigo': data });
-        this.cartabla.dataSeleccionada = item;
-        console.log(this.cartabla.dataSeleccionada);
-        this.editar(this.cartabla.dataSeleccionada);
-        break;
-      } else {
-        this.formulario?.setValue({ 'codigo': data });
-        this.cartabla.dataSeleccionada = item;
-        this.dialogo();
-      }
 
+    const encontrado = this.tablaDepartamento.find(item => item.codigoDocente == data);
+
+    if (encontrado) {
+      console.log("encontrado");
+      this.formulario?.setValue({ 'codigo': data });
+      this.cartabla.dataSeleccionada = encontrado;
+      console.log(this.cartabla.dataSeleccionada);
+      this.editar(this.cartabla.dataSeleccionada);
+    } else {
+      this.formulario?.setValue({ 'codigo': data });
+      this.dialogo();
     }
   }
   async cargartabla() {

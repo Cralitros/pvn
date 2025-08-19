@@ -99,27 +99,23 @@ export class DocentecursoComponent {
 
   }
   async buscar(data: any) {
-    if (this.tablaDepartamento.length == 0) {
+     if (this.tablaDepartamento.length == 0) {
       this.formulario?.setValue({ 'codigo': data });
-      //this.cartabla.dataSeleccionada = item;
       this.dialogo();
-
+      return;
     }
-    for (let item of await this.tablaDepartamento) {
-      console.log(item);
-      if (item.codigoDocente == data) {
-        console.log("encontrado");
-        this.formulario?.setValue({ 'codigo': data });
-        this.cartabla.dataSeleccionada = item;
-        console.log(this.cartabla.dataSeleccionada);
-        this.editar(this.cartabla.dataSeleccionada);
-        break;
-      } else {
-        this.formulario?.setValue({ 'codigo': data });
-        this.cartabla.dataSeleccionada = item;
-        this.dialogo();
-      }
 
+    const encontrado = this.tablaDepartamento.find(item => item.codigoDocente == data);
+
+    if (encontrado) {
+      console.log("encontrado");
+      this.formulario?.setValue({ 'codigo': data });
+      this.cartabla.dataSeleccionada = encontrado;
+      console.log(this.cartabla.dataSeleccionada);
+      this.editar(this.cartabla.dataSeleccionada);
+    } else {
+      this.formulario?.setValue({ 'codigo': data });
+      this.dialogo();
     }
   }
 
@@ -184,6 +180,7 @@ export class DocentecursoComponent {
           fecha_fin: this.cartabla.dataSeleccionada.fecha_fin,
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
           codigoCurso: this.cartabla.dataSeleccionada.codigoCurso,
+          docente:this.cartabla.dataSeleccionada.Docente,
         },
         modo: 1
       }

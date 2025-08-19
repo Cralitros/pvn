@@ -457,4 +457,17 @@ export class CategoriadlgComponent {
 
   }
 
+  verificarInfo(data:any){
+    //console.log(data);
+    if(data!=undefined){
+      console.log(data);
+      
+      return  `${data.nombres} ${data.apellidos}`
+    }
+    else{
+      console.log("data");
+      return "";
+    }
+    
+  }
 }

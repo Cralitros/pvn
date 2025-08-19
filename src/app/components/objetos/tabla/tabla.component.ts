@@ -113,8 +113,8 @@ export class TablaComponent {
     this.columnsToDisplayWithExpand = [...this.displayedColumns, 'expandedDetail'];
 
     this.sctabla.data$.subscribe(data => {
-      console.log(data,"infor llegado*****************************");
-      
+      console.log(data, "infor llegado*****************************");
+
       this.dataSource.data = data;
       this.dataSource.sort = this.sort;
       this.dataSrc2 = data;
@@ -407,11 +407,22 @@ export class TablaComponent {
   }
 
   mover(selectedRow: any, tip: any) {
-    console.log(selectedRow);
+    const targetUrl = `/dashboard/${tip}`;
+    const queryParams = { selectedRow };
 
-    this.router.navigate([`/dashboard/${tip}`], {
-      queryParams: { selectedRow }
-    });
+    // construyes la url actual (sin hostname)
+    const currentUrl = this.router.url.split('?')[0];
+
+    if (currentUrl === targetUrl) {
+      // si ya estás en la misma ruta, solo actualiza queryParams si cambian
+      this.router.navigate([], {
+        queryParams,
+        queryParamsHandling: 'merge', // mantiene otros params
+      });
+    } else {
+      // si no estás en la misma ruta, navega normalmente
+      this.router.navigate([targetUrl], { queryParams });
+    }
   }
   reporte() {
     console.log(this.report);

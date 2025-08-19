@@ -163,4 +163,17 @@ export class InvestigadlgComponent {
   onNoClick(): void {
     this.dialogRef.close();
   }
+  verificarInfo(data:any){
+    //console.log(data);
+    if(data!=undefined){
+      console.log(data);
+      
+      return  `${data.nombres} ${data.apellidos}`
+    }
+    else{
+      console.log("data");
+      return "";
+    }
+    
+  }
 }

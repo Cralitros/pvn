@@ -104,25 +104,21 @@ export class LaboralComponent {
   async buscar(data: any) {
     if (this.tablaDepartamento.length == 0) {
       this.formulario?.setValue({ 'codigo': data });
-      //this.cartabla.dataSeleccionada = item;
       this.dialogo();
-
+      return;
     }
-    for (let item of await this.tablaDepartamento) {
-      console.log(item);
-      if (item.codigoDocente == data) {
-        console.log("encontrado");
-        this.formulario?.setValue({ 'codigo': data });
-        this.cartabla.dataSeleccionada = item;
-        console.log(this.cartabla.dataSeleccionada);
-        this.editar(this.cartabla.dataSeleccionada);
-        break;
-      } else {
-        this.formulario?.setValue({ 'codigo': data });
-        this.cartabla.dataSeleccionada = item;
-        this.dialogo();
-      }
 
+    const encontrado = this.tablaDepartamento.find(item => item.codigoDocente == data);
+
+    if (encontrado) {
+      console.log("encontrado");
+      this.formulario?.setValue({ 'codigo': data });
+      this.cartabla.dataSeleccionada = encontrado;
+      console.log(this.cartabla.dataSeleccionada);
+      this.editar(this.cartabla.dataSeleccionada);
+    } else {
+      this.formulario?.setValue({ 'codigo': data });
+      this.dialogo();
     }
   }
   async cargartabla() {
@@ -136,7 +132,7 @@ export class LaboralComponent {
 
     this.sctabla.setData(this.tablaDepartamento);
   }
-  
+
   dialogo() {
     let laboral: any;
     this.mservice.ponerurl("docentes/cod");
@@ -217,7 +213,8 @@ export class LaboralComponent {
           correo_personal: this.cartabla.dataSeleccionada.correo_personal,
           correo_alternativo: this.cartabla.dataSeleccionada.correo_alternativo,
           contacto: this.cartabla.dataSeleccionada.contacto,
-          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente
+          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
+          docente: this.cartabla.dataSeleccionada.Docente,
         },
         modo: 1
       }

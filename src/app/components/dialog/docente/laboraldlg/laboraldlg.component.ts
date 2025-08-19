@@ -29,6 +29,7 @@ export class LaboraldlgComponent {
   funcion:any;
   fnc:boolean=true;
   tipo_empresa:any=["Público","Privado"];
+  docente:any='';
   constructor(public dialogRef: MatDialogRef<LaboraldlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
@@ -141,5 +142,18 @@ export class LaboraldlgComponent {
   }
   onNoClick(): void {
     this.dialogRef.close();
+  }
+  verificarInfo(data:any){
+    //console.log(data);
+    if(data!=undefined){
+      console.log(data);
+      
+      return  `${data.nombres} ${data.apellidos}`
+    }
+    else{
+      console.log("data");
+      return "";
+    }
+    
   }
 }

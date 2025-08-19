@@ -1,5 +1,5 @@
 import { Component, computed, Inject, inject, signal } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DateAdapter, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -59,10 +59,8 @@ export class InfodocenciadlgComponent {
   labor_adminsitrativa=["Si", "No"];
   lugar_dictado=["Lima","Provincia (Dentro del país)","Extranjero"]
   pais_dictado:Nacionalidad|any=[];
-
-  estado = ["Provisionado", "Provisionado asesoría", "Pendiente", "Falta de V°B° JD",
-    "Rechazado", "Duplicado", "Desprovisionado", "No provisionado", "Horario Cerrado", "Curso Cerrado", "Cerrado",
-    "Cancelado"]
+  rol_anterior = ["Asesoria", "De baja", "Extension", "Egresado", "Externo", "Jefe de práctica", "Otro departamento", "Profesr visitante"]
+  comisiones=["C. Seguimiento Docente","C. Investigación","C. Internacionalización","C. Responsabilidad Social Universitaria"]
   constructor(public dialogRef: MatDialogRef<InfodocenciadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
@@ -77,26 +75,27 @@ export class InfodocenciadlgComponent {
     console.log(this.data);
 
     this.formularioInfo.setValue({
-      id: this.data.valores.id,
-      categoria: this.data.valores.categoria,
-      dedicacion: this.data.valores.dedicacion,
-      inicio_dictado: this.data.valores.inicio_dictado,
-      fin_dictado: this.data.valores.fin_dictado,
-      modo_ingreso: this.data.valores.modo_ingreso,
-      departamento: this.data.valores.departamento,
-      lugar_dictado: this.data.valores.lugar_dictado,
-      pais_dictado: this.data.valores.pais_dictado,
-      dias_extranjero: this.data.valores.dias_extranjero,
-      labor_administrativa: this.data.valores.labor_administrativa,
-      rol_anterior: this.data.valores.rol_anterior,
-      comisiones: this.data.valores.comisiones,
-      emision_carne: this.data.valores.emision_carne,
-      prestamos: this.data.valores.prestamos,
-      sanciones: this.data.valores.sanciones,
-      observadap: this.data.valores.observadap,
-      historico: this.data.valores.historico,
-      felicitacion: this.data.valores.felicitacion,
-      codigoDocente: this.data.valores.codigoDocente,
+      id: this.validar_datos(this.data.valores.id),
+      categoria: this.validar_datos(this.data.valores.categoria),
+      dedicacion: this.validar_datos(this.data.valores.dedicacion),
+      inicio_dictado: this.validar_datos(this.data.valores.inicio_dictado),
+      fin_dictado: this.validar_datos(this.data.valores.fin_dictado),
+      modo_ingreso: this.validar_datos(this.data.valores.modo_ingreso),
+      departamento: this.validar_datos(this.data.valores.departamento),
+      lugar_dictado: this.validar_datos(this.data.valores.lugar_dictado),
+      pais_dictado: this.validar_datos(this.data.valores.pais_dictado),
+      dias_extranjero: this.validar_datos(this.data.valores.dias_extranjero),
+      labor_administrativa: this.validar_datos(this.data.valores.labor_administrativa),
+      rol_anterior: this.validar_datos(this.data.valores.rol_anterior),
+      comisiones: this.validar_datos(this.data.valores.comisiones),
+      emision_carne: this.validar_datos(this.data.valores.emision_carne),
+      prestamos: this.validar_datos(this.data.valores.prestamos),
+      sanciones: this.validar_datos(this.data.valores.sanciones),
+      observadap: this.validar_datos(this.data.valores.observadap),
+      historico: this.validar_datos(this.data.valores.historico),
+      felicitacion: this.validar_datos(this.data.valores.felicitacion),
+      codigoDocente: this.validar_datos(this.data.valores.codigoDocente),
+      semestre:this.validar_datos(this.data.valores.semestre)
     });
     //this.form.value.id=this.data.valores.id;
   }
@@ -164,8 +163,8 @@ export class InfodocenciadlgComponent {
       id: [''],
       categoria: [''],
       dedicacion: [''],
-      inicio_dictado: [''],
-      fin_dictado: [''],
+      inicio_dictado: ['',Validators.required],
+      fin_dictado: ['',Validators.required],
       modo_ingreso: [''],
       departamento: [''],
       lugar_dictado: [''],
@@ -174,13 +173,14 @@ export class InfodocenciadlgComponent {
       labor_administrativa: [''],
       rol_anterior: [''],
       comisiones: [''],
-      emision_carne: [''],
+      emision_carne: ['',Validators.required],
       prestamos: [''],
       sanciones: [''],
       observadap: [''],
       historico: [''],
       felicitacion: [''],
       codigoDocente: [''],
+      semestre:['']
     });
 
     if (this.data.modo == 1) {
@@ -218,25 +218,26 @@ export class InfodocenciadlgComponent {
 
   add_grado() {
     let body = {
-      categoria: this.formularioInfo.value?.categoria,
-      dedicacion: this.formularioInfo.value?.dedicacion,
-      inicio_dictado: new Date(this.formularioInfo.value?.inicio_dictado + 'T00:00:00'),
-      fin_dictado: new Date(this.formularioInfo.value?.fin_dictado + 'T00:00:00'),
-      modo_ingreso: this.formularioInfo.value?.modo_ingreso,
-      departamento: this.formularioInfo.value?.departamento,
-      lugar_dictado: this.formularioInfo.value?.lugar_dictado,
-      pais_dictado: this.formularioInfo.value?.pais_dictado,
-      dias_extranjero: this.formularioInfo.value?.dias_extranjero,
-      labor_administrativa: this.formularioInfo.value?.labor_administrativa,
-      rol_anterior: this.formularioInfo.value?.rol_anterior,
-      comisiones: this.formularioInfo.value?.comisiones,
-      emision_carne: new Date(this.formularioInfo.value?.emision_carne + 'T00:00:00'),
-      prestamos: this.formularioInfo.value?.prestamos,
-      sanciones: this.formularioInfo.value?.sanciones,
-      observadap: this.formularioInfo.value?.observadap,
-      historico: this.formularioInfo.value?.historico,
-      felicitacion: this.formularioInfo.value?.felicitacion,
-      codigoDocente: this.formularioInfo.value?.codigoDocente,
+      categoria: this.validar_datos(this.formularioInfo.value?.categoria),
+      dedicacion: this.validar_datos(this.formularioInfo.value?.dedicacion),
+      inicio_dictado: this.validar_datos(this.formularioInfo.value?.inicio_dictado),
+      fin_dictado: this.validar_datos(this.formularioInfo.value?.fin_dictado),
+      modo_ingreso: this.validar_datos(this.formularioInfo.value?.modo_ingreso),
+      departamento: this.validar_datos(this.formularioInfo.value?.departamento),
+      lugar_dictado: this.validar_datos(this.formularioInfo.value?.lugar_dictado),
+      pais_dictado: this.validar_datos(this.formularioInfo.value?.pais_dictado),
+      dias_extranjero: this.validar_datos(this.formularioInfo.value?.dias_extranjero),
+      labor_administrativa: this.validar_datos(this.formularioInfo.value?.labor_administrativa),
+      rol_anterior: this.validar_datos(this.formularioInfo.value?.rol_anterior),
+      comisiones: this.validar_datos(this.formularioInfo.value?.comisiones),
+      emision_carne: this.validar_datos(this.formularioInfo.value?.emision_carne),
+      prestamos: this.validar_datos(this.formularioInfo.value?.prestamos),
+      sanciones: this.validar_datos(this.formularioInfo.value?.sanciones),
+      observadap: this.validar_datos(this.formularioInfo.value?.observadap),
+      historico: this.validar_datos(this.formularioInfo.value?.historico),
+      felicitacion: this.validar_datos(this.formularioInfo.value?.felicitacion),
+      codigoDocente: this.validar_datos(this.formularioInfo.value?.codigoDocente),
+      semestre:this.validar_datos(this.formularioInfo.value?.semestre)
     }
     this.cgdepr.ponerurl("docentesinfo")
     if (this.formularioInfo?.valid) {
@@ -272,4 +273,23 @@ export class InfodocenciadlgComponent {
     this.dialogRef.close();
   }
 
+  verificarInfo(data:any){
+    //console.log(data);
+    if(data!=undefined){
+      console.log(data);
+      
+      return  `${data.nombres} ${data.apellidos}`
+    }
+    else{
+      console.log("data");
+      return "";
+    }
+    
+  }
+  validar_datos(data:any){
+     if(data!=undefined){
+      return data;
+     }
+     return "";
+  }
 }

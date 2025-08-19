@@ -80,9 +80,10 @@ export class GradodlgComponent {
   paises?:Nacionalidad[];
   funcion: any;
   fnc: boolean = true;
-  grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor","Segunda Especialidad","Otros"];
+  grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor","Segunda Especialidad","Segunda Especialidad (PSE)","Otros"];
   bgaControl?: FormControl;
   prestamosControl?: FormControl;
+  c=0;
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
   private readonly _intl = inject(MatDatepickerIntl);
@@ -292,6 +293,7 @@ export class GradodlgComponent {
       { value: 'Post Doctorado', label: 'Post Doctor', disabled: false },
       { value: 'PHD.', label: 'PHD.', disabled: false },
       { value: '2da. Especialidad', label: '2da. Especialidad', disabled: false },
+      { value: '2da Especialidad (PSE)', label: '2da. Especialidad (PSE)', disabled: false }
     ];
 
     console.log(this.data);
@@ -436,11 +438,25 @@ export class GradodlgComponent {
     { value: 'Doctor', label: 'Doctor', disabled: false },
     { value: 'Doctor', label: 'Doctor', disabled: false },
     { value: 'Post Doctorado', label: 'Doctor', disabled: false },
-    { value: 'PHD.', label: 'Doctor', disabled: false }
+    { value: 'PHD.', label: 'Doctor', disabled: false },
+    { value: '2da Especialidad (PSE)', label: 'Doctor', disabled: false },
   ];
 
 
 
+ verificarInfo(data:any){
+    //console.log(data);
+    if(data!=undefined){
+      console.log(data);
+      
+      return  `${data.nombres} ${data.apellidos}`
+    }
+    else{
+      console.log("data");
+      return "";
+    }
+    
+  }
 
 }
 
