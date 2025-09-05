@@ -292,8 +292,8 @@ export class GradodlgComponent {
       { value: 'Doctor', label: 'Doctor', disabled: false },
       { value: 'Post Doctorado', label: 'Post Doctor', disabled: false },
       { value: 'PHD.', label: 'PHD.', disabled: false },
-      { value: '2da. Especialidad', label: '2da. Especialidad', disabled: false },
-      { value: '2da Especialidad (PSE)', label: '2da. Especialidad (PSE)', disabled: false }
+      { value: 'Segunda Especialidad', label: 'Segunda Especialidad', disabled: false },
+      { value: 'Segunda Especialidad (PSE)', label: 'Segunda Especialidad (PSE)', disabled: false }
     ];
 
     console.log(this.data);

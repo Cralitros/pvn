@@ -226,7 +226,7 @@ export class CategoriadlgComponent {
     this.formularioCategoria.setValue({
       id:this.data.valores.id,
       tipo: this.data.valores.tipo,
-      fecha: new Date(this.data.valores.fecha + 'T00:00:00'),
+      fecha: new Date(this.data.valores.fecha ),
       categoria: JSON.parse(this.data.valores.categoria),
       condiciondap:  d2,
       codigoDocente:  this.data.valores.codigoDocente,

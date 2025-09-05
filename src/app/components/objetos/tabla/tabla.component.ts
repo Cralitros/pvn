@@ -102,7 +102,7 @@ export class TablaComponent {
 
   }
   ngOnInit(): void {
-    console.log(this.fila, "fila");
+    //console.log(this.fila, "fila");
     this.tabla();
 
   }
@@ -113,7 +113,7 @@ export class TablaComponent {
     this.columnsToDisplayWithExpand = [...this.displayedColumns, 'expandedDetail'];
 
     this.sctabla.data$.subscribe(data => {
-      console.log(data, "infor llegado*****************************");
+      //console.log(data, "infor llegado*****************************");
 
       this.dataSource.data = data;
       this.dataSource.sort = this.sort;
@@ -125,7 +125,7 @@ export class TablaComponent {
     this.tabla();
   }
   toggleFilter(event: any) {
-    console.log(event);
+   // //console.log(event);
     this.isFilterEnabled = event.checked;
     //this.isFilterEnabled = (event.target as any).checked;
     if (!this.isFilterEnabled) {
@@ -137,7 +137,7 @@ export class TablaComponent {
   }
 
   toggleFilterMenu(event: MouseEvent) {
-    console.log(this.filterMenuVisible);
+   // //console.log(this.filterMenuVisible);
     this.menuPosition.x = event.clientX;
     this.menuPosition.y = event.clientY;
     this.filterMenuVisible = !this.filterMenuVisible;  // Add this method
@@ -149,14 +149,14 @@ export class TablaComponent {
 
   editElement(element: any): void {
     // Lógica para editar el elemento
-    console.log('Edit', element);
+    //console.log('Edit', element);
     this.das.data(element);
     this.edit.emit(element);
 
   }
 
   deleteElement(element: any): void {
-    console.log(element);
+    //console.log(element);
 
     // Lógica para eliminar el elemento
     Swal.fire({
@@ -174,7 +174,7 @@ export class TablaComponent {
       }
     });
 
-    console.log('Delete', element);
+    //console.log('Delete', element);
     //this.delete.emit(element);
   }
   dpintar = false;
@@ -185,7 +185,7 @@ export class TablaComponent {
     }
     this.dpintar = true;
     this.selectedRow = row;
-    console.log(row, "doble");
+    //console.log(row, "doble");
     this.rowEmittedDbl.emit(row);
   }
   dataCliked(row: any, event: MouseEvent): void {
@@ -197,7 +197,7 @@ export class TablaComponent {
     this.menuPosition.x = event.clientX;
     this.menuPosition.y = event.clientY;
     this.selectedRow = row;
-    console.log(row);
+    //console.log(row);
     this.rowEmitted.emit(row);
 
   }
@@ -210,8 +210,8 @@ export class TablaComponent {
     this.dpintar = true;
     this.menuPosition.x = event.clientX;
     this.menuPosition.y = event.clientY;
-    console.log('Clicked row:', row);
-    console.log('Menu position:', this.menuPosition);
+    //console.log('Clicked row:', row);
+    //console.log('Menu position:', this.menuPosition);
     this.selectedRow = row;
     this.rowEmitted.emit(row);
 
@@ -222,9 +222,9 @@ export class TablaComponent {
 
     this.menuPosition.x = event.clientX;
     this.menuPosition.y = event.clientY;
-    console.log('Clicked row:', row);
-    console.log('Menu position:', this.menuPosition);
-    console.log(row);
+    //console.log('Clicked row:', row);
+    //console.log('Menu position:', this.menuPosition);
+    //console.log(row);
     this.rowEmitted.emit(row);
   }
 
@@ -291,9 +291,9 @@ export class TablaComponent {
     this.dataSource.filter = filterValue;
   }
   dataGenerada(filters: any) {
-    //console.log(event);
+    ////console.log(event);
     // this.filterMenuVisible=false;
-    console.log(filters);
+    //console.log(filters);
     this.filters = filters;
     this.applyFilters();
     this.filterMenuVisible = false;
@@ -351,7 +351,7 @@ export class TablaComponent {
   arreglo?: any[] = [];
   fitro2?: any[];
   filtroinput(element: any) {
-    console.log(element);
+    //console.log(element);
     let eli = this.processInstruction(element);
     if (!eli) {
       if (this.arreglo?.length == 0) {
@@ -360,9 +360,9 @@ export class TablaComponent {
         this.updateOrAdd(element.campo.columnDef, element.valor);
       }
     }
-    console.log(this.arreglo);
+    //console.log(this.arreglo);
     this.fitro2 = this.convertArrayToObject(this.arreglo!);
-    console.log(this.fitro2);
+    //console.log(this.fitro2);
 
     this.dataGenerada(JSON.stringify([this.fitro2]));
 
@@ -425,7 +425,7 @@ export class TablaComponent {
     }
   }
   reporte() {
-    console.log(this.report);
+    //console.log(this.report);
 
     this.mservice.reporte();
   }
@@ -452,6 +452,10 @@ export class TablaComponent {
   }
 
   contrato(element: any) {
+    //console.log("Elemento999*****************");
+    
+    //console.log(element);
+    
     const dialogRef = this.dialog.open(PdfviewComponent, {
       width: '700px',
       height: '950px',
@@ -466,8 +470,8 @@ export class TablaComponent {
   datos(element: any, title: any) {
     let cadena = '';
     if (title.columnDef == 'categoria') {
-      console.log(title);
-      console.log(JSON.parse(element));
+      //console.log(title);
+      //console.log(JSON.parse(element));
       let parseElement = JSON.parse(element);
       parseElement.forEach((el: any) => {
         if (el.seleccionada) {
