@@ -181,8 +181,8 @@ export class DocentecursodlgComponent {
   add_grado() {
     let body = {
       id: this.formularioGrado.value?.id,
-      fecha_inicio: new Date(this.formularioGrado.value?.fecha_inicio + 'T00:00:00'),
-      fecha_fin: new Date(this.formularioGrado.value?.fecha_fin + 'T00:00:00'),
+      fecha_inicio: new Date(this.formularioGrado.value?.fecha_inicio ),
+      fecha_fin: new Date(this.formularioGrado.value?.fecha_fin),
       codigoCurso: this.formularioGrado.value?.codigoCurso,
       codigoDocente: this.formularioGrado.value?.codigoDocente,
       modalidad: this.formularioGrado.value?.modalidad,

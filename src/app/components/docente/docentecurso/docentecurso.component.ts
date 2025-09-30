@@ -40,7 +40,7 @@ import Swal from 'sweetalert2';
 })
 export class DocentecursoComponent {
   tablaDepartamento: DocenteCurso[] = [];
-/**id	fecha_inicio	fecha_fin	codigoDocente	codigoCurso	 */
+  /**id	fecha_inicio	fecha_fin	codigoDocente	codigoCurso	 */
   @Input() codigo: any;
 
   columns: Column[] = [
@@ -99,7 +99,7 @@ export class DocentecursoComponent {
 
   }
   async buscar(data: any) {
-     if (this.tablaDepartamento.length == 0) {
+    if (this.tablaDepartamento.length == 0) {
       this.formulario?.setValue({ 'codigo': data });
       this.dialogo();
       return;
@@ -141,22 +141,22 @@ export class DocentecursoComponent {
         this.saux2.ponerurl("docentescurso/docente");
         this.saux2.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
           console.log(data2);
-          
-            const dialogRef = this.dialog.open(DocentecursodlgComponent, {
-              width: '500px',
-              height: '550px',
-              data: {
-                title: `Agregar ${this.titulo}`,
-                valores: { laboral },
-                modo: 0
-              }
-            });
-            dialogRef.afterClosed().subscribe(result => {
-              //if (result) {
-              this.cargartabla();
-              // }
-            });
-          
+
+          const dialogRef = this.dialog.open(DocentecursodlgComponent, {
+            width: '500px',
+            height: '550px',
+            data: {
+              title: `Agregar ${this.titulo}`,
+              valores: { laboral },
+              modo: 0
+            }
+          });
+          dialogRef.afterClosed().subscribe(result => {
+            //if (result) {
+            this.cargartabla();
+            // }
+          });
+
 
         });
       }
@@ -178,9 +178,13 @@ export class DocentecursoComponent {
           id: this.cartabla.dataSeleccionada.id,
           fecha_inicio: this.cartabla.dataSeleccionada.fecha_inicio,
           fecha_fin: this.cartabla.dataSeleccionada.fecha_fin,
+          modalidad: this.cartabla.dataSeleccionada.modalidad,
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
           codigoCurso: this.cartabla.dataSeleccionada.codigoCurso,
-          docente:this.cartabla.dataSeleccionada.Docente,
+          docente: this.cartabla.dataSeleccionada.Docente,
+          tipo: this.cartabla.dataSeleccionada.tipo,
+          tipo_clase: this.cartabla.dataSeleccionada.tipo_clase,
+          estado: this.cartabla.dataSeleccionada.estado,
         },
         modo: 1
       }

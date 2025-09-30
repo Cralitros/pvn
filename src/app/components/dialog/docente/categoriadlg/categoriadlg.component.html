@@ -1,5 +1,6 @@
 <table>
-    <h2 class="titulo">Docente: {{this.data.valores.docente.nombres?this.data.valores.docente.nombres:''}} {{this.data.valores.docente.apellidos?this.data.valores.docente.apellidos:''}}</h2>
+    
+    <h2 class="titulo">Docente: {{verificarInfo(this.data.valores.docente)}}</h2>
     <tr>
         <td>
             <form [formGroup]="formularioCategoria" class="formulario">

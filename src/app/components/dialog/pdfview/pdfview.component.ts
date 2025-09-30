@@ -82,6 +82,7 @@ export class PdfviewComponent {
   
   /**********WORD */
   generarContratoDocx() {
+    //const url = `${this.apiUrl}docentes/contrato/${this.data.persona.codigo}/${localStorage.getItem('dni')}`; // Ajusta la URL según tu API
     console.log(`${this.apiUrl}docentes/contratow/${this.data.persona.codigo}`);
     
     const url = `${this.apiUrl}docentes/contratow/${this.data.persona.codigo}`; // Ajusta la URL según tu API
