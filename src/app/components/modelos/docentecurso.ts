@@ -1,3 +1,5 @@
+import { Curso } from "./cursos";
+
 export interface DocenteCurso{
     id:string;
     fecha_inicio:string;
@@ -8,4 +10,5 @@ export interface DocenteCurso{
     estado:string;
     codigoDocente:string;
     codigoCurso:string;
+    Curso:Curso;
 }

@@ -1,3 +1,5 @@
+import { DocenteCurso } from "./docentecurso";
+
 export interface Personal{
     codigo: string;
     nombres: string;
@@ -30,4 +32,5 @@ export interface Personal{
     idProvincia:string;
     idDistrito:string;
     idNacionalidad:string;
+    DocenteCursos:DocenteCurso;
 }
