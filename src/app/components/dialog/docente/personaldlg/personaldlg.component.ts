@@ -161,9 +161,9 @@ export class PersonaldlgComponent {
       fallecimiento: this.validar_dato(this.data.valores.fallecimiento),
       fecha_fallecimiento: new Date(this.data.valores.fecha_fallecimiento + 'T00:00:00'),
       fecha_nacimiento: new Date(this.data.valores.fecha_nacimiento + 'T00:00:00'),
-      departamento: JSON.parse(this.data.valores.lugar_nacimiento).departamento,
-      provincia: JSON.parse(this.data.valores.lugar_nacimiento).provincia,
-      distrito: JSON.parse(this.data.valores.lugar_nacimiento).distrito,
+      departamento: this.validar_dato(JSON.parse(this.data.valores.lugar_nacimiento).departamento),
+      provincia: this.validar_dato(JSON.parse(this.data.valores.lugar_nacimiento).provincia),
+      distrito: this.validar_dato(JSON.parse(this.data.valores.lugar_nacimiento).distrito),
       sexo: this.data.valores.sexo,
       domicilio: this.validar_dato(this.data.valores.domicilio),
       telefono: this.validar_dato(this.data.valores.telefono),
@@ -275,37 +275,37 @@ export class PersonaldlgComponent {
       [this.dateFormatValidator('DD/MM/YYYY')]
     );
     this.formulario1 = this.formBuilder.group({
-      codigo: ['', Validators.required],
-      digito: ['', Validators.required],
-      dni: ['', Validators.required],
+      codigo: [''],
+      digito: [''],
+      dni: [''],
       pasaporte: [''],
-      nombres: ['', Validators.required],
-      apellidos: ['', Validators.required],
+      nombres: [''],
+      apellidos: [''],
       fallecimiento: [''],
       fecha_fallecimiento: this.fechaFallecimientoControl,
       fecha_nacimiento: this.fechaNacimientoControl,
-      departamento: ['', Validators.required],
-      provincia: ['', Validators.required],
-      distrito: ['', Validators.required],
-      sexo: ['', Validators.required],
-      domicilio: ['', Validators.required],
+      departamento: [''],
+      provincia: [''],
+      distrito: [''],
+      sexo: [''],
+      domicilio: [''],
       telefono: [''],
       celular: [''],
-      estado_civil: ['', Validators.required],
-      numero_hijos: ['', Validators.required],
-      nacionalidad: ['', Validators.required],
-      pais: ['', Validators.required],
-      fecha_cv: ['', Validators.required],
-      especialidad: ['', Validators.required],
+      estado_civil: [''],
+      numero_hijos: [''],
+      nacionalidad: [''],
+      pais: [''],
+      fecha_cv: [''],
+      especialidad: [''],
       edad: ['']
     });
 
     this.formulario2 = this.formBuilder.group({
-      banco: ['', Validators.required],
-      cuenta: ['', Validators.required],
-      afp: ['', Validators.required],
-      cussp: ['', Validators.required],
-      afiliacion: ['', Validators.required],
+      banco: [''],
+      cuenta: [''],
+      afp: [''],
+      cussp: [''],
+      afiliacion: [''],
       ruc: [''],
       observaciones: ['']
     });
@@ -535,9 +535,9 @@ export class PersonaldlgComponent {
       fecha_cv: this.formulario1.value.fecha_cv,
       ruc: this.formulario2.value.ruc,
       observaciones: this.formulario2.value.observaciones,
-      idDepartamento: this.formulario1.value.departamento,
-      idProvincia: this.formulario1.value.provincia,
-      idDistrito: this.formulario1.value.distrito,
+      idDepartamento: this.formulario1.value.departamento?this.formulario1.value.departamento:undefined,
+      idProvincia: this.formulario1.value.provincia?this.formulario1.value.provincia:undefined,
+      idDistrito: this.formulario1.value.distrito?this.formulario1.value.distrito:undefined,
       idNacionalidad: this.paisSeleccionado.id,
       especialidad: this.formulario1.value.especialidad,
     }
@@ -607,19 +607,22 @@ export class PersonaldlgComponent {
   onSelectChangeDepartamento(event: any) {
     //console.log(this.selectedValue);
     //console.log(event.value);
-    this.saux2.ponerurl("provincias");
-    if (this.data.modo == 1) {
-      this.saux2.getid(event).subscribe(data => {
-        console.log(data);
-        this.provincias = data;
-        const provincia = this.provincias.find(p => p.nombre === this.data.valores.lugarNacimiento.provincia);
-        this.onSelectChangeProvincia(provincia);
-      });
-    } else {
-      this.saux2.getid(event.value).subscribe(data => {
-        console.log(data);
-        this.provincias = data;
-      });
+    if (event != undefined) {
+      this.saux2.ponerurl("provincias");
+
+      if (this.data.modo == 1) {
+        this.saux2.getid(event).subscribe(data => {
+          console.log(data);
+          this.provincias = data;
+          const provincia = this.provincias.find(p => p.nombre === this.data.valores.lugarNacimiento.provincia);
+          this.onSelectChangeProvincia(provincia);
+        });
+      } else {
+        this.saux2.getid(event.value).subscribe(data => {
+          console.log(data);
+          this.provincias = data;
+        });
+      }
     }
 
   }

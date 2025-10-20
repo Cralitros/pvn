@@ -28,6 +28,7 @@ import * as XLSX from 'xlsx';
 import { MatDialog } from '@angular/material/dialog';
 import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
 import Swal from 'sweetalert2';
+import { FirmaComponent } from '../../dialog/docente/firma/firma.component';
 
 @Component({
   selector: 'app-tabla',
@@ -99,7 +100,8 @@ export class TablaComponent {
     private mservice: MaestrosserviceService,
     public dialog: MatDialog
   ) {
-
+    //console.log(this.tipo);
+    
   }
   ngOnInit(): void {
     //console.log(this.fila, "fila");
@@ -185,7 +187,7 @@ export class TablaComponent {
     }
     this.dpintar = true;
     this.selectedRow = row;
-    //console.log(row, "doble");
+    console.log(row, "doble");
     this.rowEmittedDbl.emit(row);
   }
   dataCliked(row: any, event: MouseEvent): void {
@@ -197,7 +199,7 @@ export class TablaComponent {
     this.menuPosition.x = event.clientX;
     this.menuPosition.y = event.clientY;
     this.selectedRow = row;
-    //console.log(row);
+    console.log(row);
     this.rowEmitted.emit(row);
 
   }
@@ -466,6 +468,19 @@ export class TablaComponent {
     dialogRef.afterClosed().subscribe(result => {
 
     });
+  }
+  firma(element: any){
+    const dialogRef = this.dialog.open(FirmaComponent, {
+      width: '700px',
+      height: '950px',
+      data: {
+        persona: element
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+
+    });
+
   }
   datos(element: any, title: any) {
     let cadena = '';

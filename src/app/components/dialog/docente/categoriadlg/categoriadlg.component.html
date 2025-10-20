@@ -1,5 +1,5 @@
 <table>
-    
+
     <h2 class="titulo">Docente: {{verificarInfo(this.data.valores.docente)}}</h2>
     <tr>
         <td>
@@ -191,25 +191,15 @@
                             <td>
                                 <mat-form-field class="example-full-width">
                                     <mat-label>Categoria Jubilación</mat-label>
-                                    <mat-select formControlName="categoriaJubilacion"
-                                        (selectionChange)="onCategoryChange2($event)">
-                                        <mat-option>Seleccionar categoria</mat-option>
-                                        @for (condiciondap of categorias; track condiciondap) {
-                                        <mat-option [value]="condiciondap.nombre">{{condiciondap.nombre}}</mat-option>
-                                        }
-                                    </mat-select>
+                                    <input matInput formControlName="categoriaJubilacion"
+                                        placeholder="Categoria jubilacion">
                                 </mat-form-field>
                             </td>
                             <td>
                                 <mat-form-field class="example-full-width">
                                     <mat-label>Dedicación Jubilación</mat-label>
-                                    <mat-select formControlName="dedicacionJubilacion"
-                                        (selectionChange)="onCategoryChange2($event)">
-                                        <mat-option>Seleccionar dedicación</mat-option>
-                                        @for (condiciondap of dedicacion; track condiciondap) {
-                                        <mat-option [value]="condiciondap">{{condiciondap}}</mat-option>
-                                        }
-                                    </mat-select>
+                                    <input matInput formControlName="dedicacionJubilacion"
+                                        placeholder="Dedicación jubilacion">
                                 </mat-form-field>
                             </td>
                         </tr>

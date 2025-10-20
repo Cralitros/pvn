@@ -52,33 +52,24 @@
                 <mat-menu #menu="matMenu">
                   <button mat-menu-item (click)="contrato(element)">
                     <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia 1</span>
+                    <span>Constancia Auxiliar</span>
                   </button>
                   <button mat-menu-item (click)="contrato(element)">
                     <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia 2</span>
+                    <span>Constancia Contratado</span>
                   </button>
                   <button mat-menu-item (click)="contrato(element)">
                     <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia 3</span>
+                    <span>Constancia Principal</span>
                   </button>
                   <button mat-menu-item (click)="contrato(element)">
                     <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia 4</span>
+                    <span>Constancia Asociado</span>
                   </button>
-                  <button mat-menu-item (click)="contrato(element)">
+                  <button mat-menu-item (click)="firma(element)">
                     <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia 5</span>
+                    <span>Firma</span>
                   </button>
-                  <button mat-menu-item (click)="contrato(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia 6</span>
-                  </button>
-                  <button mat-menu-item (click)="contrato(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia 7</span>
-                  </button>
-
                   <!--<button mat-menu-item disabled>
                     <mat-icon>voicemail</mat-icon>
                     <span>Check voice mail</span>
@@ -122,6 +113,10 @@
       (click)="mover(selectedRow.codigo, 'infoDocentes')">Info. Docentes</button>
     <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
 
+    <button class="btncss" *ngIf="tipo=='maestros'" mat-button
+      (click)="mover(selectedRow.dni, 'firma')">Firma</button>
+    
+    
   </div>
 
   <div *ngIf="filterMenuVisible" class="filter-menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">

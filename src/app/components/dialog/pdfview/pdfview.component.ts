@@ -23,13 +23,18 @@ export class PdfviewComponent {
   pdfSrc:  any ;
   private subscription: Subscription | null = null;
   private apiUrl =  environment.direccion;
-
+  private direccion="";
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
     private saux1: Aux1Service,
     private http: HttpClient,
     private sanitizer: DomSanitizer) {
     console.log(data);
     this.saux1.ponerurl(`docentes/contrato/${data.persona.codigo}`);
+
+  }
+
+  direc(dir:any){
+
 
   }
 

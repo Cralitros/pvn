@@ -24,6 +24,7 @@ import { PlanComponent } from './components/maestros/plan/plan.component';
 import { NacionalidadComponent } from './components/maestros/nacionalidad/nacionalidad.component';
 import { AreasComponent } from './components/maestros/areas/areas.component';
 import { InfoDocenciaComponent } from './components/docente/info-docencia/info-docencia.component';
+import { FirmasComponent } from './components/maestros/firmas/firmas.component';
 
 
 export const routes: Routes = [
@@ -52,6 +53,7 @@ export const routes: Routes = [
             { path: 'plan', component: PlanComponent,title: "Plan Académico" , canActivate:[deslogueoGuard]},
             { path: 'area', component: AreasComponent,title: "Áreas" , canActivate:[deslogueoGuard]},
             { path: 'infoDocentes', component: InfoDocenciaComponent,title: "Informacion Docentes" , canActivate:[deslogueoGuard]},
+            { path: 'firma', component: FirmasComponent,title: "Firma" , canActivate:[deslogueoGuard]},
            
         ],canActivate:[deslogueoGuard]
     },
