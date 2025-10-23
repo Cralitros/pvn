@@ -44,7 +44,8 @@ export class FirmasComponent {
 
   columns: Column[] = [
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true },  // Columna de acciones
-    { columnDef: 'id', header: 'No.', cell: (element: firma) => `${element.id}` },
+    { columnDef: 'id', header: 'No.', cell: (element: firma) => `${element.idLogin}` },
+    { columnDef: 'dni', header: 'dni', cell: (element: firma) => `${element.Login.dni}` },
 
 
   ];
@@ -75,21 +76,32 @@ export class FirmasComponent {
     });
   }
 
+  info:any;
   ngAfterViewInit() {
     this.route.queryParams.subscribe((params: any) => {
       // const tipo = params['tipo'];
-      const data = params['selectedRow'];
+      let data = params['selectedRow'];
 
-      console.log('Selected Row:', data);
-      this.cargartabla().then(() => {
-        this.buscar(data);
+      this.mservice.ponerurl("login/dni");
+      this.mservice.getdni(data).subscribe((dat: any) => {
+
+        console.log("data selccionada");
+        console.log(dat);
+        this.info = dat[0];
+        data = dat[0];
+        console.log('Selected Row:', data);
+        this.cargartabla().then(() => {
+          this.buscar(data);
+        });
+
       });
+
     });
 
   }
   async buscar(data: any) {
     if (this.tablaDepartamento.length == 0) {
-      this.formulario?.setValue({ 'codigo': data });
+      this.formulario?.setValue({ 'codigo': data.dni });
       this.dialogo();
       return;
     }
@@ -98,12 +110,12 @@ export class FirmasComponent {
 
     if (encontrado) {
       console.log("encontrado");
-      this.formulario?.setValue({ 'codigo': data });
+      this.formulario?.setValue({ 'codigo': data.dni });
       this.cartabla.dataSeleccionada = encontrado;
       console.log(this.cartabla.dataSeleccionada);
       this.editar(this.cartabla.dataSeleccionada);
     } else {
-      this.formulario?.setValue({ 'codigo': data });
+      this.formulario?.setValue({ 'codigo': data.dni });
       this.dialogo();
     }
   }
@@ -121,24 +133,24 @@ export class FirmasComponent {
 
   dialogo() {
     let laboral: any;
-    this.mservice.ponerurl("firma");
-    this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
+    this.mservice.ponerurl("firma/dni");
+    this.mservice.getdni(this.formulario?.value.codigo).subscribe((data: any) => {
       console.log(data);
       laboral = data;
       if (data.length > 0) {//verifica si existe el docente
 
-        this.mservice.ponerurl("firma");
-        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
+        this.mservice.ponerurl("firma/dni");
+        this.mservice.getdni(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
           console.log(data2);
           console.log("viendo");
 
           if (data2.length == 0) {
             const dialogRef = this.dialog.open(FirmasdlgComponent, {
-              width: '500px',
-              height: '550px',
+              width: '1100px',
+              height: '700px',
               data: {
                 title: `Agregar ${this.titulo}`,
-                valores: { codigo:this.formulario?.value.codigo  },
+                valores: { codigo: this.formulario?.value.codigo.dni, id: this.formulario?.value.id },
                 modo: 0
               }
             });
@@ -147,6 +159,8 @@ export class FirmasComponent {
               this.cargartabla();
               // }
             });
+          } else {
+            this.editar(data2[0]);
           }
 
         });
@@ -165,21 +179,21 @@ export class FirmasComponent {
           // }
          });*/
       }
-      else{
+      else {
         const dialogRef = this.dialog.open(FirmasdlgComponent, {
-              width: '500px',
-              height: '550px',
-              data: {
-                title: `Agregar ${this.titulo}`,
-                valores: { codigo:this.formulario?.value.codigo  },
-                modo: 0
-              }
-            });
-            dialogRef.afterClosed().subscribe(result => {
-              //if (result) {
-              this.cargartabla();
-              // }
-            });
+          width: '1100px',
+          height: '700px',
+          data: {
+            title: `Agregar ${this.titulo}`,
+            valores: { codigo: this.info.dni, id: this.info.id },
+            modo: 0
+          }
+        });
+        dialogRef.afterClosed().subscribe(result => {
+          //if (result) {
+          this.cargartabla();
+          // }
+        });
 
       }
     });
@@ -201,23 +215,15 @@ export class FirmasComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(FirmasdlgComponent, {
-      width: '500px',
-      height: '550px',
+      width: '1100px',
+      height: '700px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
-          id: this.cartabla.dataSeleccionada.id,
-          trabajo: this.cartabla.dataSeleccionada.trabajo,
-          cargo_actual: this.cartabla.dataSeleccionada.cargo_actual,
-          tipo_empresa: this.cartabla.dataSeleccionada.tipo_empresa,
-          direccion_empresa: this.cartabla.dataSeleccionada.direccion_empresa,
-          telefono_empresa: this.cartabla.dataSeleccionada.telefono_empresa,
-          correo_corporativo: this.cartabla.dataSeleccionada.correo_corporativo,
-          correo_personal: this.cartabla.dataSeleccionada.correo_personal,
-          correo_alternativo: this.cartabla.dataSeleccionada.correo_alternativo,
-          contacto: this.cartabla.dataSeleccionada.contacto,
-          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
-          docente: this.cartabla.dataSeleccionada.Docente,
+          id: this.cartabla.dataSeleccionada?.id ? this.cartabla.dataSeleccionada.id : element.id,
+          firma: this.cartabla.dataSeleccionada?.firma ? this.cartabla.dataSeleccionada.firma : element.firma,
+          idLogin: this.cartabla.dataSeleccionada?.idLogin ? this.cartabla.dataSeleccionada.idLogin : element.idLogin,
+          iniciales: this.cartabla.dataSeleccionada?.iniciales ? this.cartabla.dataSeleccionada.iniciales : element.iniciales,
         },
         modo: 1
       }

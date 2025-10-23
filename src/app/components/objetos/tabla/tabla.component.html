@@ -109,14 +109,14 @@
       (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
     <button class="btncss" *ngIf="tipo=='docentes'" mat-button
       (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
-      (click)="mover(selectedRow.codigo, 'infoDocentes')">Info. Docentes</button>
+    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'infoDocentes')">Info.
+      Docentes</button>
+    <button class="btncss" *ngIf="tipo=='maestros'" mat-button (click)="mover(selectedRow.dni, 'firma')">Firma</button>
     <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
 
-    <button class="btncss" *ngIf="tipo=='maestros'" mat-button
-      (click)="mover(selectedRow.dni, 'firma')">Firma</button>
-    
-    
+
+
+
   </div>
 
   <div *ngIf="filterMenuVisible" class="filter-menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">

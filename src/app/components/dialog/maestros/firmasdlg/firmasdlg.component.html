@@ -1,37 +1,41 @@
-<div class="p-4">
-    <h2>{{data.title}}</h2>
-
-    <h3>Selecciona:</h3>
+<div class="p-4 cnt">
+    <h2>{{ data.title }}</h2>
     <form [formGroup]="form">
+        <mat-form-field class="example-form-field">
+            <mat-label>Ingresa las iniciales del nombre</mat-label>
+            <input matInput type="text" formControlName="iniciales">
+        </mat-form-field>
+        <h3>Selecciona:</h3>
+
         <mat-radio-group aria-label="Select an option" formControlName="tipoFirma">
             <mat-radio-button value="1">Firma manual</mat-radio-button>
             <mat-radio-button value="2">Cargar imagen firma</mat-radio-button>
         </mat-radio-group>
     </form>
+
     <div class="container">
         <!-- Subir firma -->
         <div class="mt-4" *ngIf="form.get('tipoFirma')?.value === '2'">
-            <input type="file" (change)="onFileSelected($event)" accept="image/*" />
+            <input type="file" (change)="onFileSelected2($event)" accept="image/*" />
             <p *ngIf="fileName">Archivo cargado: {{ fileName }}</p>
         </div>
 
         <!-- Canvas -->
         <canvas *ngIf="form.get('tipoFirma')?.value === '1'" #canvas></canvas>
+        <div *ngIf="signatureImg" class="mt-4">
+            <h3>Vista previa:</h3>
+            <img [src]="signatureImg" alt="Firma" width="300" height="150" />
 
-
+            <h4 class="mt-2">Texto Base64:</h4>
+            <textarea rows="5" cols="60" readonly>{{ signatureText }}</textarea>
+        </div>
     </div>
 
-    <div *ngIf="signatureImg" class="mt-4">
-        <h3>Vista previa:</h3>
-        <img [src]="signatureImg" alt="Firma" />
-    </div>
+    <!-- Vista previa de imagen y texto Base64 -->
+
 
     <div class="mt-2">
         <button (click)="clear()">Limpiar</button>
         <button (click)="save()">Guardar</button>
     </div>
-
-
-    <!-- Vista previa -->
-
 </div>

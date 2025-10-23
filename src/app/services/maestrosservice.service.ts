@@ -40,6 +40,12 @@ export class MaestrosserviceService {
     
     return this.http.get<any[]>(`${this.apiUrl}/${id}`);
   }
+  
+  getdni(dni: any): Observable<any[]> {
+    console.log(`${this.apiUrl}/${dni}`);
+    
+    return this.http.get<any[]>(`${this.apiUrl}/${dni}`);
+  }
 
   getDepartamentos(page: number, limit: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`);

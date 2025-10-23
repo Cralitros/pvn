@@ -1,10 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import SignaturePad from 'signature_pad';
 
 @Component({
   selector: 'app-firma',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './firma.component.html',
   styleUrl: './firma.component.scss'
 })
