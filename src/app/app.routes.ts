@@ -25,6 +25,7 @@ import { NacionalidadComponent } from './components/maestros/nacionalidad/nacion
 import { AreasComponent } from './components/maestros/areas/areas.component';
 import { InfoDocenciaComponent } from './components/docente/info-docencia/info-docencia.component';
 import { FirmasComponent } from './components/maestros/firmas/firmas.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 
 export const routes: Routes = [
@@ -32,6 +33,8 @@ export const routes: Routes = [
     {
         path: 'dashboard', component: NavigationComponent,title: "Dashboard Gestion Docente",
         children: [
+            { path: '', redirectTo: 'dash', pathMatch: 'full' }, // ←←← Esta línea
+            { path: 'dash', component: DashboardComponent,title: "Dashboard", canActivate:[deslogueoGuard]},
             { path: 'usuarios', component: UsuariosComponent,title: "Usuarios", canActivate:[deslogueoGuard]},
             { path: 'departamento', component: DepartamentoComponent,title: "Departamentos", canActivate:[deslogueoGuard]},
             { path: 'provincia', component: ProvinciaComponent,title: "Provincias" , canActivate:[deslogueoGuard]},

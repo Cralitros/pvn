@@ -1,26 +1,19 @@
 <div class="grid-container">
-  <h1 class="mat-h1">Dashboard</h1>
-  <mat-grid-list cols="2" rowHeight="350px">
-    @for (card of cards | async; track card) {
-      <mat-grid-tile [colspan]="card.cols" [rowspan]="card.rows">
-        <mat-card class="dashboard-card">
-          <mat-card-header>
-            <mat-card-title>
-              {{card.title}}
-              <button mat-icon-button class="more-button" [matMenuTriggerFor]="menu" aria-label="Toggle menu">
-                <mat-icon>more_vert</mat-icon>
-              </button>
-              <mat-menu #menu="matMenu" xPosition="before">
-                <button mat-menu-item>Expand</button>
-                <button mat-menu-item>Remove</button>
-              </mat-menu>
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content class="dashboard-card-content">
-            <div>Card Content Here</div>
-          </mat-card-content>
-        </mat-card>
-      </mat-grid-tile>
-    }
-  </mat-grid-list>
+  <h1 class="mat-h1">📊 TOTAL DE REGISTROS</h1>
+  <h2 class="section-title">Maestros y Gestión</h2>
+
+  <div class="cards-grid">
+    <mat-card class="stat-card" *ngFor="let valor of valores; let i = index">
+      <mat-card-content class="stat-content">
+        <div class="stat-icon">
+          <mat-icon>{{ getIcon(maestros[i]) }}</mat-icon>
+        </div>
+        <div class="stat-info">
+          <p class="stat-label">{{ maestros[i] | titlecase }}</p>
+          <p class="stat-value">{{ valor }}</p>
+          <p class="stat-desc">registros</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>

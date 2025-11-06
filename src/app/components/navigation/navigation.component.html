@@ -1,18 +1,20 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #drawer class="sidenav" fixedInViewport
-      [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
-      [mode]="(isHandset$ | async) ? 'over' : 'side'"
-      [opened]="(isHandset$ | async) === false">
-    <mat-toolbar>Menú</mat-toolbar>
+  <mat-sidenav #drawer class="sidenav" fixedInViewport [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'" [opened]="(isHandset$ | async) === false">
+    <a class="cnt-rw" routerLink="/dashboard/dash" routerLinkActive="active-link">
+      <img src="./assets/favicon.ico" width="50px" height="50px" alt="" srcset="">
+      <mat-toolbar>Menú</mat-toolbar>      
+    </a>
+
     <mat-nav-list>
       <mat-expansion-panel hideToggle *ngIf="nivel==1">
-        <mat-expansion-panel-header >
+        <mat-expansion-panel-header>
           <mat-panel-description>
             Tablas Generales
           </mat-panel-description>
         </mat-expansion-panel-header>
         <a mat-list-item routerLink="/dashboard/usuarios" routerLinkActive="active-link">Usuarios</a>
-        
+
         <a mat-list-item routerLink="/dashboard/nacionalidad" routerLinkActive="active-link">Nacionalidad</a>
         <a mat-list-item routerLink="/dashboard/departamento" routerLinkActive="active-link">Departamento</a>
         <a mat-list-item routerLink="/dashboard/provincia" routerLinkActive="active-link">Provincia</a>
@@ -27,9 +29,9 @@
         <a mat-list-item routerLink="/dashboard/programa" routerLinkActive="active-link">Escuela y Programas</a>
         <a mat-list-item routerLink="/dashboard/curso" routerLinkActive="active-link">Cursos</a>
         <a mat-list-item routerLink="/dashboard/firma" routerLinkActive="active-link">Firma</a>
-        
-        
-        
+
+
+
       </mat-expansion-panel>
       <mat-expansion-panel hideToggle *ngIf="nivel==1 || nivel==2">
         <mat-expansion-panel-header>
@@ -38,12 +40,12 @@
           </mat-panel-description>
         </mat-expansion-panel-header>
         <a mat-list-item routerLink="/dashboard/personal" routerLinkActive="active-link">Info. Personal</a>
-        <a mat-list-item routerLink="/dashboard/laboral" routerLinkActive="active-link" >Info. Laboral</a>
-        <a mat-list-item routerLink="/dashboard/grado" routerLinkActive="active-link" >Info. Grado</a>
-        <a mat-list-item routerLink="/dashboard/categoria" routerLinkActive="active-link" >Info. Categoría</a>
-        <a mat-list-item routerLink="/dashboard/investigador" routerLinkActive="active-link" >Info. Investigación</a>
-        <a mat-list-item routerLink="/dashboard/cursoDocentes" routerLinkActive="active-link" >Cursos asignados</a>
-        <a mat-list-item routerLink="/dashboard/infoDocentes" routerLinkActive="active-link" >Info. Docencia</a>
+        <a mat-list-item routerLink="/dashboard/laboral" routerLinkActive="active-link">Info. Laboral</a>
+        <a mat-list-item routerLink="/dashboard/grado" routerLinkActive="active-link">Info. Grado</a>
+        <a mat-list-item routerLink="/dashboard/categoria" routerLinkActive="active-link">Info. Categoría</a>
+        <a mat-list-item routerLink="/dashboard/investigador" routerLinkActive="active-link">Info. Investigación</a>
+        <a mat-list-item routerLink="/dashboard/cursoDocentes" routerLinkActive="active-link">Cursos asignados</a>
+        <a mat-list-item routerLink="/dashboard/infoDocentes" routerLinkActive="active-link">Info. Docencia</a>
       </mat-expansion-panel>
       <!--<a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Postulacion</a>
       <a mat-list-item class="btn" routerLink="" routerLinkActive="active-link">Ratificacion</a>
@@ -54,17 +56,14 @@
   <mat-sidenav-content>
     <mat-toolbar color="primary">
       @if (isHandset$ | async) {
-        <button
-          type="button"
-          aria-label="Toggle sidenav"
-          mat-icon-button
-          (click)="drawer.toggle()">
-          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
-        </button>
+      <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="drawer.toggle()">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
       }
       <span class="example-spacer">Gestión docente</span>
 
-      <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon" (click)="cerrar_sesion()">
+      <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon"
+        (click)="cerrar_sesion()">
         <mat-icon>logout</mat-icon>
       </button>
     </mat-toolbar>
