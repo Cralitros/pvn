@@ -21,6 +21,7 @@ import { Condiciones } from '../../../modelos/condiciones';
 import { Aux1Service } from '../../../../services/aux1.service';
 import Swal from 'sweetalert2';
 
+
 export const MY_DATE_FORMATS = {
   parse: {
     dateInput: 'DD/MM/YYYY',
@@ -52,8 +53,8 @@ export const MY_DATE_FORMATS = {
     MatPaginatorModule,
     MatTableModule,
     MatRadioModule,
-    MatCheckboxModule
-  ],
+    MatCheckboxModule,
+],
   templateUrl: './categoriadlg.component.html',
   styleUrl: './categoriadlg.component.scss',
   providers: [
@@ -244,10 +245,16 @@ export class CategoriadlgComponent {
     });
 
     this.formularioHistorico.setValue({
-      contratado:new Date(this.data.valores.contratado),
-      auxiliar:new Date(this.data.valores.auxiliar),
-      principal:new Date(this.data.valores.principal),
-      asociado:new Date(this.data.valores.asociado),
+      jefepractica:this.data.valores.jefepractica,
+      ayudante: this.data.valores.ayudante,
+      asistente: this.data.valores.asistente,
+      instructor: this.data.valores.instructor,
+      profesorvisitante: this.data.valores.profesorvisitante,
+      contratado:this.data.valores.contratado,
+      auxiliar:this.data.valores.auxiliar,
+      principal:this.data.valores.principal,
+      asociado:this.data.valores.asociado,
+      
       dedicacionJubilacion:this.data.valores.dedicacionJubilacion,
       categoriaJubilacion:this.data.valores.categoriaJubilacion,
     });
@@ -287,10 +294,15 @@ export class CategoriadlgComponent {
     });
 
     this.formularioHistorico= this.formBuilder.group({
+      jefepractica: [''],
+      ayudante: [''],
+      asistente: [''],
+      instructor: [''],
+      profesorvisitante: [''],
       contratado:[''],
       auxiliar: [''],
       asociado: [''],
-      principal: [''],
+      principal: [''],      
       categoriaJubilacion:  [''],
       dedicacionJubilacion:  [''],
       
@@ -365,6 +377,11 @@ export class CategoriadlgComponent {
       hAuxiliar:this.formularioHistorico.value?.auxiliar,
       hPrincipal:this.formularioHistorico.value?.principal,
       hAsociado:this.formularioHistorico.value?.asociado,
+      hProfesorVisita:this.formularioHistorico.value?.profesorvisitante,
+      hInstructor:this.formularioHistorico.value?.instructor,
+      hJefePract:this.formularioHistorico.value?.jefepractica,
+      hAyudante:this.formularioHistorico.value?.ayudante,
+      hAsistente:this.formularioHistorico.value?.asistente,
       dedicacionJubilacion:this.formularioHistorico.value?.dedicacionJubilacion,
       categoriaJubilacion:this.formularioHistorico.value?.categoriaJubilacion,
     }

@@ -60,7 +60,7 @@ export class InfodocenciadlgComponent {
   lugar_dictado=["Lima","Provincia (Dentro del país)","Extranjero"]
   pais_dictado:Nacionalidad|any=[];
   rol_anterior = ["Asesoria", "De baja", "Extension", "Egresado", "Externo", "Jefe de práctica", "Otro departamento", "Profesr visitante"]
-  comisiones=["C. Seguimiento Docente","C. Investigación","C. Internacionalización","C. Responsabilidad Social Universitaria"]
+  comisiones=["C. Seguimiento Docente","C. Investigación","C. Internacionalización","C. Responsabilidad Social Universitaria","No aplica"]
   constructor(public dialogRef: MatDialogRef<InfodocenciadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
