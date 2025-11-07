@@ -10,5 +10,5 @@ export interface DocenteCurso{
     estado:string;
     codigoDocente:string;
     codigoCurso:string;
-    Curso:Curso;
+    cursos?:Curso;
 }

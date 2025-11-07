@@ -1,0 +1,69 @@
+<!-- Contenedor que será exportado -->
+<!-- Overlay de carga (opcional, pero profesional) -->
+<div *ngIf="isLoadingPDF" class="loading-overlay">
+  <div class="spinner">
+    <img src="assets/images/logo.png" alt="Cargando..." class="loading-logo" />
+    <p>Generando documento...</p>
+  </div>
+</div>
+
+<!-- Botón de exportar -->
+<button (click)="exportToPDF()" [disabled]="isLoadingPDF">
+  {{ isLoadingPDF ? 'Generando PDF...' : 'Exportar a PDF' }}
+</button>
+<div #documentContent id="document-content" class="document-container">
+    <div class="header">
+        <div class="dept-text">
+            <strong style="color: #1a237e; font-size: 12px;">DEPARTAMENTO</strong><br>
+            <strong style="color: #1a237e; font-size: 12px;">ACADÉMICO DE</strong><br>
+            <strong style="color: #1a237e; font-size: 12px;">DERECHO</strong>
+        </div>
+        <img src="../assets/logo.png" alt="Logo" class="logo">
+    </div>
+
+    <h2 class="institution">PONTIFICIA UNIVERSIDAD CATÓLICA DEL PERÚ</h2>
+    <h3 class="department">DEPARTAMENTO ACADÉMICO DE DERECHO</h3>
+
+    <p class="main-text">
+        EL JEFE DEL DEPARTAMENTO ACADÉMICO DE DERECHO DE LA
+        <strong>PONTIFICIA UNIVERSIDAD CATÓLICA DEL PERÚ</strong>,
+        pone en su conocimiento lo siguiente:
+    </p>
+
+    <p class="body-text">
+        {{ enunciacion }}
+        <strong>{{ docente.nombres }} {{ docente.apellidos }}</strong>
+        es profesor <strong>{{ this.data.persona.DocenteCategoria[0].categoriadap }}</strong>
+        en la categoria como 
+        <strong>{{ categoriaActual.campo }}</strong>
+        con dedicación a
+        <strong>{{ getDedicacionNombre(this.data.persona.DocenteCategoria[0].dedicacion) }}</strong>
+        del <strong>Departamento Académico de Derecho</strong>.
+        Ingresó a la docencia universitaria como profesor 
+        <strong>{{categoriaAntigua.campo}}</strong>
+        desde el semestre <strong>{{ categoriaAntigua.fecha }}</strong>,
+        siendo ascendido a su actual categoria en <strong>{{ categoriaActual.fecha }}</strong>.
+    </p>
+
+    <p class="body-text">
+        Desde esa fecha, el profesor
+        <strong>{{ docente.apellidos }}</strong>
+        ha tenido a su cargo el dictado de las siguientes asignaturas:
+    </p>
+
+    <p><strong>ASIGNATURAS</strong></p>
+    <ul>
+        <li *ngFor="let curso of cursosAgrupados">{{ curso }}</li>
+    </ul>
+
+    <p class="footer-text">Se expide el presente a solicitud del interesado.</p>
+    <p class="date">{{ fechaHoy }}</p>
+
+    <div class="signature">
+        <p><strong>Miguel David Lovatón Palacios</strong></p>
+        <p>Jefe del Departamento</p>
+        <p>Académico de Derecho</p>
+        <p>{{ inicialesJefe }}/{{ inicialesAsistente }}</p>
+    </div>
+</div>
+

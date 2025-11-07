@@ -50,6 +50,9 @@
                   <mat-icon>more_vert</mat-icon>
                 </button>
                 <mat-menu #menu="matMenu">
+                  <button mat-menu-item (click)="llamarPDF(element)">
+                    <span>Prueba</span>
+                  </button>
                   <button mat-menu-item (click)="contrato(element)">
                     <mat-icon>picture_as_pdf</mat-icon>
                     <span>Constancia Auxiliar</span>

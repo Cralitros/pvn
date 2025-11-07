@@ -29,6 +29,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
 import Swal from 'sweetalert2';
 import { FirmaComponent } from '../../dialog/docente/firma/firma.component';
+import { PdfDocenteComponent } from '../pdf-docente/pdf-docente.component';
 
 @Component({
   selector: 'app-tabla',
@@ -453,6 +454,19 @@ export class TablaComponent {
     XLSX.writeFile(workbook, 'my-excel-file.xlsx');
   }
 
+  llamarPDF(element: any){
+    const dialogRef = this.dialog.open(PdfDocenteComponent, {
+      width: '800px',
+      height: '950px',
+      data: {
+        persona: element
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+
+    });
+
+  }
   contrato(element: any) {
     //console.log("Elemento999*****************");
     

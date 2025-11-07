@@ -32,5 +32,5 @@ export interface Personal{
     idProvincia:string;
     idDistrito:string;
     idNacionalidad:string;
-    DocenteCursos:DocenteCurso;
+    DocenteCursos:DocenteCurso[];
 }
