@@ -65,7 +65,7 @@ export class FirmasdlgComponent {
     console.log(this.data);
 
     this.form.setValue({
-      iniciales: this.data.valores.iniciales,
+      iniciales: this.data.valores.iniciales || '',
       tipoFirma: '1',
       //idLogin:this.data.valores.idLogin,
 

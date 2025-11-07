@@ -1,62 +1,69 @@
 .document-container {
-    //width: 21cm;
-    //min-height: 29.7cm;
-    padding: 2cm;
-    margin: 0 auto;
-    box-sizing: border-box;
-    background: white;
-    font-family: 'Helvetica', Arial, sans-serif;
-    font-size: 12px;
-    line-height: 1.5;
+  //width: 21cm;
+  //min-height: 29.7cm;
+  padding: 2cm;
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: white;
+  font-family: 'Helvetica', Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
 }
 
 .logo {
-    width:150px;
+  width: 200px;
 }
 
 .institution {
-    text-align: center;
-    font-weight: bold;
-    color: #1a237e;
-    margin: 0 0 5px 0;
-    font-size: 14px;
+  text-align: center;
+  font-weight: bold;
+  color: #1a237e;
+  margin: 0 0 5px 0;
+  font-size: 14px;
 }
 
 .department {
-    text-align: center;
-    font-weight: bold;
-    color: #1a237e;
-    margin: 0 0 30px 0;
-    font-size: 12px;
+  text-align: center;
+  font-weight: bold;
+  color: #1a237e;
+  margin: 0 0 30px 0;
+  font-size: 12px;
 }
 
 .main-text,
 .body-text {
-    text-align: justify;
-    margin-bottom: 15px;
+  text-align: justify;
+  margin-bottom: 15px;
 }
 
 .footer-text {
-    font-style: italic;
-    margin-top: 30px;
+  font-style: italic;
+  margin-top: 30px;
 }
 
 .date {
-    text-align: right;
-    margin-top: 20px;
+  text-align: right;
+  margin-top: 20px;
 }
 
 .signature {
-    margin-top: 50px;
-    text-align: right;
-    font-size: 12px;
+  margin-top: 50px;
+  text-align: right;
+  font-size: 12px;
 }
+
+.signatureleft {
+  margin-top: 50px;
+  text-align: left;
+  font-size: 12px;
+}
+
 .loading-overlay {
   position: fixed;
   top: 0;
@@ -82,12 +89,57 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Opcional: deshabilitar el botón visualmente */
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.firma-derecha {
+  text-align: right;
+  margin-top: 40px;
+  font-family: 'Times New Roman', serif;
+  font-size: 14px;
+  line-height: 1.8;
+  padding-right: 20px;
+  /* opcional, para dar espacio */
+}
+
+.firma-derecha p {
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+.firma-derecha p:first-child {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.firma-derecha {
+  text-align: right;
+  margin-top: 30px;
+  padding-right: 20px;
+}
+
+.imagen-firma {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 10px;
+  /* Opcional: si es una firma escaneada, puede ser más ancha */
+}
+
+.firma-derecha p {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
 }

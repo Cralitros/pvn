@@ -48,6 +48,9 @@ export class PdfDocenteComponent {
 
   isLoadingPDF = false;
 
+  agrupados: any;
+  firma:any;
+  firmaImagenBase64: string = ''; // la cadena que me diste
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private saux1: Aux1Service,
@@ -55,6 +58,11 @@ export class PdfDocenteComponent {
     private sanitizer: DomSanitizer
   ) {
     console.log('Datos recibidos en diálogo:', data);
+    this.saux1.ponerurl("firma/dni/07628234");
+    saux1.get().subscribe(data=>{
+      console.log(data);
+      this.firmaImagenBase64='data:image/png;base64,' +data[0].firma;
+    })
   }
 
   ngOnInit(): void {
@@ -87,6 +95,9 @@ export class PdfDocenteComponent {
     this.inicialesAsistente = this.asistente
       ? this.obtenerIniciales(`${this.asistente.nombres} ${this.asistente.apellidos}`)
       : '';
+    this.agrupados = this.agruparCursosPorCurso(this.data.persona.DocenteCursos);
+    console.log(this.agrupados);
+
   }
 
   obtenerCampoYUltimaFecha(docente: any): { campo: string; fecha: Date } | null {
@@ -204,46 +215,57 @@ export class PdfDocenteComponent {
       year: 'numeric'
     });
   }
-  
+
   agruparCursosPorCurso(docenteCursos: DocenteCurso[]): CursoAgrupado[] {
-  const mapa = new Map<string, CursoAgrupado>();
+    const mapa = new Map<string, CursoAgrupado>();
 
-  for (const dc of docenteCursos) {
-    const curso = dc.Curso;
-    if (!curso) continue;
+    for (const dc of docenteCursos) {
+      const curso = dc.Curso;
+      if (!curso) continue;
 
-    const key = curso.codigo; // agrupamos por código de curso
+      // ⬇️ Usa la nueva función
+      const semestre = this.calcularSemestreRomano(dc.fecha_inicio);
+      const key = curso.codigo;
 
-    if (!mapa.has(key)) {
-      mapa.set(key, {
-        nombre: curso.nombre,
-        codigo: curso.codigo,
-        semestres: []
-      });
+      if (!mapa.has(key)) {
+        mapa.set(key, {
+          nombre: curso.nombre,
+          codigo: curso.codigo,
+          semestres: []
+        });
+      }
+
+      const item = mapa.get(key)!;
+      if (!item.semestres.includes(semestre)) {
+        item.semestres.push(semestre);
+      }
     }
 
-    const item = mapa.get(key)!;
-    if (!item.semestres.includes(curso.semestre)) {
-      item.semestres.push(curso.semestre);
-    }
+    // Ordenar semestres: 2023-I, 2023-II, 2024-I, 2024-II, ...
+    return Array.from(mapa.values()).map(item => ({
+      ...item,
+      semestres: item.semestres.sort((a, b) => {
+        const [anioA, cicloA] = a.split('-');
+        const [anioB, cicloB] = b.split('-');
+        const numA = parseInt(anioA) * 10 + (cicloA === 'I' ? 1 : 2);
+        const numB = parseInt(anioB) * 10 + (cicloB === 'I' ? 1 : 2);
+        return numA - numB;
+      })
+    }));
   }
 
-  // Convertir a array y ordenar semestres (opcional: descendente o ascendente)
-  const resultado = Array.from(mapa.values()).map(item => ({
-    ...item,
-    semestres: item.semestres.sort((a, b) => {
-      // Ordena como "2023-0", "2024-0", "2025-0"
-      const [anioA, cicloA] = a.split('-').map(Number);
-      const [anioB, cicloB] = b.split('-').map(Number);
-      if (anioA !== anioB) return anioA - anioB;
-      return cicloA - cicloB;
-    })
-  }));
 
-  return resultado;
-}
+  calcularSemestreRomano(fechaInicio: string): string {
+    const fecha = new Date(fechaInicio);
+    const year = fecha.getFullYear();
+    const mes = fecha.getMonth() + 1; // getMonth() devuelve 0-11, así que +1
 
-
+    if (mes >= 1 && mes <= 6) {
+      return `${year}-I`;
+    } else {
+      return `${year}-II`;
+    }
+  }
 
   async exportToPDF(): Promise<void> {
     this.isLoadingPDF = true;

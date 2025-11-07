@@ -1,15 +1,15 @@
 <!-- Contenedor que será exportado -->
 <!-- Overlay de carga (opcional, pero profesional) -->
 <div *ngIf="isLoadingPDF" class="loading-overlay">
-  <div class="spinner">
-    <img src="assets/images/logo.png" alt="Cargando..." class="loading-logo" />
-    <p>Generando documento...</p>
-  </div>
+    <div class="spinner">
+        <img src="assets/images/logo.png" alt="Cargando..." class="loading-logo" />
+        <p>Generando documento...</p>
+    </div>
 </div>
 
 <!-- Botón de exportar -->
 <button (click)="exportToPDF()" [disabled]="isLoadingPDF">
-  {{ isLoadingPDF ? 'Generando PDF...' : 'Exportar a PDF' }}
+    {{ isLoadingPDF ? 'Generando PDF...' : 'Exportar a PDF' }}
 </button>
 <div #documentContent id="document-content" class="document-container">
     <div class="header">
@@ -34,12 +34,12 @@
         {{ enunciacion }}
         <strong>{{ docente.nombres }} {{ docente.apellidos }}</strong>
         es profesor <strong>{{ this.data.persona.DocenteCategoria[0].categoriadap }}</strong>
-        en la categoria como 
+        en la categoria como
         <strong>{{ categoriaActual.campo }}</strong>
         con dedicación a
         <strong>{{ getDedicacionNombre(this.data.persona.DocenteCategoria[0].dedicacion) }}</strong>
         del <strong>Departamento Académico de Derecho</strong>.
-        Ingresó a la docencia universitaria como profesor 
+        Ingresó a la docencia universitaria como profesor
         <strong>{{categoriaAntigua.campo}}</strong>
         desde el semestre <strong>{{ categoriaAntigua.fecha }}</strong>,
         siendo ascendido a su actual categoria en <strong>{{ categoriaActual.fecha }}</strong>.
@@ -52,18 +52,32 @@
     </p>
 
     <p><strong>ASIGNATURAS</strong></p>
-    <ul>
-        <li *ngFor="let curso of cursosAgrupados">{{ curso }}</li>
-    </ul>
+    <div class="card">
+        <div class="card-header">
+            Cursos asignados
+        </div>
+        <div class="card-body">
+            <ul class="list-unstyled">
+                <li *ngFor="let curso of agrupados">
+                    {{ curso.nombre }} ({{ curso.codigo }}) en los semestres: {{ curso.semestres.join(', ') }}
+                </li>
+            </ul>
+        </div>
+    </div>
 
     <p class="footer-text">Se expide el presente a solicitud del interesado.</p>
-    <p class="date">{{ fechaHoy }}</p>
 
-    <div class="signature">
+    <div class="firma-derecha mt-5">
+        <p>7 de noviembre de 2025</p>
+       
+        <br>
+        <img *ngIf="firmaImagenBase64" [src]="firmaImagenBase64" alt="Firma" class="imagen-firma" />
         <p><strong>Miguel David Lovatón Palacios</strong></p>
         <p>Jefe del Departamento</p>
         <p>Académico de Derecho</p>
+    </div>
+
+    <div class="signatureleft">
         <p>{{ inicialesJefe }}/{{ inicialesAsistente }}</p>
     </div>
 </div>
-
