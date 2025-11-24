@@ -328,7 +328,7 @@ export class CategoriadlgComponent {
       this.fnc=true;
     }
 
-    if(this.data.valores.categoriadap=="Extraordinario"){
+   /* if(this.data.valores.categoriadap=="Extraordinario"){
       this.formularioCategoria.get('rg1')?.enable();
       this.selectedCategory="Extraordinario";
     }else{
@@ -343,7 +343,7 @@ export class CategoriadlgComponent {
     }else{
       this.formularioCategoria.get('rg2')?.disable();
       this.selectedCategory2=this.data.valores.condiciondap;
-    }
+    }*/
 
   }
   poner_codigo(){
@@ -442,7 +442,7 @@ export class CategoriadlgComponent {
     
   }
   onCategoryChange2(event: any) {
-    this.selectedCategory2 = event.value;   
+   /* this.selectedCategory2 = event.value;   
     console.log(this.selectedCategory2);
     
     if(this.selectedCategory2=="Inactivo"){
@@ -451,12 +451,12 @@ export class CategoriadlgComponent {
     }else{
       this.formularioCategoria.get('rg2')?.disable();
       this.selectedCategory2=this.data.valores.condiciondap;
-    }
+    }*/
     
   }
   selectedCategory3:any;
   onCategoryChangeRatificado(event: any){
-    this.selectedCategory3 = event.value;  
+   /* this.selectedCategory3 = event.value;  
     if(this.selectedCategory3=="Ratificado"){
       this.formularioCategoria.get('chk1')?.enable();
       this.formularioCategoria.get('chk2')?.enable();
@@ -470,7 +470,7 @@ export class CategoriadlgComponent {
       this.formularioCategoria.get('chk3')?.disable();
       this.formularioCategoria.get('chk4')?.disable();
       this.formularioCategoria.get('chk5')?.disable();
-    }
+    }*/
 
   }
 

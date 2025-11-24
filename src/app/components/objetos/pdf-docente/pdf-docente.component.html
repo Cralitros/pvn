@@ -8,8 +8,13 @@
 </div>
 
 <!-- Botón de exportar -->
-<button (click)="exportToPDF()" [disabled]="isLoadingPDF">
-    {{ isLoadingPDF ? 'Generando PDF...' : 'Exportar a PDF' }}
+
+<button mat-button (click)="exportToWord()" [disabled]="isLoadingPDF">
+  {{ isLoadingPDF ? 'Generando...' : 'Descargar Word' }}
+</button>
+
+<button mat-button (click)="exportToPDF()" [disabled]="isLoadingPDF">
+  {{ isLoadingPDF ? 'Generando...' : 'Descargar PDF' }}
 </button>
 <div #documentContent id="document-content" class="document-container">
     <div class="header">

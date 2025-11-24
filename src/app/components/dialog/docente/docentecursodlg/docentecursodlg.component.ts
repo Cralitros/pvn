@@ -46,11 +46,11 @@ export class DocentecursodlgComponent {
   funcion: any;
   fnc: boolean = true;
   cursos?: Curso[];
-  modalidad=["Presencial","Semipresencial","Virtual","A distancia","Práctica"];
-  tipo=["Clase","Asesoría","Práctica","Taller"];
-  tipo_clase=["Regular","Compartida","Codictado"];
-  estado=["Provisionado","Provisionado asesoría","Pendiente", "Falta de V°B° JD",
-    "Rechazado","Duplicado","Desprovisionado","No provisionado","Horario Cerrado","Curso Cerrado","Cerrado",
+  modalidad = ["Presencial", "Semipresencial", "Virtual", "A distancia", "Práctica"];
+  tipo = ["Clase", "Asesoría", "Práctica", "Taller"];
+  tipo_clase = ["Regular", "Compartida", "Codictado"];
+  estado = ["Provisionado", "Provisionado asesoría", "Pendiente", "Falta de V°B° JD",
+    "Rechazado", "Duplicado", "Desprovisionado", "No provisionado", "Horario Cerrado", "Curso Cerrado", "Cerrado",
     "Cancelado"]
   constructor(public dialogRef: MatDialogRef<DocentecursodlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -75,20 +75,28 @@ export class DocentecursodlgComponent {
       tipo: this.data.valores.tipo,
       tipo_clase: this.data.valores.tipo_clase,
       estado: this.data.valores.estado,
+      horas_semana: this.data.valores.horas_semana,
+      horario: this.data.valores.horario,
+
     });
     //this.form.value.id=this.data.valores.id;
+  }
+  onCursoSeleccionado(codigoCurso: string | null): void {
+    this.formularioGrado.patchValue({
+      codigoCurso: codigoCurso || ''
+    });
   }
   onDateInput(event: any, fieldName: string) {
     const value = event.target.value;
     const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const matches = value.match(datePattern);
-    
+
     if (matches) {
       const day = parseInt(matches[1], 10);
       const month = parseInt(matches[2], 10) - 1;
       const year = parseInt(matches[3], 10);
       const date = new Date(year, month, day);
-      
+
       if (
         date.getFullYear() === year &&
         date.getMonth() === month &&
@@ -156,6 +164,8 @@ export class DocentecursodlgComponent {
       tipo: [''],
       tipo_clase: [''],
       estado: [''],
+      horas_semana: [''],
+      horario: [''],
 
     });
     this.cgdepr.ponerurl("docentescurso");
@@ -181,14 +191,16 @@ export class DocentecursodlgComponent {
   add_grado() {
     let body = {
       id: this.formularioGrado.value?.id,
-      fecha_inicio: new Date(this.formularioGrado.value?.fecha_inicio ),
+      fecha_inicio: new Date(this.formularioGrado.value?.fecha_inicio),
       fecha_fin: new Date(this.formularioGrado.value?.fecha_fin),
       codigoCurso: this.formularioGrado.value?.codigoCurso,
       codigoDocente: this.formularioGrado.value?.codigoDocente,
       modalidad: this.formularioGrado.value?.modalidad,
-      tipo:this.formularioGrado.value?.tipo,
+      tipo: this.formularioGrado.value?.tipo,
       tipo_clase: this.formularioGrado.value?.tipo_clase,
       estado: this.formularioGrado.value?.estado,
+      horas_semana: this.formularioGrado.value?.horas_semana,
+      horario: this.formularioGrado.value?.horario,
     }
     this.cgdepr.ponerurl("docentescurso")
     if (this.formularioGrado?.valid) {
@@ -225,17 +237,17 @@ export class DocentecursodlgComponent {
   }
 
 
-  verificarInfo(data:any){
+  verificarInfo(data: any) {
     //console.log(data);
-    if(data!=undefined){
+    if (data != undefined) {
       console.log(data);
-      
-      return  `${data.nombres} ${data.apellidos}`
+
+      return `${data.nombres} ${data.apellidos}`
     }
-    else{
+    else {
       console.log("data");
       return "";
     }
-    
+
   }
 }

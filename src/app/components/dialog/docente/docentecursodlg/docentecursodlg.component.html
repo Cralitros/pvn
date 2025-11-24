@@ -8,11 +8,17 @@
             </mat-form-field>
         </div>
 
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Codigo Curso</mat-label>
+                <input matInput formControlName="codigoCurso" placeholder="Codigo curso" readonly>
+            </mat-form-field>
+        </div>
 
         <div class="form">
-            <mat-form-field class="example-full-width nac">
+            <mat-form-field class="example-full-width full">
                 <mat-label>Curso</mat-label>
-                <mat-select formControlName="codigoCurso" >
+                <mat-select formControlName="codigoCurso" (selectionChange)="onCursoSeleccionado($event.value)">
                     <mat-option>Seleccionar curso</mat-option>
                     @for (curso of cursos; track curso) {
                     <mat-option [value]="curso.codigo">{{curso.nombre}}</mat-option>
@@ -30,6 +36,18 @@
                 <mat-hint>DD/MM/YYYY</mat-hint>
                 <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                 <mat-datepicker #picker2></mat-datepicker>
+            </mat-form-field>
+        </div>
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Horas x semana</mat-label>
+                <input matInput formControlName="horas_semana" placeholder="Horas x semana">
+            </mat-form-field>
+        </div>
+        <div class="form">
+            <mat-form-field class="example-full-width">
+                <mat-label>Horario</mat-label>
+                <input matInput formControlName="horario" placeholder="Horario">
             </mat-form-field>
         </div>
 

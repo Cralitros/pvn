@@ -144,7 +144,7 @@ export class DocentecursoComponent {
 
           const dialogRef = this.dialog.open(DocentecursodlgComponent, {
             width: '500px',
-            height: '550px',
+            height: '750px',
             data: {
               title: `Agregar ${this.titulo}`,
               valores: { laboral },
@@ -171,7 +171,7 @@ export class DocentecursoComponent {
     codigoCurso:string; */
     const dialogRef = this.dialog.open(DocentecursodlgComponent, {
       width: '500px',
-      height: '550px',
+      height: '750px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
@@ -185,6 +185,9 @@ export class DocentecursoComponent {
           tipo: this.cartabla.dataSeleccionada.tipo,
           tipo_clase: this.cartabla.dataSeleccionada.tipo_clase,
           estado: this.cartabla.dataSeleccionada.estado,
+          horas_semana: this.cartabla.dataSeleccionada.horas_semana,
+          horario:this.cartabla.dataSeleccionada.horario,
+
         },
         modo: 1
       }

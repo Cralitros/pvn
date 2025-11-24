@@ -55,7 +55,10 @@
 }
 
 .nac {
-    width: 131px;
+    width: 210px;
+}
+.full{
+    width: 440px;
 }
 
 .texto {
@@ -168,4 +171,48 @@
 .formulario {
     position: relative;
     top: 50px;
+}
+
+/* Estilos para las opciones del mat-select */
+::ng-deep .mat-mdc-select-panel .mat-mdc-option {
+    /* Color de fondo cuando se pasa el mouse */
+    background-color: #f5f5f5 !important;
+    /* Color de texto */
+    color: #333 !important;
+    /* Borde inferior como línea de separación */
+    border-bottom: 1px solid #ddd !important;
+    /* Espaciado interno para mejor lectura */
+    padding: 10px 16px !important;
+    /* Transición suave al pasar el mouse */
+    transition: background-color 0.2s ease;
+}
+
+/* Color de fondo cuando se selecciona una opción (hover) */
+::ng-deep .mat-mdc-select-panel .mat-mdc-option:hover {
+    background-color: #e0e0e0 !important;
+    color: #000 !important;
+}
+
+/* Color de fondo cuando la opción está seleccionada (si aplica) */
+::ng-deep .mat-mdc-select-panel .mat-mdc-option.mat-mdc-option-selected {
+    background-color: #bbdefb !important; /* Azul claro */
+    color: #000 !important;
+    font-weight: bold;
+}
+
+/* Elimina el borde inferior de la última opción para evitar doble línea */
+::ng-deep .mat-mdc-select-panel .mat-mdc-option:last-child {
+    border-bottom: none !important;
+}
+
+/* Opcional: Ajustar altura mínima si las opciones se ven muy juntas */
+::ng-deep .mat-mdc-select-panel .mat-mdc-option {
+    min-height: 40px !important;
+}
+
+/* Estilo opcional para el panel desplegable */
+::ng-deep .mat-mdc-select-panel {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
 }

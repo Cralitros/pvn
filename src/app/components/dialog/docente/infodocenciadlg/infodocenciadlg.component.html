@@ -42,7 +42,7 @@
                 </td>
             </tr>
             <tr>
-                <td>
+               <!-- <td>
                     <mat-form-field>
                         <mat-label>Rango de dictado</mat-label>
                         <mat-date-range-input [rangePicker]="picker">
@@ -53,7 +53,7 @@
                         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                         <mat-date-range-picker #picker></mat-date-range-picker>
                     </mat-form-field>
-                </td>
+                </td>-->
                 <td>
                     <mat-form-field class="tamanio">
                         <mat-label>Profesor perteneciente a:</mat-label>
@@ -67,7 +67,7 @@
                 <td>
                     <tr>
                         <td> 
-                            <mat-form-field class="ancho">
+                            <mat-form-field  class="tamanio">
                                 <mat-label>Labor administrativa</mat-label>
                                 <mat-select name="labor_administrativa" formControlName="labor_administrativa">
                                     @for (la of labor_adminsitrativa; track la) {
@@ -76,12 +76,12 @@
                                 </mat-select>
                             </mat-form-field>
                         </td>
-                        <td>
+                       <!-- <td>
                             <mat-form-field class="ancho">
                                 <mat-label>semestre</mat-label>
                                 <input type="text" matInput placeholder="semestre" formControlName="semestre">
                             </mat-form-field>
-                        </td>
+                        </td>-->
                     </tr>
                 </td>
             </tr>

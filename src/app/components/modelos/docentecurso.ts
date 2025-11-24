@@ -10,5 +10,7 @@ export interface DocenteCurso{
     estado:string;
     codigoDocente:string;
     codigoCurso:string;
+    horas_semana:string;
+    horario:string;
     Curso?:Curso;
 }
