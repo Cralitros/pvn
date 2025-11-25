@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MaestrosserviceService } from '../../services/maestrosservice.service';
 import { lastValueFrom } from 'rxjs';
+import { OrgaComponent } from "../maestros/orga/orga.component";
 
 @Component({
   selector: 'app-dashboard',
@@ -22,8 +23,9 @@ import { lastValueFrom } from 'rxjs';
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    CommonModule
-  ]
+    CommonModule,
+    OrgaComponent
+]
 })
 export class DashboardComponent {
   afps?: any;

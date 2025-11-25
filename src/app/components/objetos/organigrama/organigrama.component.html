@@ -1,0 +1,15 @@
+<div class="org-node">
+  <div class="node-content">
+    <div class="node-name">{{ nodo.name }}</div>
+    <div class="node-title" *ngIf="nodo.title">{{ nodo.title }}</div>
+  </div>
+
+  <div class="org-children" *ngIf="nodo.children && nodo.children.length > 0">
+    <div class="children-container">
+      <app-organigrama
+        *ngFor="let child of nodo.children"
+        [nodo]="child">
+      </app-organigrama>
+    </div>
+  </div>
+</div>

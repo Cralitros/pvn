@@ -1,40 +1,48 @@
-<!-- Sección: Maestros y Gestión -->
-<div class="grid-container">
-  <h1 class="mat-h1">📊 TOTAL DE REGISTROS</h1>
-  <h2 class="section-title">Maestros y Gestión</h2>
-
-  <div class="cards-grid">
-    <mat-card class="stat-card" *ngFor="let valor of valores; let i = index">
-      <mat-card-content class="stat-content">
-        <div class="stat-icon">
-          <mat-icon>{{ getIcon(maestros[i]) }}</mat-icon>
-        </div>
-        <div class="stat-info">
-          <p class="stat-label">{{ maestros[i] | titlecase }}</p>
-          <p class="stat-value">{{ valor }}</p>
-          <p class="stat-desc">registros</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
+<div class="dashboard-container">
+  <!-- Organigrama: SIN MODIFICAR -->
+  <div class="organigrama-wrapper">
+    <app-orga></app-orga>
   </div>
-</div>
 
-<!-- Sección: Docentes -->
-<div class="grid-container">
-  <h2 class="section-title">👨‍🏫 Información de Docentes</h2>
+  <!-- Tarjetas con scroll vertical independiente -->
+  <div class="estadisticas-wrapper">
+    <!-- Sección: Maestros y Gestión -->
+    <div class="grid-container">
+      <h1 class="mat-h1">📊 TOTAL DE REGISTROS</h1>
+      <h2 class="section-title">Maestros y Gestión</h2>
+      <div class="cards-grid">
+        <mat-card class="stat-card" *ngFor="let valor of valores; let i = index">
+          <mat-card-content class="stat-content">
+            <div class="stat-icon">
+              <mat-icon>{{ getIcon(maestros[i]) }}</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">{{ maestros[i] | titlecase }}</p>
+              <p class="stat-value">{{ valor }}</p>
+              <p class="stat-desc">registros</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
 
-  <div class="cards-grid">
-    <mat-card class="stat-card" *ngFor="let valor of valoresDocentes; let i = index">
-      <mat-card-content class="stat-content">
-        <div class="stat-icon">
-          <mat-icon>{{ getIcon(docentesRutas[i]) }}</mat-icon>
-        </div>
-        <div class="stat-info">
-          <p class="stat-label">{{ docentesRutas[i] | titlecase }}</p>
-          <p class="stat-value">{{ valor }}</p>
-          <p class="stat-desc">registros</p>
-        </div>
-      </mat-card-content>
-    </mat-card>
+    <!-- Sección: Docentes -->
+    <div class="grid-container">
+      <h2 class="section-title">👨‍🏫 Información de Docentes</h2>
+      <div class="cards-grid">
+        <mat-card class="stat-card" *ngFor="let valor of valoresDocentes; let i = index">
+          <mat-card-content class="stat-content">
+            <div class="stat-icon">
+              <mat-icon>{{ getIcon(docentesRutas[i]) }}</mat-icon>
+            </div>
+            <div class="stat-info">
+              <p class="stat-label">{{ docentesRutas[i] | titlecase }}</p>
+              <p class="stat-value">{{ valor }}</p>
+              <p class="stat-desc">registros</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
   </div>
 </div>
