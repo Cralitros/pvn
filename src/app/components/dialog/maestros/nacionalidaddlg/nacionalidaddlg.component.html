@@ -1,34 +1,40 @@
-<div class="contenido">
-    <h1 class="titulo">{{funcion}}</h1>
-    <form [formGroup]="formulario">
-        <mat-form-field class="example-full-width" *ngIf="data.modo==1">
-            <mat-label>ID</mat-label>
-            <input matInput formControlName="id" placeholder="ID">
-        </mat-form-field>
-        <div class="example-full-width mensaje" *ngIf="formulario?.get('id')?.invalid && formulario?.get('id')?.touched && data.modo==1">
-            ID es requerido.
-        </div>
+<h2 mat-dialog-title class="titulo">
+  {{ funcion }} Nacionalidad
+</h2>
 
+<form [formGroup]="formulario" (ngSubmit)="onSubmit()">
+  <div mat-dialog-content class="form-grid">
+    
+    <!-- ID (Visible solo en modo Editar) -->
+    <mat-form-field appearance="outline" class="example-full-width" *ngIf="funcion === 'Editar'">
+      <mat-label>ID</mat-label>
+      <input matInput formControlName="id" readonly>
+    </mat-form-field>
 
-        <mat-form-field class="example-full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" placeholder="Nombre">
-        </mat-form-field>
-        <div class="example-full-width mensaje" *ngIf="formulario?.get('nombre')?.invalid && formulario?.get('nombre')?.touched">
-            Nombre es requerido.
-        </div>
+    <!-- Nombre -->
+    <mat-form-field appearance="outline" class="example-full-width">
+      <mat-label>Nombre</mat-label>
+      <input matInput formControlName="nombre" placeholder="Ingrese el nombre de la nacionalidad">
+      <mat-error class="mensaje" *ngIf="formulario.get('nombre')?.hasError('required') && formulario.get('nombre')?.touched">
+        El nombre es requerido.
+      </mat-error>
+    </mat-form-field>
 
-        <mat-form-field class="example-full-width">
-            <mat-label>Pais</mat-label>
-            <input matInput formControlName="pais" placeholder="Pais">
-        </mat-form-field>
-        <div class="example-full-width mensaje" *ngIf="formulario?.get('pais')?.invalid && formulario?.get('pais')?.touched">
-            Pais es requerido.
-        </div>
-        <div mat-dialog-actions class="buttons">
-            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
-            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
-                cdkFocusInitial>{{funcion}}</button>
-        </div>
-    </form>
-</div>
+    <!-- País -->
+    <mat-form-field appearance="outline" class="example-full-width">
+      <mat-label>País</mat-label>
+      <input matInput formControlName="pais" placeholder="Ingrese el país">
+      <mat-error class="mensaje" *ngIf="formulario.get('pais')?.hasError('required') && formulario.get('pais')?.touched">
+        El país es requerido.
+      </mat-error>
+    </mat-form-field>
+
+  </div>
+
+  <div mat-dialog-actions class="buttons">
+    <button mat-button class="btn" type="button" (click)="onNoClick()">Cancelar</button>
+    <button mat-raised-button color="primary" class="btn" type="submit" [disabled]="formulario?.invalid">
+      {{ funcion }}
+    </button>
+  </div>
+</form>

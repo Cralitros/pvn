@@ -86,8 +86,8 @@ export class ProgramaComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(ProgramasdlgComponent, {
-      width: '550px',
-      height:'500px',
+      width: '700px',
+      height:'750px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -105,8 +105,8 @@ export class ProgramaComponent {
     console.log(this.cartabla.dataSeleccionada);
     
     const dialogRef = this.dialog.open(ProgramasdlgComponent, {
-      width: '550px',
-      height:'500px',
+      width: '700px',
+      height:'750px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

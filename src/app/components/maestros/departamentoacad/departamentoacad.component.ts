@@ -15,11 +15,11 @@ import { MaestrosserviceService } from '../../../services/maestrosservice.servic
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
-import { EscueladlgComponent } from '../../dialog/maestros/escueladlg/escueladlg.component';
+import { DepartamentoacaddlgComponent } from '../../dialog/maestros/departamentoacaddlg/departamentoacaddlg.component';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-escuela',
+  selector: 'app-departamentoacad',
   standalone: true,
   imports: [
     CommonModule,
@@ -32,8 +32,8 @@ import Swal from 'sweetalert2';
     MatPaginatorModule, 
     MatTableModule
   ],
-  templateUrl: './escuela.component.html',
-  styleUrl: './escuela.component.scss'
+  templateUrl: './departamentoacad.component.html',
+  styleUrl: './departamentoacad.component.scss'
 })
 export class EscuelaComponent {
   tablaDepartamento:Escuela[]=[];
@@ -85,9 +85,9 @@ export class EscuelaComponent {
     this.sctabla.setData(this.tablaDepartamento);
   }
   dialogo(){
-    const dialogRef = this.dialog.open(EscueladlgComponent, {
-      width: '290px',
-      height:'450px',
+    const dialogRef = this.dialog.open(DepartamentoacaddlgComponent, {
+      width: '500px',
+      height:'550px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -101,9 +101,9 @@ export class EscuelaComponent {
     });
   }
   editar(element: any){
-    const dialogRef = this.dialog.open(EscueladlgComponent, {
-      width: '250px',
-      height:'450px',
+    const dialogRef = this.dialog.open(DepartamentoacaddlgComponent, {
+      width: '500px',
+      height:'550px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="titulo">
-  {{ funcion }} Departamento
+  {{ funcion }} Unidad Académica
 </h2>
 
 <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
@@ -14,21 +14,12 @@
       </mat-error>
     </mat-form-field>
 
-    <!-- Nombre -->
+    <!-- Nombre de la Unidad -->
     <mat-form-field appearance="outline" class="example-full-width">
-      <mat-label>Nombre</mat-label>
-      <input matInput formControlName="nombre" placeholder="Ingrese el nombre del departamento">
+      <mat-label>Nombre unidad</mat-label>
+      <input matInput formControlName="nombre" placeholder="Ingrese el nombre de la unidad académica">
       <mat-error class="mensaje" *ngIf="formulario.get('nombre')?.hasError('required') && formulario.get('nombre')?.touched">
         Nombre es requerido.
-      </mat-error>
-    </mat-form-field>
-
-    <!-- Valor -->
-    <mat-form-field appearance="outline" class="example-full-width">
-      <mat-label>Valor</mat-label>
-      <input matInput formControlName="valor" placeholder="Ingrese el valor">
-      <mat-error class="mensaje" *ngIf="formulario.get('valor')?.hasError('required') && formulario.get('valor')?.touched">
-        Valor es requerido.
       </mat-error>
     </mat-form-field>
 

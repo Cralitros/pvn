@@ -28,8 +28,8 @@ import { NacionalidaddlgComponent } from '../../dialog/maestros/nacionalidaddlg/
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    TablaComponent, 
-    MatPaginatorModule, 
+    TablaComponent,
+    MatPaginatorModule,
     MatTableModule
   ],
   templateUrl: './nacionalidad.component.html',
@@ -82,8 +82,8 @@ export class NacionalidadComponent {
   }
   dialogo() {
     const dialogRef = this.dialog.open(NacionalidaddlgComponent, {
-      width: '290px',
-      height: '350px',
+      width: '500px',
+      height: '550px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores: {},
@@ -98,14 +98,14 @@ export class NacionalidadComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(NacionalidaddlgComponent, {
-      width: '250px',
-      height: '350px',
+      width: '500px',
+      height: '550px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
           id: this.cartabla.dataSeleccionada.id,
           nombre: this.cartabla.dataSeleccionada.nombre,
-          pais:this.cartabla.dataSeleccionada.pais,
+          pais: this.cartabla.dataSeleccionada.pais,
         },
         modo: 1
       }
@@ -118,16 +118,43 @@ export class NacionalidadComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
-      Swal.fire({
-        title: "Eliminado",
-        text: "Continuar",
-        icon: "info"
-      });
-      this.cargartabla();
-    })
+    console.log("Elemento a eliminar:", element);
+
+    // Verificar qué propiedad tiene el nombre (puede ser 'nombre', 'descripcion', etc.)
+    const nombreElemento = element.nombre || element.descripcion || 'este elemento';
+
+    Swal.fire({
+      title: `¿Deseas eliminar a ${nombreElemento}?`,
+      text: "Sí eliminas, no se podrá revertir el cambio.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: '¡Sí, Eliminar!',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.mservice.delete(element.id).subscribe({
+          next: (data) => {
+            console.log("Eliminado", data);
+            Swal.fire({
+              title: "Eliminado",
+              text: "El elemento ha sido eliminado correctamente",
+              icon: "success"
+            });
+            this.cargartabla();
+          },
+          error: (err) => {
+            console.error("Error al eliminar", err);
+            Swal.fire({
+              title: "Error",
+              text: "No se pudo eliminar el elemento",
+              icon: "error"
+            });
+          }
+        });
+      }
+    });
   }
 
 }

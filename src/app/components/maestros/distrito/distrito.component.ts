@@ -86,8 +86,8 @@ export class DistritoComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(DstdlgComponent, {
-      width: '290px',
-      height:'450px',
+      width: '500px',
+      height:'600px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -102,8 +102,8 @@ export class DistritoComponent {
   }
   editar(element: any){
     const dialogRef = this.dialog.open(DstdlgComponent, {
-      width: '250px',
-      height:'450px',
+      width: '500px',
+      height:'600px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

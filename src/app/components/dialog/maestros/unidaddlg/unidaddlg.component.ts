@@ -1,17 +1,16 @@
+import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Departamento } from '../../../modelos/departamento';
-import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { CommonModule } from '@angular/common';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-dptdlg',
+  selector: 'app-unidaddlg',
   standalone: true,
   imports: [
     MatFormFieldModule,
@@ -22,33 +21,33 @@ import Swal from 'sweetalert2';
     MatSelectModule,
     MatDialogModule // Necesario para mat-dialog-title, content y actions
   ],
-  templateUrl: './dptdlg.component.html',
-  styleUrl: './dptdlg.component.scss'
+  templateUrl: './unidaddlg.component.html',
+  styleUrl: './unidaddlg.component.scss'
 })
-export class DptdlgComponent implements OnInit {
-  formulario!: FormGroup;
-  departamentos?: Departamento[];
-  funcion: string = 'Añadir';
+export class FacultaddlgComponent implements OnInit {
+  formulario?: FormGroup | any = null;
+  funcion: any;
   fnc: boolean = true;
 
   constructor(
-    public dialogRef: MatDialogRef<DptdlgComponent>,
+    public dialogRef: MatDialogRef<FacultaddlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
     private cgdepr: MaestrosserviceService
   ) {}
 
+  poner_datos() {
+    console.log(this.data);
+    this.formulario.setValue({
+      id: this.data.valores.id,
+      nombre: this.data.valores.nombre,
+    });
+  }
+
   ngOnInit(): void {
     this.formulario = this.formBuilder.group({
       id: [''],
       nombre: ['', Validators.required],
-      valor: ['', Validators.required]
-    });
-
-    this.cgdepr.ponerurl("departamentos");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
-      this.departamentos = data;
     });
 
     if (this.data?.modo === 1) {
@@ -61,31 +60,21 @@ export class DptdlgComponent implements OnInit {
     }
   }
 
-  poner_datos() {
-    console.log(this.data);
-    this.formulario.setValue({
-      id: this.data.valores.id,
-      nombre: this.data.valores.nombre,
-      valor: this.data.valores.valor,
-    });
-  }
-
   onSubmit() {
-    if (this.formulario?.valid) {
-      let body = {
-        id: this.formulario.value?.id,
-        nombre: this.formulario.value.nombre,
-        valor: this.formulario.value.valor
-      };
+    let body = {
+      id: this.formulario.value?.id,
+      nombre: this.formulario.value.nombre,
+    };
 
+    if (this.formulario?.valid) {
       if (this.fnc) {
-        this.cgdepr.ponerurl("departamentos");
+        this.cgdepr.ponerurl("facultad");
         this.cgdepr.add(body).subscribe({
           next: (data) => {
             console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
-              text: "El departamento se agregó correctamente",
+              text: "La unidad académica se agregó correctamente",
               icon: "success"
             });
             this.dialogRef.close(this.formulario.value);
@@ -94,19 +83,19 @@ export class DptdlgComponent implements OnInit {
             console.error("Error al agregar:", err);
             Swal.fire({
               title: "Error",
-              text: "No se pudo agregar el departamento",
+              text: "No se pudo agregar la unidad académica",
               icon: "error"
             });
           }
         });
       } else {
-        this.cgdepr.ponerurl("departamentos");
+        this.cgdepr.ponerurl("facultad");
         this.cgdepr.update(body.id, body).subscribe({
           next: (data) => {
             console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
-              text: "El departamento se actualizó correctamente",
+              text: "La unidad académica se actualizó correctamente",
               icon: "success"
             });
             this.dialogRef.close(this.formulario.value);
@@ -115,7 +104,7 @@ export class DptdlgComponent implements OnInit {
             console.error("Error al actualizar:", err);
             Swal.fire({
               title: "Error",
-              text: "No se pudo actualizar el departamento",
+              text: "No se pudo actualizar la unidad académica",
               icon: "error"
             });
           }

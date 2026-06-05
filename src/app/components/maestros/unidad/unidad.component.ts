@@ -15,11 +15,11 @@ import { MaestrosserviceService } from '../../../services/maestrosservice.servic
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
-import { FacultaddlgComponent } from '../../dialog/maestros/facultaddlg/facultaddlg.component';
+import { FacultaddlgComponent } from '../../dialog/maestros/unidaddlg/unidaddlg.component';
 import Swal from 'sweetalert2';
 
 @Component({
-  selector: 'app-facultad',
+  selector: 'app-unidad',
   standalone: true,
   imports: [
     CommonModule,
@@ -32,8 +32,8 @@ import Swal from 'sweetalert2';
     MatPaginatorModule, 
     MatTableModule
   ],
-  templateUrl: './facultad.component.html',
-  styleUrl: './facultad.component.scss'
+  templateUrl: './unidad.component.html',
+  styleUrl: './unidad.component.scss'
 })
 export class FacultadComponent {
   tablaDepartamento:Facultad[]=[];
@@ -81,8 +81,8 @@ export class FacultadComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(FacultaddlgComponent, {
-      width: '290px',
-      height:'350px',
+      width: '500px',
+      height:'550px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -97,8 +97,8 @@ export class FacultadComponent {
   }
   editar(element: any){
     const dialogRef = this.dialog.open(FacultaddlgComponent, {
-      width: '250px',
-      height:'350px',
+      width: '500px',
+      height:'550px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

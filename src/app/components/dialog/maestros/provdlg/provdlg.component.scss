@@ -1,19 +1,42 @@
-.example-full-width{
-    margin-left: 20px;
+:host {
+  display: block;
+  padding: 24px;
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  min-width: 400px;
 }
-.buttons{
-    margin-left: 20px;
+
+.titulo {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #673ab7;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
 }
-.btn{
-    margin-left: 10px;
-    padding-right: 10px;
+
+.example-full-width {
+  width: 100%;
+  margin-bottom: 8px;
 }
-.mensaje{
-    color: red;
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
 }
-.titulo{
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
+
+.btn {
+  min-width: 100px;
+  font-weight: 500;
+}
+
+.mensaje {
+  color: #f44336;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 500;
 }

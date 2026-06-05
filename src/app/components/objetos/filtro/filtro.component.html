@@ -1,20 +1,35 @@
-<button mat-button (click)="addFilter()" class="btn"><img src="./assets/filter_add.png" alt="" srcset=""
-        width="30px"></button>
-<div *ngFor="let filter of filters; let i = index">
-    <mat-form-field>
-        <mat-label>Seleccione columna</mat-label>
-        <mat-select [(ngModel)]="filter.column" name="column{{i}}">
-            <mat-option *ngFor="let item of columns" [value]="item.columnDef">{{item.header}}</mat-option>
-        </mat-select>
+<div class="filter-container">
+  <div *ngFor="let filter of filters; let i = index" class="filter-row">
+    <mat-form-field appearance="outline">
+      <mat-label>Seleccione columna</mat-label>
+      <mat-select [(ngModel)]="filter.column">
+        <mat-option *ngFor="let item of columns" [value]="item.columnDef">
+          {{item.header}}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
 
-    <mat-form-field>
-        <mat-label>Filtro</mat-label>
-        <input matInput placeholder="Ex. ium" [(ngModel)]="filter.filter" name="filter{{i}}">
+    <mat-form-field appearance="outline">
+      <mat-label>Filtro</mat-label>
+      <input matInput [(ngModel)]="filter.filter" placeholder="Ingrese filtro">
     </mat-form-field>
 
+    <button mat-icon-button (click)="filters.splice(i, 1)" matTooltip="Eliminar filtro">
+      <mat-icon>remove_circle</mat-icon>
+    </button>
+  </div>
+
+  <div class="filter-actions">
+    <button mat-icon-button color="primary" (click)="addFilter()" matTooltip="Agregar otro filtro">
+      <mat-icon>add_circle</mat-icon>
+    </button>
+
+    <button mat-icon-button color="accent" (click)="aceptarFiltro()" matTooltip="Aplicar filtros">
+      <mat-icon>check</mat-icon>
+    </button>
+
+    <button mat-icon-button color="warn" (click)="cancelarrFiltro()" matTooltip="Cancelar filtros">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 </div>
-<button mat-button (click)="aceptarFiltro()" class="btn"><img src="./assets/aceptar.png" alt="" srcset=""
-        width="30px"></button>
-<button mat-button (click)="cancelarrFiltro()" class="btn"><img src="./assets/cancelar.png" alt="" srcset=""
-        width="30px"></button>

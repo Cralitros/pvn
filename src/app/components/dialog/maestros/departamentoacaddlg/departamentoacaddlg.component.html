@@ -1,5 +1,5 @@
 <h2 mat-dialog-title class="titulo">
-  {{ funcion }} Provincia
+  {{ funcion }} Departamento Académico
 </h2>
 
 <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
@@ -14,34 +14,25 @@
       </mat-error>
     </mat-form-field>
 
-    <!-- Nombre -->
+    <!-- Nombre del Departamento Académico -->
     <mat-form-field appearance="outline" class="example-full-width">
-      <mat-label>Nombre</mat-label>
-      <input matInput formControlName="nombre" placeholder="Ingrese el nombre de la provincia">
+      <mat-label>Nombre Departamento</mat-label>
+      <input matInput formControlName="nombre" placeholder="Ingrese el nombre del departamento académico">
       <mat-error class="mensaje" *ngIf="formulario.get('nombre')?.hasError('required') && formulario.get('nombre')?.touched">
         Nombre es requerido.
       </mat-error>
     </mat-form-field>
 
-    <!-- Valor -->
+    <!-- Unidad Académica (Facultad) -->
     <mat-form-field appearance="outline" class="example-full-width">
-      <mat-label>Valor</mat-label>
-      <input matInput formControlName="valor" placeholder="Ingrese el valor">
-      <mat-error class="mensaje" *ngIf="formulario.get('valor')?.hasError('required') && formulario.get('valor')?.touched">
-        Valor es requerido.
-      </mat-error>
-    </mat-form-field>
-
-    <!-- Departamento -->
-    <mat-form-field appearance="outline" class="example-full-width">
-      <mat-label>Departamento</mat-label>
-      <mat-select formControlName="departamento_id" placeholder="Seleccionar departamento">
-        <mat-option *ngFor="let departamento of departamentos; track departamento" [value]="departamento.id">
-          {{ departamento.nombre }}
+      <mat-label>Unidad académica</mat-label>
+      <mat-select formControlName="idFacultad" placeholder="Seleccionar Unidad">
+        <mat-option *ngFor="let facultad of facultades; track facultad" [value]="facultad.id">
+          {{ facultad.nombre }}
         </mat-option>
       </mat-select>
-      <mat-error class="mensaje" *ngIf="formulario.get('departamento_id')?.hasError('required') && formulario.get('departamento_id')?.touched">
-        Departamento es requerido.
+      <mat-error class="mensaje" *ngIf="formulario.get('idFacultad')?.hasError('required') && formulario.get('idFacultad')?.touched">
+        Unidad es requerida.
       </mat-error>
     </mat-form-field>
 

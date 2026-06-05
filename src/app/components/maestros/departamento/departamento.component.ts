@@ -83,8 +83,8 @@ export class DepartamentoComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(DptdlgComponent, {
-      width: '290px',
-      height:'350px',
+      width: '500px',
+      height:'550px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -99,8 +99,8 @@ export class DepartamentoComponent {
   }
   editar(element: any){
     const dialogRef = this.dialog.open(DptdlgComponent, {
-      width: '250px',
-      height:'350px',
+      width: '500px',
+      height:'550px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

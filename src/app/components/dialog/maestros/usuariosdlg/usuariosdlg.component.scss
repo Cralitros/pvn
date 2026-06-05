@@ -1,40 +1,74 @@
-.example-full-width {
-    margin-left: 20px;
-}
-
-.buttons {
-    margin-left: 20px;
-}
-
-.btn {
-    margin-left: 10px;
-    padding-right: 10px;
-}
-
-.mensaje {
-    color: red;
+:host {
+  display: block;
+  padding: 24px;
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  min-width: 600px; /* Ancho mínimo para que se vea bien a 2 columnas */
 }
 
 .titulo {
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #673ab7; /* Un tono violeta moderno */
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
 }
 
-.myTooltip {
-    .mdc-tooltip__surface {
-        max-width: 350px;
-        padding: 5px;
-    }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas */
+  gap: 16px;
 }
 
-.rg2{
-    margin-left: 10px;
-
+.full-width {
+  grid-column: 1 / -1; /* Ocupa todo el ancho */
 }
-.rgroup{
-    display: flex; /* or inline-flex */
-    flex-direction:  column ;
 
+.example-full-width {
+  width: 100%;
+}
+
+.mensaje {
+  color: #f44336;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn {
+  min-width: 100px;
+  font-weight: 500;
+}
+
+.rgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.rg2 {
+  display: flex;
+  gap: 16px;
+}
+
+/* Personalización del Tooltip de Angular Material */
+::ng-deep .myTooltip .mdc-tooltip__surface {
+  max-width: 350px !important;
+  padding: 10px 14px !important;
+  font-size: 0.875rem !important;
+  background-color: #333333 !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
 }

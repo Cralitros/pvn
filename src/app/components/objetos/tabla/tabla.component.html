@@ -1,143 +1,114 @@
-<div class="mat-elevation-z8">
-  <mat-form-field>
+<!-- Barra de herramientas horizontal -->
+<div class="toolbar">
+  <mat-form-field appearance="outline" class="filter-field">
     <mat-label>Filtro</mat-label>
-    <input matInput (keyup)="applyFilterDebounced($event)" placeholder="Ex. ium" #input>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Buscar...">
+    <mat-icon matPrefix>search</mat-icon>
   </mat-form-field>
 
-  <mat-checkbox class="example-margin" (change)="toggleFilter($event)">Activar Filtro</mat-checkbox>
+  <mat-checkbox (change)="toggleFilter($event)" class="filter-checkbox">
+    Activar Filtro
+  </mat-checkbox>
 
-  <button mat-fab extended (click)="toggleFilterMenu($event)" [disabled]="!isFilterEnabled">
-    <mat-label>Filtro</mat-label>
+  <button mat-icon-button (click)="toggleFilterMenu($event)" *ngIf="isFilterEnabled" matTooltip="Filtros avanzados">
+    <mat-icon>filter_list</mat-icon>
   </button>
 
-  <button mat-fab extended (click)="reporte()">
-    <mat-label>Reporte</mat-label>
+  <span class="spacer"></span>
+
+  <button mat-stroked-button color="primary" (click)="reporte()" class="toolbar-btn">
+    <mat-icon>assessment</mat-icon>
+    Reporte
   </button>
 
-  <button mat-fab extended (click)="exportToExcel()">
-    <mat-label>Exportar a Excel</mat-label>
+  <button mat-stroked-button color="accent" (click)="exportToExcel()" class="toolbar-btn">
+    <mat-icon>file_download</mat-icon>
+    Exportar a Excel
   </button>
 
-  <button mat-fab extended (click)="refresh()">
-    <mat-label>Refrescar tabla</mat-label>
+  <button mat-stroked-button color="warn" (click)="refresh()" class="toolbar-btn">
+    <mat-icon>refresh</mat-icon>
+    Refrescar
   </button>
+</div>
 
+<!-- Menú de filtros avanzados -->
+<!--<div class="filter-menu" *ngIf="filterMenuVisible" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
+  <app-filtro (dataGenerada)="dataGenerada($event)"></app-filtro>
+</div>-->
+<!-- Menú de filtros avanzados -->
+<!-- Menú de filtros avanzados -->
+<div class="filter-menu" *ngIf="filterMenuVisible" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
+  <app-filtro [columns]="columns" (filterg)="dataGenerada($event)"></app-filtro>
+</div>
+<!-- Tabla -->
+<div class="table-container">
   <div class="table-wrapper">
-    <table mat-table matSort [dataSource]="dataSource" (matSortChange)="announceSortChange($event)">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
 
-      <!-- Dynamic columns -->
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
-          <div class="header-container">
-            <span>{{ column.header }}</span>
-            <app-inputs [campo]="column" (seleccionado)="filtroinput($event)"></app-inputs>
-          </div>
+          {{ column.header }}
         </th>
-        <td mat-cell *matCellDef="let element" class="pre-formatted">
-          <ng-container *ngIf="!column.isAction"> <!-- Check if it's not an action column -->
-            {{datos(column.cell(element),column)}}
-          </ng-container>
-          <ng-container *ngIf="column.isAction"> <!-- If it's an action column, render buttons -->
+        <td mat-cell *matCellDef="let element">
+          <ng-container *ngIf="column.isAction; else normalCell">
             <div class="buttons">
-              <button class="edit-btn" mat-icon-button color="primary" (click)="editElement(element)">
+              <button mat-icon-button color="primary" (click)="editElement(element)" matTooltip="Editar">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button class="del-btn" mat-icon-button color="warn" (click)="deleteElement(element)">
+              <button mat-icon-button color="warn" (click)="deleteElement(element)" matTooltip="Eliminar">
                 <mat-icon>delete</mat-icon>
               </button>
-              <div>
-                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
-                  <mat-icon>more_vert</mat-icon>
-                </button>
-                <mat-menu #menu="matMenu">
-                  <button mat-menu-item (click)="llamarPDF(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia</span>
-                  </button>
-                  <!--<button mat-menu-item (click)="contrato(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia Auxiliar</span>
-                  </button>
-                  <button mat-menu-item (click)="contrato(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia Contratado</span>
-                  </button>
-                  <button mat-menu-item (click)="contrato(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia Principal</span>
-                  </button>
-                  <button mat-menu-item (click)="contrato(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Constancia Asociado</span>
-                  </button>-->
-                  <button mat-menu-item (click)="firma(element)">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Firma</span>
-                  </button>
-                  <!--<button mat-menu-item disabled>
-                    <mat-icon>voicemail</mat-icon>
-                    <span>Check voice mail</span>
-                  </button>
-                  <button mat-menu-item>
-                    <mat-icon>notifications_off</mat-icon>
-                    <span>Disable alerts</span>
-                  </button>-->
-                </mat-menu>
-              </div>
+              <button mat-icon-button [matMenuTriggerFor]="moreMenu" matTooltip="Más opciones">
+                <mat-icon>more_vert</mat-icon>
+              </button>
             </div>
           </ng-container>
+
+          <ng-template #normalCell>
+            {{ datos(column.cell(element), column) }}
+          </ng-template>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row (click)="dataCliked(row, $event)" (dblclick)="dataClickedData(row)"
-        (contextmenu)="clkderecho(row, $event)"
-        [ngClass]="{'selected-row': isRowSelected(row), 'highlighted-row': isRowHighlighted(row)}"
-        *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.selected-row]="isRowSelected(row)"
+        [class.highlighted-row]="isRowHighlighted(row)" [class.example-element-row]="true"
+        (click)="dataCliked(row, $event)" (dblclick)="dataClickedData(row)" (contextmenu)="clkderecho(row, $event)">
+      </tr>
     </table>
   </div>
-  <mat-paginator [pageSizeOptions]="[10, 20, 30, 50, 100, 1000,3000]" showFirstLastButtons
-    aria-label="Select page of periodic elements">
-  </mat-paginator>
+</div>
 
-  <div *ngIf="selectedRow && dpintar" class="menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
-    <button class="btncss" mat-button (click)="editElement(selectedRow)">Editar</button>
-    <button class="btncss" mat-button (click)="deleteElement(selectedRow)">Eliminar</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
-      (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
-      (click)="mover(selectedRow.codigo, 'grado')">Grado</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
-      (click)="mover(selectedRow.codigo, 'categoria')">Categoria</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
-      (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button
-      (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
-    <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'infoDocentes')">Info.
-      Docentes</button>
-    <button class="btncss" *ngIf="tipo=='maestros'" mat-button (click)="mover(selectedRow.dni, 'firma')">Firma</button>
-    <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
+<mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
 
+<!-- Menú de tres puntos -->
+<mat-menu #moreMenu="matMenu">
+  <button mat-menu-item (click)="llamarPDF(selectedRow)">
+    <mat-icon>picture_as_pdf</mat-icon>
+    <span>Constancia</span>
+  </button>
+  <button mat-menu-item (click)="firma(selectedRow)">
+    <mat-icon>picture_as_pdf</mat-icon>
+    <span>Firma</span>
+  </button>
+</mat-menu>
 
-
-
-  </div>
-
-  <div *ngIf="filterMenuVisible" class="filter-menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
-    <!-- <mat-form-field>
-        <mat-label>Seleccione columna</mat-label>
-        <mat-select>
-          @for (item of columns; track item) {
-            <mat-option [value]="item.columnDef">{{item.header}}</mat-option>
-          }
-          
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Filtro</mat-label>
-        <input matInput placeholder="Ex. ium" #input>
-      </mat-form-field>
-      <button mat-button >Añadir filtro</button>-->
-    <app-filtro [columns]="columns" (filterg)="dataGenerada($event)"></app-filtro>
-  </div>
+<!-- Menú contextual (clic derecho) -->
+<div *ngIf="selectedRow && dpintar" class="menu" [ngStyle]="{'top.px': menuPosition.y, 'left.px': menuPosition.x}">
+  <button class="btncss" mat-button (click)="editElement(selectedRow)">Editar</button>
+  <button class="btncss" mat-button (click)="deleteElement(selectedRow)">Eliminar</button>
+  <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+    (click)="mover(selectedRow.codigo, 'laboral')">Laboral</button>
+  <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'grado')">Grado</button>
+  <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+    (click)="mover(selectedRow.codigo, 'categoria')">Categoria</button>
+  <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+    (click)="mover(selectedRow.codigo, 'investigador')">Investigación</button>
+  <button class="btncss" *ngIf="tipo=='docentes'" mat-button
+    (click)="mover(selectedRow.codigo, 'cursoDocentes')">Cursos</button>
+  <button class="btncss" *ngIf="tipo=='docentes'" mat-button (click)="mover(selectedRow.codigo, 'infoDocentes')">Info.
+    Docentes</button>
+  <button class="btncss" *ngIf="tipo=='maestros'" mat-button (click)="mover(selectedRow.dni, 'firma')">Firma</button>
+  <button class="btncss" mat-button (click)="cerrar()">Cerrar</button>
 </div>

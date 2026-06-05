@@ -1,145 +1,169 @@
-<div class="dialog-container" [formGroup]="formularioGrado">
-    <div class="dialog-title">
-        <span class="title-accent"></span>
-        <span>{{ funcion }} Curso</span>
-    </div>
+<h2 mat-dialog-title class="dialog-title">
+    <span class="title-accent"></span>
+    {{ funcion }} Curso
+</h2>
 
-    <div class="tab-form">
-        <!-- Sección: Información General -->
+<form [formGroup]="formularioGrado" (ngSubmit)="onSubmit()">
+    <div mat-dialog-content class="tab-form">
+
+        <!-- Información General -->
         <div class="form-section">
             <span class="section-title">Información General</span>
-            
+
             <div class="grid-2">
                 <mat-form-field appearance="outline">
                     <mat-label>Código</mat-label>
-                    <input matInput formControlName="codigo" placeholder="Código del curso">
+                    <input matInput formControlName="codigo" placeholder="Ingrese el código">
+                    <mat-error
+                        *ngIf="formularioGrado.get('codigo')?.hasError('required') && formularioGrado.get('codigo')?.touched">
+                        Requerido.
+                    </mat-error>
                 </mat-form-field>
-                <mat-form-field appearance="outline">
-                    <mat-label>Nombre del Curso *</mat-label>
-                    <input matInput formControlName="nombre" placeholder="Nombre descriptivo">
-                    <mat-error>Requerido.</mat-error>
-                </mat-form-field>
-            </div>
 
-            <div class="grid-3">
                 <mat-form-field appearance="outline">
-                    <mat-label>Semestre *</mat-label>
-                    <input matInput formControlName="semestre" placeholder="Ej: 2024-1">
-                    <mat-error>Requerido.</mat-error>
+                    <mat-label>Nombre del Curso</mat-label>
+                    <input matInput formControlName="nombre" placeholder="Ingrese el nombre">
+                    <mat-error
+                        *ngIf="formularioGrado.get('nombre')?.hasError('required') && formularioGrado.get('nombre')?.touched">
+                        Requerido.
+                    </mat-error>
                 </mat-form-field>
+
                 <mat-form-field appearance="outline">
-                    <mat-label>Nivel *</mat-label>
-                    <input matInput formControlName="nivel" placeholder="Pregrado/Posgrado">
-                    <mat-error>Requerido.</mat-error>
+                    <mat-label>Semestre</mat-label>
+                    <input matInput formControlName="semestre" placeholder="Ingrese el semestre">
+                    <mat-error
+                        *ngIf="formularioGrado.get('semestre')?.hasError('required') && formularioGrado.get('semestre')?.touched">
+                        Requerido.
+                    </mat-error>
                 </mat-form-field>
+
                 <mat-form-field appearance="outline">
-                    <mat-label>Créditos *</mat-label>
-                    <input matInput formControlName="creditos" type="number" placeholder="0">
-                    <mat-error>Requerido.</mat-error>
+                    <mat-label>Nivel</mat-label>
+                    <input matInput formControlName="nivel" placeholder="Ingrese el nivel">
+                    <mat-error
+                        *ngIf="formularioGrado.get('nivel')?.hasError('required') && formularioGrado.get('nivel')?.touched">
+                        Requerido.
+                    </mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                    <mat-label>Créditos</mat-label>
+                    <input matInput formControlName="creditos" type="number" placeholder="Ingrese los créditos">
+                    <mat-error
+                        *ngIf="formularioGrado.get('creditos')?.hasError('required') && formularioGrado.get('creditos')?.touched">
+                        Requerido.
+                    </mat-error>
                 </mat-form-field>
             </div>
+        </div>
+
+        <!-- Plan de Estudio y Área -->
+        <div class="form-section">
+            <span class="section-title">Plan de Estudio y Área</span>
 
             <div class="grid-2">
                 <mat-form-field appearance="outline">
                     <mat-label>Plan de Estudio</mat-label>
-                    <mat-select formControlName="plan" placeholder="Seleccionar plan">
+                    <mat-select formControlName="plan">
                         @for (plan of planes; track plan) {
-                        <mat-option [value]="plan.id">{{ plan.nombre }}</mat-option>
+                        <mat-option [value]="plan.id">
+                            {{ plan.nombre }}
+                        </mat-option>
                         }
                     </mat-select>
+                    <mat-error
+                        *ngIf="formularioGrado.get('plan')?.hasError('required') && formularioGrado.get('plan')?.touched">
+                        Requerido.
+                    </mat-error>
                 </mat-form-field>
+
                 <mat-form-field appearance="outline">
                     <mat-label>Área</mat-label>
-                    <mat-select formControlName="areas" placeholder="Seleccionar área">
+                    <mat-select formControlName="areas">
                         @for (area of areas; track area) {
-                        <mat-option [value]="area.id">{{ area.nombre }}</mat-option>
+                        <mat-option [value]="area.id">
+                            {{ area.nombre }}
+                        </mat-option>
                         }
                     </mat-select>
+                    <mat-error
+                        *ngIf="formularioGrado.get('areas')?.hasError('required') && formularioGrado.get('areas')?.touched">
+                        Requerido.
+                    </mat-error>
                 </mat-form-field>
             </div>
         </div>
 
-        <!-- Sección: Asignación Académica -->
+        <!-- Asignación Académica -->
         <div class="form-section">
             <span class="section-title">Asignación Académica</span>
-            
-            <!-- FACULTAD - Con (input) y (focus) para mostrar la lista -->
-            <mat-form-field appearance="outline">
-                <mat-label>Facultad *</mat-label>
-                <input 
-                    type="text"
-                    matInput 
-                    formControlName="facultad" 
-                    placeholder="Escribe el nombre de la facultad"
-                    [matAutocomplete]="autoFacultad"
-                    (input)="onFacultadInput($event)"
-                    (focus)="onFacultadFocus()"
-                >
-                <mat-autocomplete #autoFacultad="matAutocomplete" 
-                (optionSelected)="onFacultadSeleccionado($event)" 
-                [displayWith]="displayFn">
-                    @for (f of facultadesFiltradas | async; track f) {
-                    <mat-option [value]="f">
-                        {{ f.nombre }}
-                    </mat-option>
-                    }
-                </mat-autocomplete>
-            </mat-form-field>
 
-            <!-- ESCUELA -->
-            <mat-form-field appearance="outline">
-                <mat-label>Escuela Profesional *</mat-label>
-                <input 
-                    type="text"
-                    matInput 
-                    formControlName="escuela" 
-                    placeholder="Escribe el nombre de la escuela"
-                    [matAutocomplete]="autoEscuela"
-                    (input)="onEscuelaInput($event)"
-                    (focus)="onEscuelaFocus()"
-                    [disabled]="!formularioGrado.get('facultad')?.value"
-                >
-                <mat-autocomplete #autoEscuela="matAutocomplete" (optionSelected)="onEscuelaSeleccionado($event)" [displayWith]="displayFn">
-                    @for (e of escuelasFiltradas | async; track e) {
-                    <mat-option [value]="e">
-                        {{ e.nombre }}
-                    </mat-option>
-                    }
-                </mat-autocomplete>
-            </mat-form-field>
+            <div class="grid-2">
+                <!-- Facultad -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Facultad</mat-label>
+                    <input type="text" matInput formControlName="facultad" [matAutocomplete]="autoFacultad"
+                        (input)="onFacultadInput($event)" (focus)="onFacultadFocus()">
+                    <mat-autocomplete #autoFacultad="matAutocomplete" (optionSelected)="onFacultadSeleccionado($event)"
+                        [displayWith]="displayFn">
+                        @for (f of facultadesFiltradas | async; track f) {
+                        <mat-option [value]="f">
+                            {{ f.nombre }}
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+                    <mat-error
+                        *ngIf="formularioGrado.get('facultad')?.hasError('required') && formularioGrado.get('facultad')?.touched">
+                        Requerido.
+                    </mat-error>
+                </mat-form-field>
 
-            <!-- PROGRAMA -->
-            <mat-form-field appearance="outline">
-                <mat-label>Programa *</mat-label>
-                <input 
-                    type="text"
-                    matInput 
-                    formControlName="programa" 
-                    placeholder="Escribe el nombre del programa"
-                    [matAutocomplete]="autoPrograma"
-                    (input)="onProgramaInput($event)"
-                    (focus)="onProgramaFocus()"
-                    [disabled]="!formularioGrado.get('escuela')?.value"
-                >
-                <mat-autocomplete #autoPrograma="matAutocomplete" [displayWith]="displayProgFn">
-                    @for (p of programasFiltrados | async; track p) {
-                    <mat-option [value]="p">
-                        {{ p.programa || p.nombre }}
-                    </mat-option>
-                    }
-                </mat-autocomplete>
-            </mat-form-field>
+                <!-- Escuela Profesional -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Escuela Profesional</mat-label>
+                    <input type="text" matInput formControlName="escuela" [matAutocomplete]="autoEscuela"
+                        (input)="onEscuelaInput($event)" (focus)="onEscuelaFocus()">
+                    <mat-autocomplete #autoEscuela="matAutocomplete" (optionSelected)="onEscuelaSeleccionado($event)"
+                        [displayWith]="displayFn">
+                        @for (e of escuelasFiltradas | async; track e) {
+                        <mat-option [value]="e">
+                            {{ e.nombre }}
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+                    <mat-error
+                        *ngIf="formularioGrado.get('escuela')?.hasError('required') && formularioGrado.get('escuela')?.touched">
+                        Requerido.
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Programa -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Programa</mat-label>
+                    <input type="text" matInput formControlName="programa" [matAutocomplete]="autoPrograma"
+                        (input)="onProgramaInput($event)" (focus)="onProgramaFocus()">
+                    <mat-autocomplete #autoPrograma="matAutocomplete" [displayWith]="displayProgFn">
+                        @for (p of programasFiltrados | async; track p) {
+                        <mat-option [value]="p">
+                            {{ p.programa || p.nombre }}
+                        </mat-option>
+                        }
+                    </mat-autocomplete>
+                    <mat-error
+                        *ngIf="formularioGrado.get('programa')?.hasError('required') && formularioGrado.get('programa')?.touched">
+                        Requerido.
+                    </mat-error>
+                </mat-form-field>
+            </div>
         </div>
+
     </div>
 
-    <!-- Barra de acciones -->
-    <div class="dialog-actions">
-        <div class="actions-left"></div>
-        <div class="actions-right">
-            <button mat-button (click)="onNoClick()">Cancelar</button>
-            <button mat-raised-button color="primary" (click)="onSubmit()" class="btn-nav">
-                {{ funcion }}
-            </button>
-        </div>
+    <div mat-dialog-actions class="dialog-actions">
+        <button mat-button type="button" (click)="onNoClick()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="formularioGrado?.invalid">
+            {{ funcion }}
+        </button>
     </div>
-</div>
+</form>

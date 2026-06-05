@@ -97,8 +97,8 @@ export class PlanComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(PlandlgComponent, {
-      width: '290px',
-      height:'350px',
+      width: '500px',
+      height:'600px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -113,8 +113,8 @@ export class PlanComponent {
   }
   editar(element: any){
     const dialogRef = this.dialog.open(PlandlgComponent, {
-      width: '350px',
-      height:'450px',
+      width: '500px',
+      height:'600px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

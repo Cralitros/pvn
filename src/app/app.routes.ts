@@ -11,8 +11,8 @@ import { CategoriaComponent } from './components/docente/categoria/categoria.com
 import { InvestigadorComponent } from './components/docente/investigador/investigador.component';
 import { CursosComponent } from './components/maestros/cursos/cursos.component';
 import { DocentecursoComponent } from './components/docente/docentecurso/docentecurso.component';
-import { FacultadComponent } from './components/maestros/facultad/facultad.component';
-import { EscuelaComponent } from './components/maestros/escuela/escuela.component';
+import { FacultadComponent } from './components/maestros/unidad/unidad.component';
+import { EscuelaComponent } from './components/maestros/departamentoacad/departamentoacad.component';
 import { LoginComponent } from './components/login/login.component';
 import { logueoGuard } from './logueo.guard';
 import { deslogueoGuard } from './deslogueo.guard';

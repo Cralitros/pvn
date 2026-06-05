@@ -1,235 +1,258 @@
-.edit-btn {
-    position: relative;
-    margin-right: 10px;
+/* ===== TOOLBAR HORIZONTAL ===== */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+}
 
+.filter-field {
+  flex: 1;
+  max-width: 300px;
+  margin-bottom: 0;
+}
+
+.filter-field ::ng-deep .mat-form-field-wrapper {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.filter-checkbox {
+  margin-left: 8px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.toolbar-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* ===== BOTONES Y ACCIONES ===== */
+.edit-btn {
+  position: relative;
+  margin-right: 10px;
 }
 
 .buttons {
-    display: flex;
+  display: flex;
 }
 
+.btncss {
+  display: inline-block;
+  outline: none;
+  cursor: pointer;
+  font-weight: 500;
+  border-radius: 3px;
+  padding: 0 15px;
+  border-radius: 4px;
+  color: #6200ee;
+  background: transparent;
+  line-height: 1.15;
+  font-size: 14px;
+  height: 36px;
+  word-spacing: 0px;
+  letter-spacing: .0892857143em;
+  text-decoration: none;
+  text-transform: uppercase;
+  min-width: 64px;
+  border: 1px solid #6200ee;
+  text-align: center;
+  transition: background 280ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    background: #f4f4f4;
+  }
+}
+
+/* ===== FILAS DE LA TABLA ===== */
 .selected-row {
-    background-color: #c8e6c9 !important;
-    /* Change this to the desired color */
-    font-size: 15px;
-    font-weight: bold;
+  background-color: #c8e6c9 !important;
+  font-size: 15px;
+  font-weight: bold;
 }
 
 .highlighted-row {
-    background-color: #a3c1f0;
-    /* Color de fondo para la fila resaltada por el número de fila */
+  background-color: #a3c1f0;
 }
 
 .example-element-row {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .example-expanded-row .example-element-detail {
-    overflow: hidden;
-    display: flex;
+  overflow: hidden;
+  display: flex;
 }
 
 .example-element-diagram {
-    width: 40%;
+  width: 40%;
 }
 
 .example-element-description {
-    padding: 16px;
+  padding: 16px;
 }
 
+/* ===== MENÚS CONTEXTUALES ===== */
 .menu {
-    position: fixed;
-    background: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 8px;
+  position: fixed;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
 }
 
 .menu button {
-    display: block;
-    width: 100%;
-    text-align: left;
-    padding: 8px 16px;
-    border: none;
-    background: none;
-    cursor: pointer;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
 .menu button:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .filter-menu {
-    position: fixed;
-    z-index: 1000;
-    padding: 10px;
-    background: #fff;
-    border: 1px solid #ccc;
-    margin-top: 10px;
+  position: fixed;
+  z-index: 1000;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ccc;
+  margin-top: 10px;
 }
 
-
-ul {
-    list-style-type: none;
-    position: relative;
-    right: 40px;
-    // margin-top: 4px;
-}
-
-.example-margin {
-    padding-right: 5px;
-}
-
+/* ===== CONTENEDOR DE TABLA Y SCROLLBAR ===== */
 .table-container {
-    max-height: 400px;
-    /* Puedes ajustar la altura según tu necesidad */
-    overflow: auto;
-    /* Esto permite el desplazamiento si el contenido es más grande que el contenedor */
+  max-height: 400px;
+  overflow: auto;
 }
 
 .table-wrapper {
-    width: 100%;
-    overflow-x: scroll;
-    /* Permite el desplazamiento horizontal si es necesario */
-}
-
-/* Aplica al contenedor de la tabla */
-.table-wrapper {
-    max-height: 800px;
-    overflow-y: auto;
-    overflow-x: auto;
+  width: 100%;
+  max-height: 800px;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 /* WebKit Scrollbar */
 .table-wrapper::-webkit-scrollbar {
-    width: 12px;
+  width: 12px;
 }
 
 .table-wrapper::-webkit-scrollbar-track {
-    background: #f1f1f1;
+  background: #f1f1f1;
 }
 
 .table-wrapper::-webkit-scrollbar-thumb {
-    background-color: #140101;
-    border-radius: 10px;
-    border: 3px solid #f1f1f1;
+  background-color: #140101;
+  border-radius: 10px;
+  border: 3px solid #f1f1f1;
 }
 
 .table-wrapper::-webkit-scrollbar-thumb:hover {
-    background-color: #1633d4;
+  background-color: #1633d4;
 }
 
 /* Firefox Scrollbar */
 .table-wrapper {
-    scrollbar-width: thin;
-    scrollbar-color: #263872 #f1f1f1;
+  scrollbar-width: thin;
+  scrollbar-color: #263872 #f1f1f1;
 }
 
+/* ===== ESTADOS ESPECIALES ===== */
 .img {
-    cursor: pointer;
-    margin-left: 5px;
+  cursor: pointer;
+  margin-left: 5px;
 }
 
 .expired {
-    background-color: red;
-    color: white;
-
-
+  background-color: red;
+  color: white;
 }
 
 .no-stock-row {
-    background-color: #f8d7da !important;
-    /* Puedes ajustar el color aquí */
-    position: relative;
-    z-index: 0;
+  background-color: #f8d7da !important;
+  position: relative;
+  z-index: 0;
 }
-
 
 .low-stock {
-    background-color: #d1e0cf;
-    /* Color de fondo para stock 0 */
-    color: rgb(41, 2, 2);
-    /* Texto de color rojo */
-    font-weight: bold;
-    position: relative;
-    z-index: 1;
+  background-color: #d1e0cf;
+  color: rgb(41, 2, 2);
+  font-weight: bold;
+  position: relative;
+  z-index: 1;
 }
 
-/*********************************/
-
-.btncss {
-
-    display: inline-block;
-    outline: none;
-    cursor: pointer;
-    font-weight: 500;
-    border-radius: 3px;
-    padding: 0 15px;
-    border-radius: 4px;
-    color: #6200ee;
-    background: transparent;
-    line-height: 1.15;
-    font-size: 14px;
-    height: 36px;
-    word-spacing: 0px;
-    letter-spacing: .0892857143em;
-    text-decoration: none;
-    text-transform: uppercase;
-    min-width: 64px;
-    border: 1px solid #6200ee;
-    text-align: center;
-    transition: background 280ms cubic-bezier(0.4, 0, 0.2, 1);
-
-    :hover {
-        background: #f4f4f4;
-    }
-
+.pre-formatted {
+  white-space: pre-wrap;
 }
 
+/* ===== ENCABEZADOS Y FILTROS ===== */
 .header-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* Alinea el contenido centrado */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .header-container span {
-    margin-bottom: 5px;
-    /* Espacio entre el encabezado y el filtro */
+  margin-bottom: 5px;
 }
 
 app-inputs {
-    width: 100%;
-    /* Para que el filtro ocupe el ancho completo del encabezado */
+  width: 100%;
 }
 
-/* Aumenta el tamaño de la flecha y cambia el color */
+ul {
+  list-style-type: none;
+  position: relative;
+  right: 40px;
+}
+
+.example-margin {
+  padding-right: 5px;
+}
+
+/* ===== SORT HEADERS ===== */
 .mat-sort-header-arrow {
-    font-size: 20px;
-    /* Tamaño de la flecha */
-    color: #9c27b0;
-    /* Cambia al color que desees */
-    opacity: 1 !important;
-    /* Asegúrate de que sea visible */
+  font-size: 20px;
+  color: #9c27b0;
+  opacity: 1 !important;
 }
 
-/* Cambia el color de la flecha cuando se activa */
 .mat-sort-header-arrow-active {
-    color: #e91e63;
-    /* Cambia al color que desees cuando esté activa */
+  color: #e91e63;
 }
 
-/* Ajusta el contenedor de la flecha para centrarla */
 .mat-sort-header-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-mat-sort-header-arrow{
-    color: #e91e63!important;
-}
-.pre-formatted {
-    white-space: pre-wrap;
+
+mat-sort-header-arrow {
+  color: #e91e63 !important;
 }

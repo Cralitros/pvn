@@ -99,8 +99,8 @@ export class UsuariosComponent {
   }
   dialogo() {
     const dialogRef = this.dialog.open(UsuariosdlgComponent, {
-      width: '520px',
-      height: '650px',
+      width: '700px',
+      height: '800px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores: {},
@@ -115,8 +115,8 @@ export class UsuariosComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(UsuariosdlgComponent, {
-      width: '520px',
-      height: '650px',
+      width: '700px',
+      height: '800px',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {

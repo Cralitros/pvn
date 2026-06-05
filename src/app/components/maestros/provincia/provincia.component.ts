@@ -88,8 +88,8 @@ export class ProvinciaComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(ProvdlgComponent, {
-      width: '290px',
-      height:'450px',
+      width: '500px',
+      height:'550px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -104,8 +104,8 @@ export class ProvinciaComponent {
   }
   editar(element: any){
     const dialogRef = this.dialog.open(ProvdlgComponent, {
-      width: '250px',
-      height:'450px',
+      width: '500px',
+      height:'550px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

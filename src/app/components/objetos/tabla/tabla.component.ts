@@ -1,5 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
-
+import { Component, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Column } from '../../modelos/column';
@@ -14,18 +13,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { FiltroComponent } from "../filtro/filtro.component";
 import { InputsComponent } from "../inputs/inputs.component";
 import { MatButtonModule } from '@angular/material/button';
-import { log } from 'console';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Personal } from '../../modelos/personal';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { MatMenuModule } from '@angular/material/menu';
-
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
-
 import * as XLSX from 'xlsx';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
 import Swal from 'sweetalert2';
 import { FirmaComponent } from '../../dialog/docente/firma/firma.component';
@@ -43,7 +38,8 @@ import { PdfDocenteComponent } from '../pdf-docente/pdf-docente.component';
       transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
     ]),
   ],
-  imports: [MatPaginatorModule,
+  imports: [
+    MatPaginatorModule,
     FormsModule,
     MatTableModule,
     CommonModule,
@@ -56,9 +52,9 @@ import { PdfDocenteComponent } from '../pdf-docente/pdf-docente.component';
     MatFormFieldModule,
     MatSortModule,
     MatButtonModule,
-    MatMenuModule],
-
-
+    MatMenuModule,
+    MatDialogModule // Añadido para evitar errores con dialog.open
+  ],
 })
 export class TablaComponent {
   @Input() columns: Column[] = [];
@@ -66,248 +62,118 @@ export class TablaComponent {
   @Input() dataSource = new MatTableDataSource<any>([]);
   @Input() tipo: any;
   @Input() report: any;
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort?: MatSort | any;
 
   displayedColumns: string[] = [];
+  columnsToDisplayWithExpand?: string[];
+  expandedElement: any | null;
+  dataSrc2: any;
+  filterMenuVisible: boolean = false;
+  filters: any;
+  isFilterEnabled = false;
+  inputText: string = '';
+  dpintar = false;
+  menuPosition = { x: 0, y: 0 };
+  selectedRow: any;
+  arreglo?: any[] = [];
+  fitro2?: any[];
 
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() rowEmitted = new EventEmitter<any>();
   @Output() rowEmittedDbl = new EventEmitter<any>();
-
-  selectedRow: any;
-
-  //displayedColumns?: string[] = ['column1', 'column2', 'actions'];
-  columnsToDisplayWithExpand?: string[];
-
-  expandedElement: any | null;
-  ELEMENT_DATA?: any[];
-  dataSrc2: any;
-
-  filterMenuVisible: boolean = false;  // Add this line
-  filters: any;
-
-  isFilterEnabled = false;
-  inputText: string = '';
-  isRowExpanded(row: any): boolean {
-    return this.expandedElement === row;
-  }
-
-  constructor(private sctabla: CargatablaService,
+  // Agrega este Output junto a los demás
+  @Output() refreshTable = new EventEmitter<void>();
+  constructor(
+    private sctabla: CargatablaService,
     private das: ConversiontablaService,
     private router: Router,
     private mservice: MaestrosserviceService,
     public dialog: MatDialog
-  ) {
-    //console.log(this.tipo);
-    
-  }
-  ngOnInit(): void {
-    //console.log(this.fila, "fila");
-    this.tabla();
+  ) { }
 
+  ngOnInit(): void {
+    this.tabla();
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
   }
 
   tabla() {
     this.displayedColumns = this.columns.map(c => c.columnDef);
-
     this.columnsToDisplayWithExpand = [...this.displayedColumns, 'expandedDetail'];
 
     this.sctabla.data$.subscribe(data => {
-      //console.log(data, "infor llegado*****************************");
-
       this.dataSource.data = data;
       this.dataSource.sort = this.sort;
       this.dataSrc2 = data;
     });
+  }
 
-  }
   refresh() {
-    this.tabla();
+    // En lugar de llamar a this.tabla(), emitimos el evento al componente padre
+    this.refreshTable.emit(); 
   }
+
+  // ===== FILTROS =====
   toggleFilter(event: any) {
-   // //console.log(event);
     this.isFilterEnabled = event.checked;
-    //this.isFilterEnabled = (event.target as any).checked;
     if (!this.isFilterEnabled) {
       this.resetFilter();
     }
   }
+
   resetFilter(): void {
     this.dataSource.filter = '';
   }
 
   toggleFilterMenu(event: MouseEvent) {
-   // //console.log(this.filterMenuVisible);
     this.menuPosition.x = event.clientX;
     this.menuPosition.y = event.clientY;
-    this.filterMenuVisible = !this.filterMenuVisible;  // Add this method
-
+    this.filterMenuVisible = !this.filterMenuVisible;
   }
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-  }
-
-  editElement(element: any): void {
-    // Lógica para editar el elemento
-    //console.log('Edit', element);
-    this.das.data(element);
-    this.edit.emit(element);
-
-  }
-
-  deleteElement(element: any): void {
-    //console.log(element);
-
-    // Lógica para eliminar el elemento
-    Swal.fire({
-      title: `¿Deseas eliminar a ${element.nombres}?`,
-      text: "Sí eliminas, no se podrá revertir el cambio.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "¡Si!,¡Eliminar!"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.delete.emit(element);
-
-      }
-    });
-
-    //console.log('Delete', element);
-    //this.delete.emit(element);
-  }
-  dpintar = false;
-  dataClickedData(row: any) {
-    this.cerrar();
-    if (this.filterMenuVisible) {
-      this.filterMenuVisible = false;
-    }
-    this.dpintar = true;
-    this.selectedRow = row;
-    console.log(row, "doble");
-    this.rowEmittedDbl.emit(row);
-  }
-  dataCliked(row: any, event: MouseEvent): void {
-    this.cerrar();
-    if (this.filterMenuVisible) {
-      this.filterMenuVisible = false;
-    }
-    this.dpintar = false;
-    this.menuPosition.x = event.clientX;
-    this.menuPosition.y = event.clientY;
-    this.selectedRow = row;
-    console.log(row);
-    this.rowEmitted.emit(row);
-
-  }
-  clkderecho(row: any, event: MouseEvent) {
-    event.preventDefault(); // Prevenir el menú contextual por defecto del navegador
-    this.selectedRow = row;
-    if (this.filterMenuVisible) {
-      this.filterMenuVisible = false;
-    }
-    this.dpintar = true;
-    this.menuPosition.x = event.clientX;
-    this.menuPosition.y = event.clientY;
-    //console.log('Clicked row:', row);
-    //console.log('Menu position:', this.menuPosition);
-    this.selectedRow = row;
-    this.rowEmitted.emit(row);
-
-  }
-  dataClick(row: any, event: MouseEvent): void {
-    this.expandedElement = this.expandedElement === row ? null : row;
-    this.selectedRow = row;
-
-    this.menuPosition.x = event.clientX;
-    this.menuPosition.y = event.clientY;
-    //console.log('Clicked row:', row);
-    //console.log('Menu position:', this.menuPosition);
-    //console.log(row);
-    this.rowEmitted.emit(row);
-  }
-
-  cerrar() {
-    this.selectedRow = null;
-  }
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const targetElement = event.target as HTMLElement;
-    if (targetElement && !targetElement.closest('.menu') && !targetElement.closest('table')) {
-      this.cerrar();
-    }
-  }
-
-  isRowSelected(row: any) {
-    let columnas = ['id', 'dni', 'month'];
-    return this.selectedRow === row;
-    /* if(row){
-       return true;
-     }
-     return false;*/
-  }
-  isRowHighlighted(row: any) {
-    const rowIndex = this.dataSource.data.indexOf(row);
-    return rowIndex === this.fila;
-
-  }
-  // Debounce function using arrow function to retain 'this' context
-  debounce(func: Function, wait: number) {
-    let timeout: any;
-    return (...args: any[]) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  }
-
-  // Debounced version of the filter with explicit typing
-  applyFilterDebounced: (filterValue: any) => void = this.debounce((filterValue: any) => {
-    this.applyFilter(filterValue);
-  }, 300); // 300ms delay for debouncing
 
   applyFilter(event: Event) {
-
     const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
 
     this.dataSource.filterPredicate = (data: any, filter: string): boolean => {
-      // Indexación simple del objeto a una cadena para búsqueda rápida
       const flattenObject = (obj: any): string => {
         let flatString = '';
         for (const key in obj) {
           if (obj[key] !== null && typeof obj[key] === 'object') {
-            flatString += flattenObject(obj[key]); // Llamada recursiva para concatenar strings
+            flatString += flattenObject(obj[key]);
           } else if (obj[key] !== null) {
-            flatString += obj[key].toString().toLowerCase() + ' '; // Convertir todo a string y concatenar
+            flatString += obj[key].toString().toLowerCase() + ' ';
           }
         }
         return flatString;
       };
 
       const flattenedData = flattenObject(data);
-      return flattenedData.includes(filter); // Búsqueda rápida en la cadena plana
+      return flattenedData.includes(filter);
     };
 
     this.dataSource.filter = filterValue;
   }
+
+  applyFilterDebounced: (filterValue: any) => void = this.debounce((filterValue: any) => {
+    this.applyFilter(filterValue);
+  }, 300);
+
   dataGenerada(filters: any) {
-    ////console.log(event);
-    // this.filterMenuVisible=false;
-    //console.log(filters);
     this.filters = filters;
     this.applyFilters();
     this.filterMenuVisible = false;
-
   }
 
+  // ✅ CORREGIDO: Se arreglaron todos los errores de sintaxis (= >, normalizedFil ter, o bject, & &)
+  // Método applyFilters corregido (sin errores de sintaxis)
   applyFilters() {
-
     this.dataSource.filterPredicate = (data: any, filter: any): boolean => {
       // Si no hay filtro, mostrar todos los datos
-      if (filter === '0') {
+      if (filter === '0' || !filter) {
         this.filterMenuVisible = false;
         return true;
       }
@@ -344,17 +210,22 @@ export class TablaComponent {
         // Verificar el valor primitivo
         return dataValue !== null && dataValue.toString().toLowerCase().includes(filterValue);
       });
-    }
+    };
 
     this.dataSource.filter = this.filters;
   }
 
-  menuPosition = { x: 0, y: 0 };
+  // Método para limpiar el filtro cuando se cancela
+  limpiarFiltro() {
+    this.filters = '0';
+    this.arreglo = [];
+    this.fitro2 = undefined;
+    this.dataSource.filter = '';
+    this.filterMenuVisible = false;
+    this.isFilterEnabled = false;
+  }
 
-  arreglo?: any[] = [];
-  fitro2?: any[];
   filtroinput(element: any) {
-    //console.log(element);
     let eli = this.processInstruction(element);
     if (!eli) {
       if (this.arreglo?.length == 0) {
@@ -363,18 +234,12 @@ export class TablaComponent {
         this.updateOrAdd(element.campo.columnDef, element.valor);
       }
     }
-    //console.log(this.arreglo);
     this.fitro2 = this.convertArrayToObject(this.arreglo!);
-    //console.log(this.fitro2);
-
     this.dataGenerada(JSON.stringify([this.fitro2]));
-
-
   }
 
   updateOrAdd(key: string, value: any) {
     let found = false;
-
     for (let obj of this.arreglo!) {
       if (obj.hasOwnProperty(key)) {
         obj[key] = value;
@@ -409,119 +274,181 @@ export class TablaComponent {
     this.arreglo = this.arreglo!.filter(obj => !obj.hasOwnProperty(key));
   }
 
+  // ===== ACCIONES DE FILA =====
+  editElement(element: any): void {
+    this.das.data(element);
+    this.edit.emit(element);
+  }
+
+  // ✅ CORREGIDO: Bug del "undefined" al eliminar
+  deleteElement(element: any): void {
+    const nombreElemento = element.nombre || element.nombres || element.descripcion || element.id || 'este elemento';
+
+    Swal.fire({
+      title: `¿Deseas eliminar a ${nombreElemento}?`,
+      text: "Sí eliminas, no se podrá revertir el cambio.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "¡Sí, Eliminar!",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.delete.emit(element);
+      }
+    });
+  }
+
+  dataClickedData(row: any) {
+    this.cerrar();
+    if (this.filterMenuVisible) {
+      this.filterMenuVisible = false;
+    }
+    this.dpintar = true;
+    this.selectedRow = row;
+    this.rowEmittedDbl.emit(row);
+  }
+
+  dataCliked(row: any, event: MouseEvent): void {
+    this.cerrar();
+    if (this.filterMenuVisible) {
+      this.filterMenuVisible = false;
+    }
+    this.dpintar = false;
+    this.menuPosition.x = event.clientX;
+    this.menuPosition.y = event.clientY;
+    this.selectedRow = row;
+    this.rowEmitted.emit(row);
+  }
+
+  clkderecho(row: any, event: MouseEvent) {
+    event.preventDefault();
+    this.selectedRow = row;
+    if (this.filterMenuVisible) {
+      this.filterMenuVisible = false;
+    }
+    this.dpintar = true;
+    this.menuPosition.x = event.clientX;
+    this.menuPosition.y = event.clientY;
+    this.rowEmitted.emit(row);
+  }
+
+  dataClick(row: any, event: MouseEvent): void {
+    this.expandedElement = this.expandedElement === row ? null : row;
+    this.selectedRow = row;
+    this.menuPosition.x = event.clientX;
+    this.menuPosition.y = event.clientY;
+    this.rowEmitted.emit(row);
+  }
+
+  isRowSelected(row: any) {
+    return this.selectedRow === row;
+  }
+
+  isRowHighlighted(row: any) {
+    const rowIndex = this.dataSource.data.indexOf(row);
+    return rowIndex === this.fila;
+  }
+
+  isRowExpanded(row: any): boolean {
+    return this.expandedElement === row;
+  }
+
+  cerrar() {
+    this.selectedRow = null;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const targetElement = event.target as HTMLElement;
+    if (targetElement && !targetElement.closest('.menu') && !targetElement.closest('table')) {
+      this.cerrar();
+    }
+  }
+
+  // ===== UTILIDADES =====
+  debounce(func: Function, wait: number) {
+    let timeout: any;
+    return (...args: any[]) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  }
+
+  // ✅ TU LÓGICA DE REDIRECCIÓN INTACTA
   mover(selectedRow: any, tip: any) {
     const targetUrl = `/dashboard/${tip}`;
     const queryParams = { selectedRow };
-
-    // construyes la url actual (sin hostname)
     const currentUrl = this.router.url.split('?')[0];
 
     if (currentUrl === targetUrl) {
-      // si ya estás en la misma ruta, solo actualiza queryParams si cambian
       this.router.navigate([], {
         queryParams,
-        queryParamsHandling: 'merge', // mantiene otros params
+        queryParamsHandling: 'merge',
       });
     } else {
-      // si no estás en la misma ruta, navega normalmente
       this.router.navigate([targetUrl], { queryParams });
     }
   }
+
   reporte() {
-    //console.log(this.report);
-
     this.mservice.reporte();
-  }
-
-  /** Announce the change in sort state for assistive technology. */
-  announceSortChange(sortState: Sort) {
-    // This example uses English messages. If your application supports
-    // multiple language, you would internationalize these strings.
-    // Furthermore, you can customize the message to add additional
-    // details about the values being sorted.
-    /*if (sortState.direction) {
-      this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
-    } else {
-      this._liveAnnouncer.announce('Sorting cleared');
-    }*/
   }
 
   exportToExcel() {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.dataSource.data);
     const workbook: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-
     XLSX.writeFile(workbook, 'my-excel-file.xlsx');
   }
 
-  llamarPDF(element: any){
+  llamarPDF(element: any) {
     const dialogRef = this.dialog.open(PdfDocenteComponent, {
       width: '800px',
       height: '950px',
-      data: {
-        persona: element
-      }
+      data: { persona: element }
     });
-    dialogRef.afterClosed().subscribe(result => {
-
-    });
-
+    dialogRef.afterClosed().subscribe(result => { });
   }
+
   contrato(element: any) {
-    //console.log("Elemento999*****************");
-    
-    //console.log(element);
-    
     const dialogRef = this.dialog.open(PdfviewComponent, {
       width: '700px',
       height: '950px',
-      data: {
-        persona: element
-      }
+      data: { persona: element }
     });
-    dialogRef.afterClosed().subscribe(result => {
-
-    });
+    dialogRef.afterClosed().subscribe(result => { });
   }
-  firma(element: any){
+
+  firma(element: any) {
     const dialogRef = this.dialog.open(FirmaComponent, {
       width: '700px',
       height: '950px',
-      data: {
-        persona: element
-      }
+      data: { persona: element }
     });
-    dialogRef.afterClosed().subscribe(result => {
-
-    });
-
+    dialogRef.afterClosed().subscribe(result => { });
   }
+
   datos(element: any, title: any) {
     let cadena = '';
     if (title.columnDef == 'categoria') {
-      //console.log(title);
-      //console.log(JSON.parse(element));
       let parseElement = JSON.parse(element);
       parseElement.forEach((el: any) => {
         if (el.seleccionada) {
           cadena += el.nombre + " - Asignado:" + this.fechaformat(el.fecha) + "\n";
         }
       });
-
       return cadena;
     }
-
     return element;
   }
+
   fechaformat(fechaParam?: Date | string) {
-    // Si no se proporciona fecha, usa la actual
     const fecha = fechaParam ? new Date(fechaParam) : new Date();
-
-    // Obtener día, mes y año
     const dia = String(fecha.getDate()).padStart(2, '0');
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
     const anio = fecha.getFullYear();
-
     return `${dia}/${mes}/${anio}`;
   }
 }

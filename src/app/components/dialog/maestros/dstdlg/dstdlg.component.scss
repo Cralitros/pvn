@@ -1,19 +1,27 @@
-.example-full-width{
-    margin-left: 20px;
+.example-full-width {
+  margin-left: 20px;
+  width: calc(100% - 40px); /* Asegura que no se salga del contenedor */
 }
-.buttons{
-    margin-left: 20px;
+
+.buttons {
+  margin-left: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
-.btn{
-    margin-left: 10px;
-    padding-right: 10px;
+
+.btn {
+  margin-left: 10px;
+  padding-right: 10px;
 }
-.mensaje{
-    color: red;
+
+.mensaje {
+  color: red;
 }
-.titulo{
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
+
+.titulo {
+  font-weight: bold;
+  color: blueviolet;
+  margin-left: 10px;
+  margin-top: 10px;
 }
