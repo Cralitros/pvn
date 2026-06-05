@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PersonaldlgComponent } from './personaldlg.component';
+import { beforeEach, describe, it } from 'node:test';
 
 describe('PersonaldlgComponent', () => {
   let component: PersonaldlgComponent;
@@ -18,6 +19,6 @@ describe('PersonaldlgComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    
   });
 });

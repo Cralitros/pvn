@@ -1,26 +1,42 @@
-<div class="contenido">
-    <h1 class="titulo">{{funcion}}</h1>
-    <form [formGroup]="formulario">
-        <mat-form-field class="example-full-width" *ngIf="data.modo==1">
-            <mat-label>ID</mat-label>
-            <input matInput formControlName="id" placeholder="ID">
-        </mat-form-field>
-        <div class="example-full-width mensaje" *ngIf="formulario?.get('id')?.invalid && formulario?.get('id')?.touched && data.modo==1">
-            ID es requerido.
-        </div>
+<div class="dialog-container" [formGroup]="formulario">
+  <div class="dialog-title">
+    <span class="title-accent"></span>
+    <span>{{ funcion }} AFP</span>
+  </div>
 
-
-        <mat-form-field class="example-full-width">
-            <mat-label>Nombre</mat-label>
-            <input matInput formControlName="nombre" placeholder="Nombre">
+  <div class="tab-form">
+    <!-- Sección: Datos de la AFP -->
+    <div class="form-section">
+      <span class="section-title">Datos de la AFP</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline" *ngIf="data.modo == 1">
+          <mat-label>ID</mat-label>
+          <input matInput formControlName="id" placeholder="ID" readonly>
+          <mat-error *ngIf="formulario?.get('id')?.invalid && formulario?.get('id')?.touched">
+            ID es requerido
+          </mat-error>
         </mat-form-field>
-        <div class="example-full-width mensaje" *ngIf="formulario?.get('nombre')?.invalid && formulario?.get('nombre')?.touched">
-            Nombre es requerido.
-        </div>
-        <div mat-dialog-actions class="buttons">
-            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
-            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
-                cdkFocusInitial>{{funcion}}</button>
-        </div>
-    </form>
+
+        <mat-form-field appearance="outline" [class.full-width]="data.modo != 1">
+          <mat-label>Nombre de la AFP</mat-label>
+          <input matInput formControlName="nombre" placeholder="Ej: Prima AFP, Integra, etc.">
+          <mat-error *ngIf="formulario?.get('nombre')?.invalid && formulario?.get('nombre')?.touched">
+            El nombre de la AFP es requerido
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de acciones -->
+  <div class="dialog-actions">
+    <div class="actions-left"></div>
+    <div class="actions-right">
+      <button mat-button (click)="onNoClick()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="onSubmit()" class="btn-nav">
+        {{ funcion }}
+      </button>
+    </div>
+  </div>
 </div>

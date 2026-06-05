@@ -9,6 +9,8 @@ import { Investigador } from '../../../modelos/investigador';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
 import Swal from 'sweetalert2';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-investigadlg',
@@ -19,7 +21,10 @@ import Swal from 'sweetalert2';
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
-    MatSelectModule
+    MatSelectModule,
+    MatCheckboxModule,  // ← Agregar esta línea
+    MatTabsModule,       // ✅ Agregado
+    MatCheckboxModule
   ],
   templateUrl: './investigadlg.component.html',
   styleUrl: './investigadlg.component.scss'
@@ -29,8 +34,8 @@ export class InvestigadlgComponent {
   departamentos?: Investigador[];
   funcion: any;
   fnc: boolean = true;
-  grupo=["Carlos Monge Medrano","María Rostworowski","No aplica"];
-  nivel=["I","II","III","IV","V","VI","VII","No aplica"];
+  grupo = ["Carlos Monge Medrano", "María Rostworowski", "No aplica"];
+  nivel = ["I", "II", "III", "IV", "V", "VI", "VII", "No aplica"];
   constructor(public dialogRef: MatDialogRef<InvestigadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
@@ -43,25 +48,27 @@ export class InvestigadlgComponent {
     console.log(this.data);
 
     this.formulario.setValue({
+      id: this.data.valores.id || '',
+      orcid: this.data.valores.orcid || '',
+      renacyt: this.data.valores.renacyt || '',
+      grupo: this.data.valores.grupo || '',
+      nivel: this.data.valores.nivel || '',
+      registro: this.data.valores.registro || '',
+      rol: this.data.valores.rol || '',
+      reconocimiento: this.data.valores.reconocimiento || '',
+      contenido: this.data.valores.contenido || '',
+      codigoDocente: this.data.valores.codigoDocente || '',
 
-      id: this.data.valores.id,
-      orcid: this.data.valores.orcid,
-      renacyt: this.data.valores.renacyt,
-      grupo: this.data.valores.grupo,
-      nivel: this.data.valores.nivel,
-      registro: this.data.valores.registro,
-      rol: this.data.valores.rol,
-      reconocimiento: this.data.valores.reconocimiento,
-      contenido: this.data.valores.contenido,
-      codigoDocente: this.data.valores.codigoDocente,
-      ri: this.data.valores.ri,
-      pibpdu: this.data.valores.pibpdu,
-      gadi: this.data.valores.gadi,
-      sei: this.data.valores.sei,
-      gadd: this.data.valores.gadd,
-      gadit: this.data.valores.gadit,
-      dfi: this.data.valores.dfi,
-
+       // ✅ Recuperamos el texto tal cual viene de la BD
+      ri: this.data.valores.ri || '',
+      pibpdu: this.data.valores.pibpdu || '',
+      gadi: this.data.valores.gadi || '',
+      sei: this.data.valores.sei || '',
+      gadd: this.data.valores.gadd || '',
+      gadit: this.data.valores.gadit || '',
+      dfi: this.data.valores.dfi || ''
+      
+      
     });
     //this.form.value.id=this.data.valores.id;
   }
@@ -78,16 +85,17 @@ export class InvestigadlgComponent {
       registro: [''],
       rol: [''],
       reconocimiento: [''],
-      contenido: [''],
+      // ✅ AHORA SON CAMPOS DE TEXTO (Strings vacíos)
+      contenido: [''],      
       codigoDocente: [''],
-      ri: [''],
+      
+      ri: [''],           // Antes era [false]
       pibpdu: [''],
       gadi: [''],
       sei: [''],
       gadd: [''],
       gadit: [''],
       dfi: [''],
-
     });
     this.cgdepr.ponerurl("docentesinvestiga");
     this.cgdepr.get().subscribe(data => {
@@ -107,11 +115,12 @@ export class InvestigadlgComponent {
 
   }
   poner_codigo() {
-    this.formulario.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
+    if (this.data.valores?.laboral?.length > 0) {
+      this.formulario.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
+    }
   }
   onSubmit() {
     let body = {
-
       id: this.formulario.value?.id,
       orcid: this.formulario.value?.orcid,
       renacyt: this.formulario.value?.renacyt,
@@ -122,6 +131,8 @@ export class InvestigadlgComponent {
       reconocimiento: this.formulario.value?.reconocimiento,
       contenido: this.formulario.value?.contenido,
       codigoDocente: this.formulario.value?.codigoDocente,
+
+        // ✅ Enviamos el texto ingresado
       ri: this.formulario.value?.ri,
       pibpdu: this.formulario.value?.pibpdu,
       gadi: this.formulario.value?.gadi,
@@ -163,17 +174,17 @@ export class InvestigadlgComponent {
   onNoClick(): void {
     this.dialogRef.close();
   }
-  verificarInfo(data:any){
+  verificarInfo(data: any) {
     //console.log(data);
-    if(data!=undefined){
+    if (data != undefined) {
       console.log(data);
-      
-      return  `${data.nombres} ${data.apellidos}`
+
+      return `${data.nombres} ${data.apellidos}`
     }
-    else{
+    else {
       console.log("data");
       return "";
     }
-    
+
   }
 }

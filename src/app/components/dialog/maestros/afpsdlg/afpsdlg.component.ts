@@ -51,63 +51,55 @@ export class AfpsdlgComponent {
   fnc: boolean = true;
 
   private destroy$ = new Subject<void>();
-  private readonly TABLA: Tablas = 'AFP'; // Mismo tipo que en el componente principal
+  private readonly TABLA: Tablas = 'AFP';
   datosRecibidos: any;
 
-  constructor(public dialogRef: MatDialogRef<AfpsdlgComponent>,
+  constructor(
+    public dialogRef: MatDialogRef<AfpsdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
     private cgdepr: MaestrosserviceService,
     private mensajeService: TipoTablaService
   ) {
-
-    // Suscripción temprana en el constructor
     this.mensajeService.obtenerCanal(this.TABLA)
       .pipe(
         takeUntil(this.destroy$),
-        filter(datos => datos !== null) // Filtramos el valor inicial null
+        filter(datos => datos !== null)
       )
       .subscribe(datos => {
         console.log('Datos recibidos en diálogo:', datos);
         this.datosRecibidos = datos;
-        // Aquí puedes hacer lo que necesites con los datos
       });
-
   }
+
   poner_datos() {
     console.log(this.data);
-
     this.formulario.setValue({
-      id: this.data.valores.id,
-      nombre: this.data.valores.nombre,
-
+      id: this.data.valores.id || '',
+      nombre: this.data.valores.nombre || '',
     });
-    //this.form.value.id=this.data.valores.id;
   }
 
   ngOnInit(): void {
-
-    //this.recibirMensaje();
-
     this.formulario = this.formBuilder.group({
       id: [''],
-      nombre: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
     });
+
     this.cgdepr.ponerurl("afps");
     this.cgdepr.get().subscribe(data => {
       console.log(data);
       this.planes = data;
     });
+
     if (this.data.modo == 1) {
       this.funcion = "Editar";
       this.fnc = false;
       this.poner_datos();
-
     } else {
-      this.funcion = "Añadir"
+      this.funcion = "Añadir";
       this.fnc = true;
     }
-
   }
 
   ngOnDestroy(): void {
@@ -119,42 +111,67 @@ export class AfpsdlgComponent {
     let body = {
       id: this.formulario.value?.id,
       nombre: this.formulario.value.nombre,
+    };
 
-    }
-    this.cgdepr.ponerurl("afps")
+    this.cgdepr.ponerurl("afps");
+
     if (this.formulario?.valid) {
       if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe(data => {
-          console.log("agregado");
-          Swal.fire({
-            title: "Agregado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formulario.value);
-        })
+        this.cgdepr.add(body).subscribe({
+          next: (data) => {
+            console.log("agregado", data);
+            Swal.fire({
+              title: "Agregado",
+              text: "La AFP se ha guardado correctamente",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => {
+            console.error("Error al agregar:", error);
+            Swal.fire({
+              title: "Error",
+              text: "Ocurrió un error al guardar la AFP",
+              icon: "error"
+            });
+          }
+        });
       } else {
-        this.cgdepr.update(body.id, body).subscribe(data => {
-          console.log("actualizado");
-          Swal.fire({
-            title: "Actualizado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formulario.value);
-        })
+        this.cgdepr.update(body.id, body).subscribe({
+          next: (data) => {
+            console.log("actualizado", data);
+            Swal.fire({
+              title: "Actualizado",
+              text: "La AFP se ha actualizado correctamente",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => {
+            console.error("Error al actualizar:", error);
+            Swal.fire({
+              title: "Error",
+              text: "Ocurrió un error al actualizar la AFP",
+              icon: "error"
+            });
+          }
+        });
       }
-
-      this.dialogRef.close(this.formulario.value);
     } else {
-      // Marcar campos como tocados para mostrar errores de validación
       this.formulario?.markAllAsTouched();
+      Swal.fire({
+        title: "Campos incompletos",
+        text: "Por favor complete todos los campos requeridos",
+        icon: "warning"
+      });
     }
   }
 
   onNoClick(): void {
     this.dialogRef.close();
   }
-
-
 }

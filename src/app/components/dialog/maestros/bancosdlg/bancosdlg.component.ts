@@ -43,89 +43,113 @@ import Swal from 'sweetalert2';
   styleUrl: './bancosdlg.component.scss'
 })
 export class BancosdlgComponent {
-  formulario?: FormGroup| any= null;
-  planes?:Banco[] ;
-  funcion:any;
-  fnc:boolean=true;
-  
-  constructor(public dialogRef: MatDialogRef<BancosdlgComponent>,
+  formulario?: FormGroup | any = null;
+  planes?: Banco[];
+  funcion: any;
+  fnc: boolean = true;
+
+  constructor(
+    public dialogRef: MatDialogRef<BancosdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr:MaestrosserviceService){
-      
-      
-      
-  }
-  poner_datos(){
-    console.log(this.data);
-    
-    this.formulario.setValue({
-      id: this.data.valores.id,
-      nombre: this.data.valores.nombre,
+    private cgdepr: MaestrosserviceService
+  ) {}
 
+  poner_datos() {
+    console.log(this.data);
+    this.formulario.setValue({
+      id: this.data.valores.id || '',
+      nombre: this.data.valores.nombre || '',
     });
-    //this.form.value.id=this.data.valores.id;
   }
 
   ngOnInit(): void {
     this.formulario = this.formBuilder.group({
       id: [''],
-      nombre: ['', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
     });
+
     this.cgdepr.ponerurl("bancos");
-    this.cgdepr.get().subscribe(data=>{
+    this.cgdepr.get().subscribe(data => {
       console.log(data);
-      this.planes=data;
+      this.planes = data;
     });
-    if(this.data.modo==1){
-      this.funcion="Editar";
-      this.fnc=false;
+
+    if (this.data.modo == 1) {
+      this.funcion = "Editar";
+      this.fnc = false;
       this.poner_datos();
-
-    }else{
-      this.funcion="Añadir"
-      this.fnc=true;
-    }
-
-  }
-  onSubmit() {
-    let body={
-      id:this.formulario.value?.id,
-      nombre:this.formulario.value.nombre,
-
-    }
-    this.cgdepr.ponerurl("bancos")
-    if (this.formulario?.valid) {
-      if(this.fnc==true){
-        this.cgdepr.add(body).subscribe(data=>{
-          console.log("agregado");
-          Swal.fire({
-            title: "Agregado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formulario.value);
-        })
-      }else{
-        this.cgdepr.update(body.id,body).subscribe(data=>{
-          console.log("actualizado");
-          Swal.fire({
-            title: "Actualizado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formulario.value);
-        })
-      }
-
-      this.dialogRef.close(this.formulario.value);
     } else {
-      // Marcar campos como tocados para mostrar errores de validación
-      this.formulario?.markAllAsTouched();
+      this.funcion = "Añadir";
+      this.fnc = true;
     }
   }
+
+  onSubmit() {
+    let body = {
+      id: this.formulario.value?.id,
+      nombre: this.formulario.value.nombre,
+    };
+
+    this.cgdepr.ponerurl("bancos");
+
+    if (this.formulario?.valid) {
+      if (this.fnc == true) {
+        this.cgdepr.add(body).subscribe({
+          next: (data) => {
+            console.log("agregado", data);
+            Swal.fire({
+              title: "Agregado",
+              text: "El banco se ha guardado correctamente",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => {
+            console.error("Error al agregar:", error);
+            Swal.fire({
+              title: "Error",
+              text: "Ocurrió un error al guardar el banco",
+              icon: "error"
+            });
+          }
+        });
+      } else {
+        this.cgdepr.update(body.id, body).subscribe({
+          next: (data) => {
+            console.log("actualizado", data);
+            Swal.fire({
+              title: "Actualizado",
+              text: "El banco se ha actualizado correctamente",
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => {
+            console.error("Error al actualizar:", error);
+            Swal.fire({
+              title: "Error",
+              text: "Ocurrió un error al actualizar el banco",
+              icon: "error"
+            });
+          }
+        });
+      }
+    } else {
+      this.formulario?.markAllAsTouched();
+      Swal.fire({
+        title: "Campos incompletos",
+        text: "Por favor complete todos los campos requeridos",
+        icon: "warning"
+      });
+    }
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
-
 }

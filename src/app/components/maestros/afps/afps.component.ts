@@ -101,7 +101,7 @@ export class AfpsComponent {
   }
   dialogo() {
     const dialogRef = this.dialog.open(AfpsdlgComponent, {
-      width: '290px',
+      width: '800px',
       height: '350px',
       data: {
         title: `Agregar ${this.titulo}`,
@@ -117,7 +117,7 @@ export class AfpsComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(AfpsdlgComponent, {
-      width: '250px',
+      width: '800px',
       height: '350px',
       data: {
         title: `Editar ${this.titulo}`,

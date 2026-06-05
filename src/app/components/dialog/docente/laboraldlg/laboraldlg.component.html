@@ -1,77 +1,90 @@
-<div class="contenido">
-    <h1 class="titulo">{{funcion}}</h1>
-    <h2 class="titulo">Docente: {{verificarInfo(this.data.valores.docente)}}</h2>
-    <form [formGroup]="formulario">
-        <div class="general">
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Codigo docente</mat-label>
-                    <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Trabajo</mat-label>
-                    <input matInput formControlName="trabajo" placeholder="Trabajo">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Cargo actual</mat-label>
-                    <input matInput formControlName="cargo_actual" placeholder="Cargo actual">
-                </mat-form-field>
-            </div>
-            <div class="form">
+<div class="dialog-container" [formGroup]="formulario">
+  <div class="dialog-title">
+    <span class="title-accent"></span>
+    <span>{{funcion}} Datos Laborales</span>
+  </div>
 
-                <mat-form-field class="example-full-width">
-                    <mat-label>Tipo empresa</mat-label>
-                    <mat-select formControlName="tipo_empresa">
-                        <mat-option *ngFor="let item of tipo_empresa" [value]="item">{{item}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Direccion empresa</mat-label>
-                    <input matInput formControlName="direccion_empresa" placeholder="Direccion empresa">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Telefono empresa</mat-label>
-                    <input matInput formControlName="telefono_empresa" placeholder="Telefono empresa">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Correo empresa</mat-label>
-                    <input matInput formControlName="correo_corporativo" placeholder="Correo empresa">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Correo personal</mat-label>
-                    <input matInput formControlName="correo_personal" placeholder="Correo personal">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Correo PUCP</mat-label>
-                    <input matInput formControlName="correo_alternativo" placeholder="Correo alternativo">
-                </mat-form-field>
-            </div>
-            <div class="form">
-                <mat-form-field class="example-full-width">
-                    <mat-label>Contacto</mat-label>
-                    <input matInput formControlName="contacto" placeholder="Contacto">
-                </mat-form-field>
-            </div>
-        </div>
-        
-    </form>
-    <div mat-dialog-actions class="buttons">
-        <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
-        <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
-            cdkFocusInitial>{{funcion}}</button>
+  <div class="docente-info" *ngIf="data.valores?.docente">
+    Docente: {{verificarInfo(this.data.valores.docente)}}
+  </div>
+
+  <div class="dialog-form">
+    <!-- Sección: Información Laboral -->
+    <div class="form-section">
+      <span class="section-title">Información Laboral</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Código Docente</mat-label>
+          <input matInput formControlName="codigoDocente" placeholder="Código" readonly>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Trabajo</mat-label>
+          <input matInput formControlName="trabajo" placeholder="Trabajo">
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Cargo Actual</mat-label>
+        <input matInput formControlName="cargo_actual" placeholder="Cargo actual">
+      </mat-form-field>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo Empresa</mat-label>
+          <mat-select formControlName="tipo_empresa" placeholder="Tipo">
+            @for (item of tipo_empresa; track item) {
+              <mat-option [value]="item">{{item}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Teléfono Empresa</mat-label>
+          <input matInput formControlName="telefono_empresa" placeholder="Teléfono">
+        </mat-form-field>
+      </div>
     </div>
+
+    <!-- Sección: Dirección y Contactos -->
+    <div class="form-section">
+      <span class="section-title">Dirección y Contactos</span>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Dirección Empresa</mat-label>
+        <input matInput formControlName="direccion_empresa" placeholder="Dirección">
+      </mat-form-field>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Correo Corporativo</mat-label>
+          <input matInput formControlName="correo_corporativo" placeholder="correo@empresa.com" type="email">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Correo Personal</mat-label>
+          <input matInput formControlName="correo_personal" placeholder="correo@personal.com" type="email">
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Correo Alternativo</mat-label>
+        <input matInput formControlName="correo_alternativo" placeholder="correo@alternativo.com" type="email">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contacto de Emergencia</mat-label>
+        <input matInput formControlName="contacto" placeholder="Nombre y teléfono de contacto">
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Barra de acciones -->
+  <div class="dialog-actions">
+    <button mat-button (click)="onNoClick()">Cancelar</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" class="btn-nav">
+      {{funcion}}
+    </button>
+  </div>
 </div>

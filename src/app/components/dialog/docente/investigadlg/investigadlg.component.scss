@@ -1,34 +1,293 @@
+// ─── Variables ─────────────────────────────────────────────────────────────
+$primary:       #5c6bc0;
+$primary-light: #e8eaf6;
+$primary-dark:  #3949ab;
+$accent:        #7c4dff;
+$error:         #e53935;
+$radius:        6px;
+$transition:    0.2s ease;
 
-.btn{
-    margin-left: 10px;
-    padding-right: 10px;
+// ─── Contenedor Principal ────────────────────────────────────────────────────
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 750px; // Ligeramente más ancho para mejor visualización
+  height: calc(100vh - 60px);
+  max-height: calc(100vh - 60px);
+  font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.buttons {
-    margin-left: 20px;
+// ─── Título ──────────────────────────────────────────────────────────────────
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $primary-dark;
+  margin: 10px 16px 2px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid $primary-light;
+  flex-shrink: 0;
+
+  .title-accent {
+    display: inline-block;
+    width: 5px;
+    height: 20px;
+    background: linear-gradient(to bottom, $accent, $primary);
+    border-radius: 3px;
+  }
 }
 
-
-.titulo {
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
+// ─── Info Docente ────────────────────────────────────────────────────────────
+.docente-info {
+  background: $primary-light;
+  padding: 10px 16px; // Un poco más de espacio
+  margin: 8px 16px;
+  border-radius: $radius;
+  font-size: 0.95rem;
+  color: $primary-dark;
+  font-weight: 500;
+  border-left: 4px solid $primary;
 }
-.genera{
+
+// ─── Tabs ────────────────────────────────────────────────────────────────────
+.dialog-tabs {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  ::ng-deep {
+    .mat-mdc-tab-group { height: 100%; display: flex; flex-direction: column; }
+    .mat-mdc-tab-body-wrapper { flex: 1; min-height: 0; overflow: hidden; }
+    .mat-mdc-tab-body, .mat-mdc-tab-body-content { height: 100%; overflow: hidden; }
+    .mat-mdc-tab-header { flex-shrink: 0; }
+    
+    .mat-mdc-tab.mdc-tab {
+      background-color: $primary-light;
+      border-radius: $radius $radius 0 0;
+      min-width: 120px;
+      height: 40px; // Altura de pestaña
+      margin-right: 4px;
+      transition: background-color $transition;
+      
+      &.mdc-tab--active {
+        background-color: white;
+        color: $primary-dark;
+      }
+    }
+  }
+}
+
+// ─── Formulario: Scroll interno ──────────────────────────────────────────────
+.tab-form {
+  width: 100%;
+  height: 100%;
+  padding: 12px 16px; // Más espacio interno
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: #c5cae9; border-radius: 4px; }
+}
+
+// ─── Secciones ───────────────────────────────────────────────────────────────
+.form-section {
+  width: 100%;
+  background: #f9f9fc;
+  border: 1px solid #e3e6f5;
+  border-radius: $radius;
+  padding: 12px; // Más espacio
+  margin-bottom: 12px;
+  box-sizing: border-box;
+
+  .section-title {
+    display: block;
+    font-size: 0.75rem; // Título un poco más legible
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $primary;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid $primary-light;
+  }
+}
+
+// ─── Grids ───────────────────────────────────────────────────────────────────
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.full-width { width: 100%; }
+
+// ─── Checkboxes & Comentarios ────────────────────────────────────────────────
+.checklist-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: white;
+  padding: 10px; // Más espacio interno
+  border-radius: 4px;
+  border: 1px solid #e3e6f5;
+}
+
+.check-label {
+  flex: 1;
+  min-width: 200px;
+  font-size: 0.9rem; // Texto del checkbox más grande
+}
+
+.check-comment {
+  flex: 1.5;
+  min-width: 220px;
+  margin-bottom: 0 !important;
+}
+
+// ─── Barra de acciones ───────────────────────────────────────────────────────
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid #e0e0e0;
+  flex-shrink: 0;
+
+  .actions-right {
     display: flex;
-    flex-direction:column;
     gap: 10px;
+    align-items: center;
+  }
+}
 
+// ─── Botón estilizado ────────────────────────────────────────────────────────
+.btn-nav {
+  position: relative;
+  cursor: pointer;
+  font-size: 13px; // Fuente del botón más legible
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  transition: border-radius $transition, box-shadow $transition;
+
+  &::after, &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    transition: all 0.35s;
+  }
+  &::after { top: -1px; left: -1px; border-top: 3px solid $primary-dark; border-left: 3px solid $primary-dark; }
+  &::before { bottom: -1px; right: -1px; border-bottom: 3px solid $primary-dark; border-right: 3px solid $primary-dark; }
+
+  &:hover {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: 0 3px 10px rgba($primary, 0.3);
+    &::after, &::before { width: 100%; height: 100%; }
+  }
 }
-.input{
-    width: 350px;
+
+// ─── Overrides de Material (CAMBIOS CLAVE) ───────────────────────────────────
+::ng-deep {
+  // ✅ AUMENTO DE ALTURA Y COMODIDAD
+  .mat-mdc-form-field-infix {
+    min-height: 44px !important; // Altura aumentada significativamente
+    padding-top: 8px !important; // Más espacio arriba
+    padding-bottom: 8px !important; // Más espacio abajo
+  }
+
+  .mat-mdc-text-field-wrapper {
+    padding: 0 10px !important;
+  }
+
+  .mat-mdc-floating-label {
+    font-size: 0.85rem; // Etiqueta más visible
+  }
+
+  input.mat-mdc-input-element,
+  textarea.mat-mdc-input-element {
+    font-size: 0.95rem; // Texto del input mucho más legible
+    line-height: 1.5;
+  }
+
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-radius: $radius;
+  }
+
+  .mat-mdc-form-field {
+    width: 100%;
+  }
+
+  // Ajuste para los inputs dentro de la sección de comentarios
+  .check-comment .mat-mdc-form-field-infix {
+    min-height: 42px !important; // Consistente con el resto
+  }
+
+  .mat-mdc-select-panel {
+    border-radius: $radius !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden;
+
+    .mat-mdc-option {
+      background-color: #fafafa !important;
+      color: #333 !important;
+      border-bottom: 1px solid $primary-light !important;
+      padding: 10px 14px !important;
+      min-height: 40px !important; // Opciones del select más altas
+      font-size: 0.95rem !important;
+      transition: background-color $transition;
+
+      &:hover { background-color: $primary-light !important; color: $primary-dark !important; }
+      &.mat-mdc-option-selected { background-color: #c5cae9 !important; color: $primary-dark !important; font-weight: 600; }
+      &:last-child { border-bottom: none !important; }
+    }
+  }
+
+  .mat-mdc-checkbox, .mat-mdc-radio-button { margin-right: 8px; }
+  .mdc-label { font-size: 0.95rem; }
 }
-.formulario{
-    position: relative;
-    left: 20px;
+
+.align-center {
+  align-items: center;
+  
+  label {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+    text-align: right; // Alinea el texto a la derecha hacia el input
+    padding-right: 10px;
+  }
+
+  // Hacemos los inputs un poco más compactos
+  .compact-input {
+    margin-bottom: 10px !important;
+  }
 }
-.contenido{
-    overflow-x: hidden;
- 
+
+// Ajuste para móviles o pantallas pequeñas
+@media (max-width: 600px) {
+  .align-center {
+    label {
+      text-align: left;
+      margin-bottom: 4px;
+    }
+  }
 }

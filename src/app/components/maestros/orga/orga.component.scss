@@ -4,3 +4,53 @@
     min-height: 100vh;
     background: #fafafa;
 }
+// ─── Alineación Código + Botón (Sin modificar HTML) ────────────────────────
+form {
+  display: inline-block;
+  vertical-align: bottom;
+  margin-right: 12px;
+}
+
+.example-full-width {
+  width: 280px; // Ancho controlado para que el input no ocupe toda la fila
+}
+
+.laboral-wrapper {
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+// ─── Botón Azul Corporativo ────────────────────────────────────────────────
+.button-add {
+  background-color: #2E4C83 !important; // ✅ Azul PUCP forzado
+  color: white !important;
+  font-weight: 500;
+  height: 56px;                         // Misma altura que el mat-form-field
+  padding: 0 20px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: #1E3560 !important; // Azul más oscuro al pasar el mouse
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}
+button{
+    position: relative;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+// ─── Contenedor de Tabla ───────────────────────────────────────────────────
+.contenedortabla {
+  margin-top: 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+}

@@ -1,198 +1,472 @@
-.example-full-width{
-    margin-left: 20px;
-}
-.buttons{
-    margin-left: 20px;
-}
-.btn{
-    margin-left: 10px;
-    padding-right: 10px;
-}
-.mensaje{
-    color: red;
-}
-.titulo{
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
-}
-.example-full-width {
-    margin-left: 20px;
-}
+// ─── Variables ──────────────────────────────────────────────────────────────
+$primary: #5c6bc0;
+$primary-light: #e8eaf6;
+$primary-dark: #3949ab;
+$accent: #7c4dff;
+$error: #e53935;
+$radius: 6px;
+$transition: 0.2s ease;
 
-.buttons {
-    margin-left: 20px;
-}
-
-.btn {
-    margin-left: 10px;
-    padding-right: 10px;
-}
-
-.mensaje {
-    color: red;
-}
-
-.titulo {
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
-}
-
-.calendario {
-    width: 210px;
-}
-
-.general {
+// ─── Contenedor Principal ────────────────────────────────────────────────────
+.dialog-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    width: 100%;
+    min-width: 1100px;
+    height: calc(100vh - 60px);
+    max-height: calc(100vh - 60px);
+    font-family: 'Segoe UI', sans-serif;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
-.combo {
-    color: red;
+// ─── Título ──────────────────────────────────────────────────────────────────
+.dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: $primary-dark;
+    margin: 10px 16px 2px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid $primary-light;
+    flex-shrink: 0;
+
+    .title-accent {
+        display: inline-block;
+        width: 5px;
+        height: 20px;
+        background: linear-gradient(to bottom, $accent, $primary);
+        border-radius: 3px;
+    }
 }
 
-.nac {
-    width: 131px;
+// ─── Info Docente ────────────────────────────────────────────────────────────
+.docente-info {
+    background: $primary-light;
+    padding: 8px 16px;
+    margin: 8px 16px;
+    border-radius: $radius;
+    font-size: 0.9rem;
+    color: $primary-dark;
+    font-weight: 500;
+    border-left: 4px solid $primary;
 }
 
-.texto {
-    position: relative;
-    right: -20px;
-    font-weight: bold;
+// ─── Formulario: Scroll interno ──────────────────────────────────────────────
+.tab-form {
+    width: 100%;
+    height: 100%;
+    padding: 8px 14px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: auto;
+
+    &::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #c5cae9;
+        border-radius: 4px;
+    }
 }
 
+// ─── Secciones ───────────────────────────────────────────────────────────────
+.form-section {
+    width: 100%;
+    background: #f9f9fc;
+    border: 1px solid #e3e6f5;
+    border-radius: $radius;
+    padding: 8px 12px 10px;
+    margin-bottom: 8px;
+    box-sizing: border-box;
 
-
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="3"] {
-    background-color: antiquewhite;
-    /* Cambia este color según tus necesidades */
-
+    .section-title {
+        display: block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        color: $primary;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid $primary-light;
+    }
 }
 
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="1"] {
-    background-color: rgb(211, 236, 171);
-    /* Cambia este color según tus necesidades */
-
+// ─── Grids ───────────────────────────────────────────────────────────────────
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    align-items: start;
 }
 
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="2"] {
-    background-color: rgb(211, 236, 171);
-    /* Cambia este color según tus necesidades */
-
+.full-width {
+    width: 100%;
 }
 
+// ─── Tabla de Grados ─────────────────────────────────────────────────────────
+.table-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 12px;
 
+    .btn-add-row {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        min-height: 32px;
 
-.btm {
-    cursor: pointer;
-    position: relative;
-    padding: 10px 20px;
+        mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+        }
+    }
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: $radius;
+    border: 1px solid #e3e6f5;
     background: white;
-    color: black;
-    font-size: 14px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    transition: all 1s;
 
-    &:after,
-    &:before {
-        content: " ";
-        width: 10px;
-        height: 10px;
-        position: absolute;
-        border: 0px solid #fff;
-        transition: all 1s;
-    }
+    .grados-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.75rem;
+        min-width: 900px;
 
-    &:after {
-        top: -1px;
-        left: -1px;
-        border-top: 5px solid black;
-        border-left: 5px solid black;
-    }
+        th,
+        td {
+            padding: 8px 6px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: top;
+        }
 
-    &:before {
-        bottom: -1px;
-        right: -1px;
-        border-bottom: 5px solid black;
-        border-right: 5px solid black;
-    }
+        th {
+            background: #f5f7fc;
+            font-weight: 600;
+            color: $primary-dark;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid $primary-light;
+        }
 
-    &:hover {
-        border-top-right-radius: 0px;
-        border-bottom-left-radius: 0px;
+        tr:hover td {
+            background-color: #fafbff;
+        }
 
-        // background:rgba(0,0,0,.5);
-        // color:white;
-        &:before,
-        &:after {
-
+        .table-field {
             width: 100%;
-            height: 100%;
-            // border-color:white;
+
+            ::ng-deep .mat-mdc-form-field-infix {
+                min-height: 32px !important;
+                padding-top: 4px !important;
+                padding-bottom: 4px !important;
+            }
+
+            ::ng-deep .mat-mdc-text-field-wrapper {
+                background-color: transparent;
+            }
+        }
+
+        .date-field {
+            min-width: 110px;
+        }
+
+        .col-conservar {
+            width: 70px;
+            text-align: center;
+        }
+
+        .col-grado {
+            width: 140px;
+        }
+
+        .col-titulo {
+            min-width: 150px;
+        }
+
+        .col-fecha {
+            width: 130px;
+        }
+
+        .col-lugar {
+            min-width: 160px;
+        }
+
+        .col-revalidado {
+            width: 80px;
+            text-align: center;
+        }
+
+        .col-fecha-rev {
+            width: 130px;
+        }
+
+        .col-acciones {
+            width: 50px;
+            text-align: center;
+        }
+
+        .btn-delete-row {
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+
+            mat-icon {
+                font-size: 18px;
+                width: 18px;
+                height: 18px;
+            }
+
+            &:hover {
+                background-color: rgba($error, 0.1);
+            }
+        }
+
+        mat-checkbox {
+            display: flex;
+            justify-content: center;
         }
     }
 
+    .empty-table {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        color: #999;
+        gap: 8px;
+
+        mat-icon {
+            font-size: 40px;
+            width: 40px;
+            height: 40px;
+            color: #ccc;
+        }
+
+        span {
+            font-size: 0.85rem;
+        }
+    }
 }
 
-.btn-sgte {
-    right: -50px;
-    margin-left: 25px;
-}
-
-.btn-ant {
-    right: 35px;
-    margin-left: 25px;
-}
-
-.btn {
-    right: -35px;
-}
-
-::ng-deep .mat-tab-label {
-    pointer-events: none;
-}
-
-.add-bnt-grado {
-    /*top: -70px;*/
-    left: 10px;
-}
-
-
-.btn-gra {
-    right: -150px;
-}
-.formulario {
-    position: relative;
-    top: 50px;
-}
-.tabla{
-    padding-left: 20px;
-    padding-bottom: 20px;
-}
-.iconos{
-    display: flex;
-    gap: 10px;
-    flex-direction: row;
-}
-.db:hover{
-    background-color: red;
-    cursor: pointer;
-}
-.eb:hover{
-    background-color: yellow;
-    cursor: pointer;
-}
-input[type="text"] {
-    width: 100px;
-}
-.divs{
+// ─── Checkbox Fields ─────────────────────────────────────────────────────────
+.checkbox-field {
     display: flex;
     flex-direction: column;
+    gap: 8px;
+
+    .checkbox-label {
+        font-size: 0.8rem;
+        color: $primary-dark;
+        font-weight: 500;
+    }
 }
-.col{
-    width: 400px;
+
+// ─── Barra de acciones ───────────────────────────────────────────────────────
+.dialog-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px 10px;
+    border-top: 1px solid #e0e0e0;
+    flex-shrink: 0;
+
+    .actions-right {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
 }
+
+// ─── Botón estilizado ────────────────────────────────────────────────────────
+.btn-nav {
+    position: relative;
+    cursor: pointer;
+    font-size: 12px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    transition: border-radius $transition, box-shadow $transition;
+
+    &::after,
+    &::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        position: absolute;
+        transition: all 0.35s;
+    }
+
+    &::after {
+        top: -1px;
+        left: -1px;
+        border-top: 3px solid $primary-dark;
+        border-left: 3px solid $primary-dark;
+    }
+
+    &::before {
+        bottom: -1px;
+        right: -1px;
+        border-bottom: 3px solid $primary-dark;
+        border-right: 3px solid $primary-dark;
+    }
+
+    &:hover {
+        border-top-right-radius: 0;
+        border-bottom-left-radius: 0;
+        box-shadow: 0 3px 10px rgba($primary, 0.3);
+
+        &::after,
+        &::before {
+            width: 100%;
+            height: 100%;
+        }
+    }
+}
+
+// ─── Overrides de Material ───────────────────────────────────────────────────
+::ng-deep {
+    .mat-mdc-form-field-infix {
+        min-height: 36px !important;
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+    }
+
+    .mat-mdc-text-field-wrapper {
+        padding: 0 8px !important;
+    }
+
+    .mat-mdc-floating-label {
+        font-size: 0.75rem;
+    }
+
+    input.mat-mdc-input-element,
+    textarea.mat-mdc-input-element {
+        font-size: 0.8rem;
+    }
+
+    .mdc-text-field--outlined .mdc-notched-outline__leading,
+    .mdc-text-field--outlined .mdc-notched-outline__trailing {
+        border-radius: $radius;
+    }
+
+    .mat-mdc-form-field {
+        width: 100%;
+    }
+
+    .mat-mdc-select-panel {
+        border-radius: $radius !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
+
+        .mat-mdc-option {
+            background-color: #fafafa !important;
+            color: #333 !important;
+            border-bottom: 1px solid $primary-light !important;
+            padding: 6px 12px !important;
+            min-height: 32px !important;
+            font-size: 0.8rem;
+
+            &:hover {
+                background-color: $primary-light !important;
+                color: $primary-dark !important;
+            }
+
+            &.mat-mdc-option-selected {
+                background-color: #c5cae9 !important;
+                color: $primary-dark !important;
+                font-weight: 600;
+            }
+        }
+    }
+
+    // Estilos para checkboxes
+    .mat-mdc-checkbox {
+        .mdc-checkbox__background {
+            border-radius: 3px !important;
+        }
+    }
+}
+
+// ─── Variables ──────────────────────────────────────────────────────────────
+$primary: #5c6bc0;
+$primary-light: #e8eaf6;
+$primary-dark: #3949ab;
+$accent: #7c4dff;
+$error: #e53935;
+$radius: 6px;
+$transition: 0.2s ease;
+
+// ─── Contenedor Principal ────────────────────────────────────────────────────
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.dialog-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 1100px;
+    height: 100%;
+    max-height: 100%;
+    font-family: 'Segoe UI', sans-serif;
+    box-sizing: border-box;
+    overflow: hidden;
+    background: white;
+}
+
+.col-conservar {
+    width: 70px;
+    text-align: center;
+}
+
+.col-grado {
+    width: 140px;
+}
+
+.col-titulo {
+    min-width: 150px;
+}
+
+.col-fecha {
+    width: 120px;
+}
+
+.col-lugar {
+    min-width: 160px;
+}
+
+.col-pais {
+    width: 110px;
+}
+
+// ← Nueva columna
+.col-revalidado {
+    width: 70px;
+    text-align: center;
+}
+
+.col-fecha-rev {
+    width: 120px;
+}
+
+.col-acciones {
+    width: 50px;
+    text-align: center;
+}
+
+// ... el resto de tus estilos se mantienen igual ...

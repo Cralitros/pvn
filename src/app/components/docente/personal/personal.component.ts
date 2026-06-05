@@ -111,8 +111,9 @@ export class PersonalComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(PersonaldlgComponent, {
-      width: '550px',
-      height:'1000px',
+      width: '90vw',
+      height:'90vw',
+      maxWidth: '100vw',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -130,8 +131,9 @@ export class PersonalComponent {
     console.log(element);
     
     const dialogRef = this.dialog.open(PersonaldlgComponent, {
-      width: '550px',
-      height:'1000px',
+      width: '70vw',
+      height:'10hv',
+      
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

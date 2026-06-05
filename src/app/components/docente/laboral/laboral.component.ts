@@ -102,24 +102,8 @@ export class LaboralComponent {
 
   }
   async buscar(data: any) {
-    if (this.tablaDepartamento.length == 0) {
-      this.formulario?.setValue({ 'codigo': data });
-      this.dialogo();
-      return;
-    }
-
-    const encontrado = this.tablaDepartamento.find(item => item.codigoDocente == data);
-
-    if (encontrado) {
-      console.log("encontrado");
-      this.formulario?.setValue({ 'codigo': data });
-      this.cartabla.dataSeleccionada = encontrado;
-      console.log(this.cartabla.dataSeleccionada);
-      this.editar(this.cartabla.dataSeleccionada);
-    } else {
-      this.formulario?.setValue({ 'codigo': data });
-      this.dialogo();
-    }
+    this.formulario?.setValue({ 'codigo': data });
+    await this.abrirDialogoLaboral();
   }
   async cargartabla() {
     this.mservice.ponerurl("docenteslaboral");
@@ -131,6 +115,73 @@ export class LaboralComponent {
     console.log(this.tablaDepartamento);
 
     this.sctabla.setData(this.tablaDepartamento);
+  }
+  existeRegistro(): boolean {
+    const codigo = this.formulario?.value.codigo;
+    // Usamos == para comparar sin importar si viene como número o texto
+    return this.tablaDepartamento.some(item => item.codigoDocente == codigo);
+  }
+  // ✅ Método principal para el botón "Añadir/Ver campo laboral"
+  async abrirDialogoLaboral(): Promise<void> {
+    const codigo = this.formulario?.value.codigo;
+    if (!codigo) {
+      Swal.fire('Atención', 'Por favor ingrese un código de docente primero.', 'warning');
+      return;
+    }
+
+    // Si la tabla no está cargada, la cargamos primero
+    if (this.tablaDepartamento.length === 0) {
+      await this.cargartabla();
+    }
+
+    // Buscamos coincidencia exacta (manejando string/number)
+    const encontrado = this.tablaDepartamento.find(
+      item => String(item.codigoDocente) === String(codigo)
+    );
+
+    if (encontrado) {
+      // ✅ Ya existe: Abrir en modo Edición
+      this.cartabla.dataSeleccionada = encontrado;
+      this.editar(encontrado);
+    } else {
+      // ❌ No existe: Abrir en modo Nuevo
+      await this.crearNuevo(codigo);
+    }
+  }
+
+  // 🔹 Lógica exclusiva para crear un registro nuevo
+  private async crearNuevo(codigo: string): Promise<void> {
+    try {
+      // Verificamos que el docente exista en el maestro
+      this.mservice.ponerurl("docentes/cod");
+      const docenteData: any = await lastValueFrom(this.mservice.getid(codigo));
+
+      if (!docenteData || (Array.isArray(docenteData) && docenteData.length === 0)) {
+        Swal.fire('Error', 'El código de docente no existe en el sistema.', 'error');
+        return;
+      }
+
+      // Normalizamos la respuesta (puede ser array u objeto)
+      const docenteInfo = Array.isArray(docenteData) ? docenteData[0] : docenteData;
+
+      const dialogRef = this.dialog.open(LaboraldlgComponent, {
+        width: '750px',
+        height: '700px',
+        data: {
+          title: `Agregar ${this.titulo}`,
+          valores: {
+            laboral: docenteData,       // Mantiene compatibilidad con tu dialog
+            docente: docenteInfo        // Para mostrar nombre en el header
+          },
+          modo: 0
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(() => this.cargartabla());
+    } catch (error) {
+      console.error('Error al verificar docente:', error);
+      Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+    }
   }
 
   dialogo() {
@@ -148,8 +199,9 @@ export class LaboralComponent {
 
           if (data2.length == 0) {
             const dialogRef = this.dialog.open(LaboraldlgComponent, {
-              width: '500px',
-              height: '550px',
+              width: '750px',           // ✅ Aumentado de 500px
+              height: '700px',          // ✅ Aumentado de 550px
+              maxWidth: '90vw',
               data: {
                 title: `Agregar ${this.titulo}`,
                 valores: { laboral },
@@ -198,8 +250,9 @@ export class LaboralComponent {
   }
   editar(element: any) {
     const dialogRef = this.dialog.open(LaboraldlgComponent, {
-      width: '500px',
-      height: '550px',
+      width: '750px',           // ✅ Aumentado de 500px
+      height: '700px',          // ✅ Aumentado de 550px
+      maxWidth: '90vw',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {

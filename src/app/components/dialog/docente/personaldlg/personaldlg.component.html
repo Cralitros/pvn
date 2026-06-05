@@ -1,452 +1,281 @@
-<div class="contenido">
-    <h1 class="titulo">{{funcion}}</h1>
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" (selectedTabChange)="tabActive($event)"
-        [selectedIndex]="selectedIndex" [disableRipple]="true">
-        <mat-tab label="Personal">
-            <form [formGroup]="formulario1">
-                <table>
-                    <tr>
-                        <td>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Código PUCP</mat-label>
-                                <input matInput formControlName="codigo" placeholder="Código PUCP">
-                            </mat-form-field>
-                            <div class="example-full-width mensaje"
-                                *ngIf="formulario1?.get('codigo')?.invalid && formulario1?.get('codigo')?.touched && data.modo==1">
-                                Codigo es requerido.
-                            </div>
-                        </td>
-                        <td>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>DNI</mat-label>
-                                <input matInput formControlName="dni" placeholder="DNI">
-                            </mat-form-field>
-                            <div class="example-full-width mensaje"
-                                *ngIf="formulario1?.get('dni')?.invalid && formulario1?.get('dni')?.touched">
-                                DNI es requerido.
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Dígito verificador</mat-label>
-                                <input matInput formControlName="digito" placeholder="Dígito verificador">
-                            </mat-form-field>
-                            <div class="example-full-width mensaje"
-                                *ngIf="formulario1?.get('digito')?.invalid && formulario1?.get('digito')?.touched && data.modo==1">
-                                Dígito es requerido.
-                            </div>
-                        </td>
-                        <td>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Pasaporte</mat-label>
-                                <input matInput formControlName="pasaporte" placeholder="Pasaporte">
-                            </mat-form-field>
-                            <div class="example-full-width mensaje"
-                                *ngIf="formulario1?.get('pasaporte')?.invalid && formulario1?.get('pasaporte')?.touched">
-                                Pasaporte es requerido.
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Nombres</mat-label>
-                                <input matInput formControlName="nombres" placeholder="nombres">
-                            </mat-form-field>
-                            <div class="example-full-width mensaje"
-                                *ngIf="formulario1?.get('nombres')?.invalid && formulario1?.get('nombres')?.touched">
-                                Nombres es requerido.
-                            </div>
-                        </td>
-                        <td>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Apellidos</mat-label>
-                                <input matInput formControlName="apellidos" placeholder="Apellidos">
-                            </mat-form-field>
-                            <div class="example-full-width mensaje"
-                                *ngIf="formulario1?.get('apellidos')?.invalid && formulario1?.get('apellidos')?.touched">
-                                Apellidos es requerido.
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"> <!-- Fusiona dos columnas para la tercera fila -->
-                            <table> <!-- Tabla anidada para las 3 columnas -->
-                                <tr>
-                                    <td>
-                                        <mat-form-field class="example-full-width calendario">
-                                            <mat-label>Fecha nacimiento</mat-label>
-                                            <input matInput [matDatepicker]="picker2" formControlName="fecha_nacimiento"
-                                                (paste)="onPaste($event,'fecha_nacimiento')"
-                                                (input)="onDateInput($event, 'fecha_nacimiento')">
-                                            <mat-hint>DD/MM/YYYY</mat-hint>
-                                            <mat-datepicker-toggle matIconSuffix
-                                                [for]="picker2"></mat-datepicker-toggle>
-                                            <mat-datepicker #picker2></mat-datepicker>
-                                        </mat-form-field>
-                                        <div class="example-full-width mensaje"
-                                            *ngIf="formulario1?.get('fecha_nacimiento')?.invalid && formulario1?.get('fecha_nacimiento')?.touched">
-                                            Fecha de nacimiento es requerido.
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="contenedor">
-                                            <mat-form-field class="example-full-width nac">
-                                                <mat-label>Sexo</mat-label>
-                                                <mat-select formControlName="sexo">
-                                                    <mat-option>Seleccionar Sexo</mat-option>
-                                                    @for (sexo of sexos; track sexo) {
-                                                    <mat-option [value]="sexo">{{sexo}}</mat-option>
-                                                    }
-                                                </mat-select>
-                                                <div class="combo"
-                                                    *ngIf="formulario1?.get('sexo')?.invalid && formulario1?.get('sexo')?.touched">
-                                                    Sexo es requerido.
-                                                </div>
-                                            </mat-form-field>
+<div class="dialog-container" [formGroup]="formulario1">
+  <div class="dialog-title">
+    <span class="title-accent"></span>
+    <span>{{ funcion }} Personal</span>
+  </div>
 
-                                            <mat-form-field class="example-full-width edad">
-                                                <mat-label>Edad</mat-label>
-                                                <input matInput formControlName="edad" placeholder="Edad">
-                                            </mat-form-field>
-                                            <div class="example-full-width mensaje"
-                                                *ngIf="formulario1?.get('edad')?.invalid && formulario1?.get('edad')?.touched">
-                                                DNI es requerido.
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
+  <mat-tab-group [(selectedIndex)]="selectedIndex" (selectedTabChange)="tabActive($event)">
 
-                                    </td>
+    <!-- TAB 1: Identificación y Datos Personales -->
+    <mat-tab label="Identificación y Datos Personales">
+      <div class="tab-form">
+        <div class="form-section">
+          <span class="section-title">Identificación</span>
 
-                                </tr>
-                                <tr>
-                                    <td><mat-checkbox class="example-margin example-full-width" formControlName="fallecimiento">¿El docente falleció?</mat-checkbox></td>
-                                    <td><mat-form-field class="example-full-width calendario">
-                                            <mat-label>Fecha de fallecimiento</mat-label>
-                                            <input matInput [matDatepicker]="picker" formControlName="fecha_fallecimiento">
-                                            <mat-hint>DD/MM/YYYY</mat-hint>
-                                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                                            <mat-datepicker #picker></mat-datepicker>
-                                        </mat-form-field>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><mat-form-field class="example-full-width nacionalidad">
-                                            <mat-label>Pais</mat-label>
-                                            <mat-select formControlName="pais">
-                                                <mat-option>Seleccionar Pais</mat-option>
-                                                @for (nacionalidad of nacionalidades; track nacionalidad) {
-                                                <mat-option
-                                                    [value]="naciona(nacionalidad)">{{nacionalidad.pais}}</mat-option>
-                                                }
-                                            </mat-select>
-                                            <div class="combo"
-                                                *ngIf="formulario2?.get('pais')?.invalid && formulario2?.get('pais')?.touched">
-                                                Pais es requerido.
-                                            </div>
-                                        </mat-form-field></td>
-                                    <td>
-                                        <mat-form-field class="example-full-width">
-                                            <mat-label>Nacionalidad</mat-label>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Código</mat-label>
+            <input matInput formControlName="codigo" placeholder="Código PUCP">
+          </mat-form-field>
 
-                                            <input matInput formControlName="nacionalidad" placeholder="Nacionalidad">
-                                        </mat-form-field>
-                                        <div class="example-full-width mensaje"
-                                            *ngIf="formulario1?.get('nacionalidad')?.invalid && formulario1?.get('nacionalidad')?.touched && data.modo==1">
-                                            Nacionalidad es requerido.
-                                        </div>
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>DNI *</mat-label>
+              <input matInput formControlName="dni" placeholder="DNI" required>
+              <mat-error>Requerido.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Dígito verificador</mat-label>
+              <input matInput formControlName="digito" placeholder="Dígito">
+            </mat-form-field>
+          </div>
 
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Pasaporte</mat-label>
+            <input matInput formControlName="pasaporte" placeholder="Pasaporte">
+          </mat-form-field>
+        </div>
 
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
+        <div class="form-section">
+          <span class="section-title">Datos Personales</span>
 
-                </table>
-                <div class="general">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombres *</mat-label>
+            <input matInput formControlName="nombres" placeholder="Nombres" required>
+            <mat-error>Requerido.</mat-error>
+          </mat-form-field>
 
-                    <div class="form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Apellidos *</mat-label>
+            <input matInput formControlName="apellidos" placeholder="Apellidos" required>
+            <mat-error>Requerido.</mat-error>
+          </mat-form-field>
 
-                    </div>
-                    <div class="form">
+          <!-- ✅ Edad movido a la pestaña de Nacimiento. Sexo queda full-width para equilibrio -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Sexo</mat-label>
+            <mat-select formControlName="sexo" placeholder="Sexo">
+              @for (sexo of sexos; track sexo) {
+              <mat-option [value]="sexo">{{ sexo }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="tab-actions">
+        <button mat-stroked-button class="btn-nav" (click)="siguiente(1)">Siguiente →</button>
+      </div>
+    </mat-tab>
 
-                    </div>
+    <!-- TAB 2: Nacimiento, Nacionalidad, Fallecimiento y Contacto -->
+    <mat-tab label="Nacimiento, Contacto y Otros">
+      <div class="tab-form">
+        <div class="form-section">
+          <span class="section-title">Nacimiento, Nacionalidad y Fallecimiento</span>
 
-                    <div class="lugar nacimiento">
-                        <table>
-                            <tr>
-                                <td>
-                                    <div class="form texto"><span>Lugar Nacimiento</span></div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="form">
-                                        <mat-form-field class="example-full-width nac">
-                                            <mat-label>Departamento</mat-label>
-                                            <mat-select formControlName="departamento" [(ngModel)]="selectedValue"
-                                                (selectionChange)="onSelectChangeDepartamento($event)">
-                                                <mat-option>Seleccionar departamento</mat-option>
-                                                @for (departamento of departamentos; track departamento) {
-                                                <mat-option
-                                                    [value]="departamento.id">{{departamento.nombre}}</mat-option>
-                                                }
-                                            </mat-select>
-                                            <div class="combo"
-                                                *ngIf="formulario1?.get('departamento')?.invalid && formulario1?.get('departamento')?.touched">
-                                                Departamento es requerido.
-                                            </div>
-                                        </mat-form-field>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="form">
-                                        <mat-form-field class="example-full-width nac">
-                                            <mat-label>Provincias</mat-label>
-                                            <mat-select formControlName="provincia"
-                                                (selectionChange)="onSelectChangeProvincia($event)">
-                                                <mat-option>Seleccionar provincia</mat-option>
-                                                @for (provincia of provincias; track provincia) {
-                                                <mat-option [value]="provincia.id">{{provincia.nombre}}</mat-option>
-                                                }
-                                            </mat-select>
-                                            <div class="combo"
-                                                *ngIf="formulario1?.get('provincia')?.invalid && formulario1?.get('provincia')?.touched">
-                                                Provincia es requerido.
-                                            </div>
-                                        </mat-form-field>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="form">
-                                        <mat-form-field class="example-full-width nac">
-                                            <mat-label>Distritos</mat-label>
-                                            <mat-select formControlName="distrito">
-                                                <mat-option>Seleccionar distrito</mat-option>
-                                                @for (distrito of distritos; track distrito) {
-                                                <mat-option [value]="distrito.id">{{distrito.nombre}}</mat-option>
-                                                }
-                                            </mat-select>
-                                            <div class="combo"
-                                                *ngIf="formulario1?.get('distrito')?.invalid && formulario1?.get('distrito')?.touched">
-                                                Distrito es requerido.
-                                            </div>
-                                        </mat-form-field>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+          <div class="grid-4">
+            <mat-form-field appearance="outline">
+              <mat-label>Departamento</mat-label>
+              <mat-select formControlName="departamento" (selectionChange)="onSelectChangeDepartamento($event)"
+                placeholder="Dpto">
+                @for (dep of departamentos; track dep) {
+                <mat-option [value]="dep.id">{{ dep.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Provincia</mat-label>
+              <mat-select formControlName="provincia" (selectionChange)="onSelectChangeProvincia($event)"
+                placeholder="Prov">
+                @for (prov of provincias; track prov) {
+                <mat-option [value]="prov.id">{{ prov.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Distrito</mat-label>
+              <mat-select formControlName="distrito" placeholder="Dist">
+                @for (dist of distritos; track dist) {
+                <mat-option [value]="dist.id">{{ dist.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>País *</mat-label>
+              <mat-select formControlName="pais" placeholder="Seleccione país" required
+                (selectionChange)="onPaisChange($event)">
+                @for (nac of nacionalidades; track nac) {
+                <mat-option [value]="nac.pais">{{ nac.pais }}</mat-option>
+                }
+              </mat-select>
+              <mat-error>Requerido.</mat-error>
+            </mat-form-field>
+          </div>
 
-                    </div>
-                    <div class="form">
-                        <mat-form-field class="example-full-width calendario">
-                            <mat-label>Fecha CV</mat-label>
-                            <input matInput [matDatepicker]="picker" formControlName="fecha_cv"
-                                (paste)="onPaste($event,'fecha_cv')" (input)="onDateInput($event, 'fecha_cv')">
-                            <mat-hint>DD/MM/YYYY</mat-hint>
-                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                            <mat-datepicker #picker></mat-datepicker>
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario2?.get('fecha_cv')?.invalid && formulario2?.get('fecha_cv')?.touched">
-                            Fecha CV es requerido.
-                        </div>
-                    </div>
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Domicilio</mat-label>
-                            <input matInput formControlName="domicilio" placeholder="Domicilio">
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario1?.get('domicilio')?.invalid && formulario1?.get('domicilio')?.touched">
-                            Domicilio es requerido.
-                        </div>
-                    </div>
+          <!-- ✅ Edad agrupado junto a Fecha Nacimiento -->
+          <div class="grid-2">
+            <mat-form-field appearance="outline" class="formato">
+              <mat-label>Fecha Nacimiento *</mat-label>
+              <input matInput [matDatepicker]="picker1" formControlName="fecha_nacimiento"
+                (paste)="onPaste($event, 'fecha_nacimiento')" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'fecha_nacimiento')" required>
+              <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+              <mat-error>Requerido.</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Edad</mat-label>
+              <input matInput formControlName="edad" placeholder="Edad" readonly>
+            </mat-form-field>
+          </div>
 
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Telefono</mat-label>
-                            <input matInput formControlName="telefono" placeholder="Telefono">
-                        </mat-form-field>
-                        <!--<div class="example-full-width mensaje"
-                            *ngIf="formulario1?.get('telefono')?.invalid && formulario1?.get('telefono')?.touched ">
-                            Telefono es requerido.
-                        </div>-->
-                    </div>
-
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Celular</mat-label>
-                            <input matInput formControlName="celular" placeholder="celular">
-                        </mat-form-field>
-                        <!--<div class="example-full-width mensaje"
-                            *ngIf="formulario1?.get('celular')?.invalid && formulario1?.get('celular')?.touched">
-                            Celular es requerido.
-                        </div>-->
-                    </div>
-
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Estado civil</mat-label>
-                            <mat-select formControlName="estado_civil">
-                                <mat-option>Seleccionar departamento</mat-option>
-                                @for (estado of estadosc; track estado) {
-                                <mat-option [value]="estado">{{estado}}</mat-option>
-                                }
-                            </mat-select>
-                            <div class="combo"
-                                *ngIf="formulario1?.get('estado_civil')?.invalid && formulario1?.get('estado_civil')?.touched">
-                                Estado Civil es requerido.
-                            </div>
-                        </mat-form-field>
-                    </div>
-
-
-
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Numero hijos</mat-label>
-                            <input matInput formControlName="numero_hijos" placeholder="Numero hijos">
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario1?.get('numero_hijos')?.invalid && formulario1?.get('numero_hijos')?.touched">
-                            Numero hijos es requerido.
-                        </div>
-
-                    </div>
-
-
-                    <div class="form">
-
-                    </div>
-
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Especialidad</mat-label>
-                            <input matInput formControlName="especialidad" placeholder="Especialidad">
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario1?.get('especialidad')?.invalid && formulario1?.get('especialidad')?.touched ">
-                            Especilidad es requerido.
-                        </div>
-                    </div>
-                    <div class="form">
-                        <button class="btn-sgte btm" mat-raised-button color="primary" type="submit"
-                            (click)="siguiente(1)">Siguiente</button>
-                    </div>
-
-                </div>
-            </form>
-
-
-        </mat-tab>
-        <mat-tab label="Bancario">
-            <form [formGroup]="formulario2">
-                <div class="general">
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Banco</mat-label>
-                            <mat-select formControlName="banco">
-                                <mat-option>Seleccionar banco</mat-option>
-                                @for (banco of bancosarr; track banco) {
-                                <mat-option [value]="banco.nombre">{{banco.nombre}}</mat-option>
-                                }
-                            </mat-select>
-                            <div class="combo"
-                                *ngIf="formulario2?.get('banco')?.invalid && formulario2?.get('banco')?.touched">
-                                Banco es requerido.
-                            </div>
-                        </mat-form-field>
-                    </div>
-
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Cuenta</mat-label>
-                            <input matInput formControlName="cuenta"
-                                [required]="formulario2.get('banco')?.value !== 'No registrado'">
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario2?.get('cuenta')?.invalid && formulario2?.get('cuenta')?.touched">
-                            Cuenta es requerido.
-                        </div>
-                    </div>
-
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>AFP</mat-label>
-                            <mat-select formControlName="afp">
-                                <mat-option>Seleccionar AFP</mat-option>
-                                @for (afp of afpsarr; track afp) {
-                                <mat-option [value]="afp.nombre">{{afp.nombre}}</mat-option>
-                                }
-                            </mat-select>
-                            <div class="combo"
-                                *ngIf="formulario2?.get('afp')?.invalid && formulario2?.get('afp')?.touched">
-                                Banco es requerido.
-                            </div>
-                        </mat-form-field>
-                    </div>
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>CUSSP</mat-label>
-                            <input matInput formControlName="cussp" placeholder="cussp">
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario2?.get('cussp')?.invalid && formulario2?.get('cussp')?.touched">
-                            CUSSP es requerido.
-                        </div>
-                    </div>
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Afiliacion</mat-label>
-                            <input matInput formControlName="afiliacion" placeholder="Afiliacion">
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario2?.get('afiliacion')?.invalid && formulario2?.get('afiliacion')?.touched">
-                            Afiliacion es requerido.
-                        </div>
-                    </div>
-
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>RUC</mat-label>
-                            <input matInput formControlName="ruc" placeholder="ruc">
-                        </mat-form-field>
-                        <!--<div class="example-full-width mensaje"
-                            *ngIf="formulario2?.get('ruc')?.invalid && formulario2?.get('ruc')?.touched">
-                            RUC es requerido.
-                        </div>-->
-                    </div>
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Observaciones</mat-label>
-                            <input matInput formControlName="observaciones" placeholder="observaciones">
-                        </mat-form-field>
-                        <div class="example-full-width mensaje"
-                            *ngIf="formulario2?.get('observaciones')?.invalid && formulario2?.get('observaciones')?.touched">
-                            Observaciones es requerido.
-                        </div>
-                    </div>
-                </div>
-            </form>
-
-            <hr>
-            <div mat-dialog-actions class="buttons">
-                <button class="btn-ant btm" mat-raised-button color="primary" type="submit"
-                    (click)="siguiente(0)">Anterior</button>
-                <button class="btn" mat-raised-button color="primary" type="submit"
-                    (click)="onNoClick()">Cancel</button>
-                <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
-                    cdkFocusInitial>{{funcion}}</button>
-
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Nacionalidad</mat-label>
+              <input matInput formControlName="nacionalidad" placeholder="Nacionalidad" readonly>
+            </mat-form-field>
+            <div class="grid-2 checkbox-cell">
+              <mat-checkbox formControlName="fallecimiento">¿Falleció?</mat-checkbox>
             </div>
-        </mat-tab>
+          </div>
 
+          <mat-form-field appearance="outline" class="formato full-width">
+            <mat-label>Fecha Fallecimiento</mat-label>
+            <input matInput [matDatepicker]="picker2" formControlName="fecha_fallecimiento"
+              (paste)="onPaste($event, 'fecha_fallecimiento')" placeholder="DD/MM/YYYY"
+              (input)="onDateInput($event, 'fecha_fallecimiento')">
+            <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+        </div>
 
+        <div class="form-section">
+          <span class="section-title">Contacto y Otros</span>
 
-    </mat-tab-group>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Domicilio</mat-label>
+            <input matInput formControlName="domicilio" placeholder="Domicilio">
+          </mat-form-field>
+
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Teléfono</mat-label>
+              <input matInput formControlName="telefono" placeholder="Teléfono">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Celular</mat-label>
+              <input matInput formControlName="celular" placeholder="Celular">
+            </mat-form-field>
+          </div>
+
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Estado Civil</mat-label>
+              <mat-select formControlName="estado_civil" placeholder="Estado">
+                @for (estado of estadosc; track estado) {
+                <mat-option [value]="estado">{{ estado }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>N° Hijos</mat-label>
+              <input matInput formControlName="numero_hijos" placeholder="N° hijos">
+            </mat-form-field>
+          </div>
+
+          <div class="grid-2">
+            <mat-form-field appearance="outline" class="formato">
+              <mat-label>Fecha CV</mat-label>
+              <input matInput [matDatepicker]="picker3" formControlName="fecha_cv" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'fecha_cv')">
+              <mat-datepicker-toggle matIconSuffix [for]="picker3"></mat-datepicker-toggle>
+              <mat-datepicker #picker3></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Especialidad *</mat-label>
+              <input matInput formControlName="especialidad" placeholder="Especialidad" required>
+              <mat-error>Requerido.</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- TAB 3: Datos Bancarios y AFP -->
+    <mat-tab label="Datos Bancarios y AFP">
+      <div class="tab-form">
+        <ng-container [formGroup]="formulario2">
+          <div class="form-section">
+            <span class="section-title">Datos Bancarios</span>
+            <div class="grid-2">
+              <mat-form-field appearance="outline">
+                <mat-label>Banco *</mat-label>
+                <mat-select formControlName="banco" placeholder="Banco">
+                  @for (banco of bancosarr; track banco.id) {
+                  <mat-option [value]="banco.id">{{ banco.nombre }}</mat-option>
+                  }
+                </mat-select>
+                <mat-error>Requerido.</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Cuenta *</mat-label>
+                <input matInput formControlName="cuenta" placeholder="Cuenta" required>
+                <mat-error>Requerido.</mat-error>
+              </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>RUC</mat-label>
+              <input matInput formControlName="ruc" placeholder="RUC">
+            </mat-form-field>
+          </div>
+
+          <div class="form-section">
+            <span class="section-title">AFP y Previsión Social</span>
+            <div class="grid-2">
+              <mat-form-field appearance="outline">
+                <mat-label>AFP</mat-label>
+                <mat-select formControlName="afp" placeholder="AFP">
+                  @for (afp of afpsarr; track afp.id) {
+                  <mat-option [value]="afp.id">{{ afp.nombre }}</mat-option>
+                  }
+                </mat-select>
+                <mat-error>Requerido.</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>CUSSP *</mat-label>
+                <input matInput formControlName="cussp" placeholder="CUSSP" required>
+                <mat-error>Requerido.</mat-error>
+              </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Afiliación *</mat-label>
+              <input matInput formControlName="afiliacion" placeholder="Afiliación" required>
+              <mat-error>Requerido.</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-section">
+            <span class="section-title">Observaciones</span>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Observaciones</mat-label>
+              <textarea matInput formControlName="observaciones" placeholder="Notas o comentarios adicionales"
+                rows="4"></textarea>
+            </mat-form-field>
+          </div>
+        </ng-container>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+  <!-- Barra de acciones -->
+  <div class="dialog-actions">
+    <div class="actions-left">
+      <button mat-stroked-button class="btn-nav" (click)="siguiente(selectedIndex - 1)"
+        [disabled]="selectedIndex === 0">← Anterior</button>
+    </div>
+    <div class="actions-right">
+      <button mat-button (click)="onNoClick()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="onSubmit()">{{ funcion }}</button>
+    </div>
+  </div>
 </div>

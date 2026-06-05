@@ -1,190 +1,222 @@
-<form [formGroup]="formularioInfo" class="formulario">
-    <h2 class="titulo">Docente: {{verificarInfo(this.data.valores.docente)}}</h2>
-    <div class="general">
-        <div class="form">
-            <mat-form-field class="example-full-width">
-                <mat-label>Codigo docente</mat-label>
-                <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
-            </mat-form-field>
-        </div>
+<div class="dialog-container" [formGroup]="formularioInfo">
+  <div class="dialog-title">
+    <span class="title-accent"></span>
+    <span>{{ funcion }} Información Docente</span>
+  </div>
 
-        <table>
-            <tr>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Categoria actual</mat-label>
-                        <mat-select name="categoria" formControlName="categoria">
-                            @for (categoria of categoria_actual; track categoria) {
-                            <mat-option [value]="categoria">{{categoria}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Dedicacion</mat-label>
-                        <mat-select name="dedicacion" formControlName="dedicacion">
-                            @for (d of dedicacion; track d) {
-                            <mat-option [value]="d">{{d}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Modo ingreso</mat-label>
-                        <mat-select name="modo_ingreso" formControlName="modo_ingreso">
-                            @for (ing of ingreso; track ing) {
-                            <mat-option [value]="ing">{{ing}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-            </tr>
-            <tr>
-               <!-- <td>
-                    <mat-form-field>
-                        <mat-label>Rango de dictado</mat-label>
-                        <mat-date-range-input [rangePicker]="picker">
-                            <input matStartDate formControlName="inicio_dictado" placeholder="Inicio dictado">
-                            <input matEndDate formControlName="fin_dictado" placeholder="Fin dictado">
-                        </mat-date-range-input>
+  <div class="docente-info" *ngIf="data.valores?.docente">
+    Docente: {{ verificarInfo(data.valores.docente) }}
+  </div>
 
-                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                        <mat-date-range-picker #picker></mat-date-range-picker>
-                    </mat-form-field>
-                </td>-->
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Profesor perteneciente a:</mat-label>
-                        <mat-select name="departamento" formControlName="departamento">
-                            @for (ua of unidades_academicas; track ua) {
-                            <mat-option [value]="ua.nombre">{{ua.nombre}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <tr>
-                        <td> 
-                            <mat-form-field  class="tamanio">
-                                <mat-label>Labor administrativa</mat-label>
-                                <mat-select name="labor_administrativa" formControlName="labor_administrativa">
-                                    @for (la of labor_adminsitrativa; track la) {
-                                    <mat-option [value]="la">{{la}}</mat-option>
-                                    }
-                                </mat-select>
-                            </mat-form-field>
-                        </td>
-                       <!-- <td>
-                            <mat-form-field class="ancho">
-                                <mat-label>semestre</mat-label>
-                                <input type="text" matInput placeholder="semestre" formControlName="semestre">
-                            </mat-form-field>
-                        </td>-->
-                    </tr>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Lugar dictado</mat-label>
-                        <mat-select name="lugar_dictado" formControlName="lugar_dictado">
-                            @for (ld of lugar_dictado; track ld) {
-                            <mat-option [value]="ld">{{ld}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Pais dictado</mat-label>
-                        <mat-select name="pais_dictado" formControlName="pais_dictado">
-                            @for (pd of pais_dictado; track pd) {
-                            <mat-option [value]="pd.pais">{{pd.pais}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>dias permanencia en el extranejro</mat-label>
-                        <input matInput placeholder="Dias permamnencia" formControlName="dias_extranjero">
-                    </mat-form-field>
-                </td>
-            </tr>
+  <div class="tab-form">
+    
+    <!-- Sección: Datos Generales -->
+    <div class="form-section">
+      <span class="section-title">Datos Generales</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Código Docente</mat-label>
+          <input matInput formControlName="codigoDocente" placeholder="Código" readonly>
+        </mat-form-field>
 
-            <tr>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Rol anterior</mat-label>
-                        <mat-select name="rol_anterior" formControlName="rol_anterior">
-                            @for (ra of rol_anterior; track ra) {
-                            <mat-option [value]="ra">{{ra}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Comision especial</mat-label>
-                        <mat-select name="comisiones" formControlName="comisiones">
-                            @for (co of comisiones; track co) {
-                            <mat-option [value]="co">{{co}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Emisión carné</mat-label>
-                        <input matInput [matDatepicker]="picker3" formControlName="emision_carne">
-                        <mat-datepicker-toggle matIconSuffix [for]="picker3"></mat-datepicker-toggle>
-                        <mat-datepicker #picker3></mat-datepicker>
-                    </mat-form-field>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Prestamos acádemicos</mat-label>
-                        <textarea matInput placeholder="Prestamos acádemicos" formControlName="prestamos"></textarea>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Sanciones o presunciones</mat-label>
-                        <textarea matInput placeholder="Sanciones o presunciones"
-                            formControlName="sanciones"></textarea>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Observa DAP</mat-label>
-                        <textarea matInput placeholder="Observa DAP" formControlName="observadap"></textarea>
-                    </mat-form-field>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Histórico de ratificación</mat-label>
-                        <textarea matInput placeholder="Histórico de ratificación"
-                            formControlName="historico"></textarea>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <mat-form-field class="tamanio">
-                        <mat-label>Felicitación encuesta</mat-label>
-                        <textarea matInput placeholder="Felicitación encuesta"
-                            formControlName="felicitacion"></textarea>
-                    </mat-form-field>
-                </td>
-                <td>
-                    <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
-                        (click)="add_grado()">Agregar</button>
-                </td>
-            </tr>
-        </table>
+        <mat-form-field appearance="outline">
+          <mat-label>Semestre</mat-label>
+          <input matInput formControlName="semestre" placeholder="Ej: 2024-1">
+        </mat-form-field>
+      </div>
     </div>
-</form>
+
+    <!-- Sección: Categoría y Dedicación -->
+    <div class="form-section">
+      <span class="section-title">Categoría y Dedicación</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Categoría actual</mat-label>
+          <mat-select formControlName="categoria">
+            @for (item of categoria_actual; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Dedicación</mat-label>
+          <mat-select formControlName="dedicacion">
+            @for (item of dedicacion; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Modo de Ingreso</mat-label>
+          <mat-select formControlName="modo_ingreso">
+            @for (item of ingreso; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Unidad Académica</mat-label>
+          <mat-select formControlName="departamento">
+            @for (item of unidades_academicas; track item) {
+              <mat-option [value]="item.nombre">{{ item.nombre }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Sección: Lugar de Dictado -->
+    <div class="form-section">
+      <span class="section-title">Lugar de Dictado</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Lugar de Dictado</mat-label>
+          <mat-select formControlName="lugar_dictado">
+            @for (item of lugar_dictado; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>País de Dictado</mat-label>
+          <mat-select formControlName="pais_dictado">
+            @for (item of pais_dictado; track item) {
+              <mat-option [value]="item.pais">{{ item.pais }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline" class="formato">
+          <mat-label>Fecha Inicio Dictado</mat-label>
+          <input matInput [matDatepicker]="picker1" formControlName="inicio_dictado" 
+                 placeholder="DD/MM/YYYY" (input)="onDateInput($event, 'inicio_dictado')" 
+                 (paste)="onPaste($event, 'inicio_dictado')">
+          <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+          <mat-datepicker #picker1></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="formato">
+          <mat-label>Fecha Fin Dictado</mat-label>
+          <input matInput [matDatepicker]="picker2" formControlName="fin_dictado" 
+                 placeholder="DD/MM/YYYY" (input)="onDateInput($event, 'fin_dictado')" 
+                 (paste)="onPaste($event, 'fin_dictado')">
+          <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+          <mat-datepicker #picker2></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Días Permanencia en el Extranjero</mat-label>
+          <input matInput formControlName="dias_extranjero" placeholder="Número de días" type="number">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Labor Administrativa</mat-label>
+          <mat-select formControlName="labor_administrativa">
+            @for (item of labor_adminsitrativa; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Sección: Roles y Comisiones -->
+    <div class="form-section">
+      <span class="section-title">Roles y Comisiones</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Rol Anterior</mat-label>
+          <mat-select formControlName="rol_anterior">
+            @for (item of rol_anterior; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Comisión Especial</mat-label>
+          <mat-select formControlName="comisiones">
+            @for (item of comisiones; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline" class="formato">
+          <mat-label>Fecha Emisión Carné</mat-label>
+          <input matInput [matDatepicker]="picker3" formControlName="emision_carne" 
+                 placeholder="DD/MM/YYYY" (input)="onDateInput($event, 'emision_carne')" 
+                 (paste)="onPaste($event, 'emision_carne')">
+          <mat-datepicker-toggle matIconSuffix [for]="picker3"></mat-datepicker-toggle>
+          <mat-datepicker #picker3></mat-datepicker>
+        </mat-form-field>
+        
+        <div></div> <!-- Espaciador -->
+      </div>
+    </div>
+
+    <!-- Sección: Observaciones -->
+    <div class="form-section">
+      <span class="section-title">Observaciones y Registros</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Préstamos Académicos</mat-label>
+          <textarea matInput formControlName="prestamos" placeholder="Registro de préstamos académicos" rows="2"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Sanciones o Presunciones</mat-label>
+          <textarea matInput formControlName="sanciones" placeholder="Registro de sanciones o presunciones" rows="2"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Observaciones DAP</mat-label>
+          <textarea matInput formControlName="observadap" placeholder="Observaciones de la Dirección Académica" rows="2"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Histórico de Ratificación</mat-label>
+          <textarea matInput formControlName="historico" placeholder="Historial de ratificaciones" rows="2"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Felicitaciones Encuesta</mat-label>
+          <textarea matInput formControlName="felicitacion" placeholder="Registro de felicitaciones por encuestas" rows="2"></textarea>
+        </mat-form-field>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Barra de acciones -->
+  <div class="dialog-actions">
+    <div class="actions-left"></div>
+    <div class="actions-right">
+      <button mat-button (click)="onNoClick()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="add_grado()" class="btn-nav">
+        {{ funcion }}
+      </button>
+    </div>
+  </div>
+</div>

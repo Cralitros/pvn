@@ -108,27 +108,72 @@ export class InvestigadorComponent {
     });
 
   }
-  async buscar(data: any) {
-     if (this.tablaDepartamento.length == 0) {
-      this.formulario?.setValue({ 'codigo': data });
-      this.dialogo();
+  // ✅ Método principal corregido
+  async abrirDialogoLaboral(): Promise<void> {
+    const codigo = this.formulario?.value.codigo;
+    if (!codigo) {
+      Swal.fire('Atención', 'Por favor ingrese un código de docente primero.', 'warning');
       return;
     }
 
-    const encontrado = this.tablaDepartamento.find(item => item.codigoDocente == data);
+    if (this.tablaDepartamento.length === 0) {
+      await this.cargartabla();
+    }
+
+    // ✅ Usar conversión explícita con String() global o template literals
+    const encontrado = this.tablaDepartamento.find(
+      item => `${item.codigoDocente}` === `${codigo}`
+    );
 
     if (encontrado) {
-      console.log("encontrado");
-      this.formulario?.setValue({ 'codigo': data });
       this.cartabla.dataSeleccionada = encontrado;
-      console.log(this.cartabla.dataSeleccionada);
-      this.editar(this.cartabla.dataSeleccionada);
+      this.editar(encontrado);
     } else {
-      this.formulario?.setValue({ 'codigo': data });
-      this.dialogo();
+      await this.crearNuevo(codigo);
     }
   }
 
+  private async crearNuevo(codigo: string): Promise<void> {
+    try {
+      this.mservice.ponerurl("docentes/cod");
+      const docenteData: any = await lastValueFrom(this.mservice.getid(codigo));
+
+      if (!docenteData || (Array.isArray(docenteData) && docenteData.length === 0)) {
+        Swal.fire('Error', 'El código de docente no existe en el sistema.', 'error');
+        return;
+      }
+
+      const docenteInfo = Array.isArray(docenteData) ? docenteData[0] : docenteData;
+
+      const dialogRef = this.dialog.open(InvestigadlgComponent, {
+        width: '750px',
+        height: '700px',
+        data: {
+          title: `Agregar ${this.titulo}`,
+          valores: {
+            laboral: docenteData,
+            docente: docenteInfo
+          },
+          modo: 0
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(() => this.cargartabla());
+    } catch (error) {
+      console.error('Error al verificar docente:', error);
+      Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+    }
+  }
+
+  async buscar(data: any) {
+    this.formulario?.setValue({ 'codigo': data });
+    await this.abrirDialogoLaboral();
+  }
+  existeRegistro(): boolean {
+    const codigo = this.formulario?.value.codigo;
+    // Usamos == para comparar sin importar si viene como número o texto
+    return this.tablaDepartamento.some(item => item.codigoDocente == codigo);
+  }
   async cargartabla() {
     this.mservice.ponerurl("docentesinvestiga");
     const source$ = this.mservice.get();
@@ -196,7 +241,7 @@ export class InvestigadorComponent {
           gadd: this.cartabla.dataSeleccionada.gadd,
           gadit: this.cartabla.dataSeleccionada.gadit,
           dfi: this.cartabla.dataSeleccionada.dfi,
-          docente:this.cartabla.dataSeleccionada.Docente,
+          docente: this.cartabla.dataSeleccionada.Docente,
         },
         modo: 1
       }

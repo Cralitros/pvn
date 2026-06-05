@@ -82,7 +82,7 @@ export class BancosComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(BancosdlgComponent, {
-      width: '290px',
+      width: '800px',
       height:'350px',
       data: {
         title: `Agregar ${this.titulo}`,
@@ -98,7 +98,7 @@ export class BancosComponent {
   }
   editar(element: any){
     const dialogRef = this.dialog.open(BancosdlgComponent, {
-      width: '250px',
+      width: '800px',
       height:'350px',
       data: {
         title: `Editar ${this.titulo}`,

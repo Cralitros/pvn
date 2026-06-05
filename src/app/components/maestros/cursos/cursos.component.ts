@@ -88,8 +88,8 @@ export class CursosComponent {
   }
   dialogo(){
     const dialogRef = this.dialog.open(CursosdlgComponent, {
-      width: '500px',
-      height:'550px',
+      width: '1000px',
+      height:'800px',
       data: {
         title: `Agregar ${this.titulo}`,
         valores:{},
@@ -109,8 +109,8 @@ export class CursosComponent {
     
     
     const dialogRef = this.dialog.open(CursosdlgComponent, {
-      width: '500px',
-      height:'550px',
+      width: '1000px',
+      height:'800px',
       data: {
         title: `Editar ${this.titulo}`,
         valores:{ 

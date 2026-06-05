@@ -19,8 +19,6 @@ import { GradodlgComponent } from '../../dialog/docente/gradodlg/gradodlg.compon
 import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
 
-
-
 @Component({
   selector: 'app-grado',
   standalone: true,
@@ -46,11 +44,8 @@ export class GradoComponent {
   columns: Column[] = [
     { columnDef: 'id', header: 'No.', cell: (element: Grado) => `${element.id}` },
     { columnDef: 'codigo', header: 'Codigo Docente', cell: (element: Grado) => `${element.codigoDocente}` },
-    { columnDef: 'grado', header: 'Grado', cell: (element: Grado) => this.separar_data(element.grado), cssClass: 'pre-formatted' }, // Añade esta propiedad  },
-    /* { columnDef: 'revalidado', header: 'Revalidado', cell: (element: Grado) => `${element.revalidado}` },
-     { columnDef: 'lugar_obtencion', header: 'Lugar obtencion', cell: (element: Grado) => `${element.lugar_obtencion}` },
-     { columnDef: 'fecha_obtencion', header: 'Fecha obtencion', cell: (element: Grado) => `${element.fecha_obtencion}` },*/
-    { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
+    { columnDef: 'grado', header: 'Grado', cell: (element: Grado) => this.separar_data(element.grado), cssClass: 'pre-formatted' },
+    { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }
   ];
 
   formulario?: FormGroup | any = null;
@@ -69,21 +64,19 @@ export class GradoComponent {
     public dialog: MatDialog,
     private route: ActivatedRoute
   ) {
-
     this.departamentoForm = this.fb.group({
       nombre: ['', Validators.required]
     });
     this.titulos.emit(this.titulo);
   }
+
   ngOnInit(): void {
     this.cargartabla();
     this.formulario = this.formBuilder.group({
       codigo: ['']
     });
     this.route.queryParams.subscribe((params: any) => {
-      // const tipo = params['tipo'];
       const data = params['selectedRow'];
-
       console.log('Selected Row:', data);
       this.cargartabla().then(() => {
         this.buscar(data);
@@ -91,30 +84,77 @@ export class GradoComponent {
     });
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit() { }
 
-
-  }
-  async buscar(data: any) {
-    if (this.tablaDepartamento.length == 0) {
-      this.formulario?.setValue({ 'codigo': data });
-      this.dialogo();
+  // ✅ Método principal corregido
+  async abrirDialogoLaboral(): Promise<void> {
+    const codigo = this.formulario?.value.codigo;
+    if (!codigo) {
+      Swal.fire('Atención', 'Por favor ingrese un código de docente primero.', 'warning');
       return;
     }
 
-    const encontrado = this.tablaDepartamento.find(item => item.codigoDocente == data);
+    if (this.tablaDepartamento.length === 0) {
+      await this.cargartabla();
+    }
+
+    const encontrado = this.tablaDepartamento.find(
+      item => `${item.codigoDocente}` === `${codigo}`
+    );
 
     if (encontrado) {
-      console.log("encontrado");
-      this.formulario?.setValue({ 'codigo': data });
       this.cartabla.dataSeleccionada = encontrado;
-      console.log(this.cartabla.dataSeleccionada);
-      this.editar(this.cartabla.dataSeleccionada);
+      this.editar(encontrado);
     } else {
-      this.formulario?.setValue({ 'codigo': data });
-      this.dialogo();
+      await this.crearNuevo(codigo);
     }
   }
+
+  private async crearNuevo(codigo: string): Promise<void> {
+    try {
+      this.mservice.ponerurl("docentes/cod");
+      const docenteData: any = await lastValueFrom(this.mservice.getid(codigo));
+
+      if (!docenteData || (Array.isArray(docenteData) && docenteData.length === 0)) {
+        Swal.fire('Error', 'El código de docente no existe en el sistema.', 'error');
+        return;
+      }
+
+      const docenteInfo = Array.isArray(docenteData) ? docenteData[0] : docenteData;
+
+      const dialogRef = this.dialog.open(GradodlgComponent, {
+        width: '1200px',
+        maxWidth: '95vw',
+        height: '85vh',
+        maxHeight: '90vh',
+        panelClass: 'grados-dialog',
+        data: {
+          title: `Agregar ${this.titulo}`,
+          valores: {
+            laboral: docenteData,
+            docente: docenteInfo
+          },
+          modo: 0
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(() => this.cargartabla());
+    } catch (error) {
+      console.error('Error al verificar docente:', error);
+      Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+    }
+  }
+
+  async buscar(data: any) {
+    this.formulario?.setValue({ 'codigo': data });
+    await this.abrirDialogoLaboral();
+  }
+
+  existeRegistro(): boolean {
+    const codigo = this.formulario?.value.codigo;
+    return this.tablaDepartamento.some(item => item.codigoDocente == codigo);
+  }
+
   async cargartabla() {
     this.mservice.ponerurl("docentesgrado");
     const source$ = this.mservice.get();
@@ -126,76 +166,54 @@ export class GradoComponent {
 
     this.sctabla.setData(this.tablaDepartamento);
   }
+
   dialogo() {
     let laboral: any;
     this.mservice.ponerurl("docentes/cod");
     this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
       console.log("******************************************");
-
       console.log(data);
       laboral = data;
-      if (data.length > 0) {//verifica si existe el docente
-
+      if (data.length > 0) {
         this.mservice.ponerurl("docentesgrado");
-        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
+        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {
           console.log(data2);
 
           const dialogRef = this.dialog.open(GradodlgComponent, {
-            width: '1000px',
-            height: '750px',
+            width: '1200px',
+            maxWidth: '95vw',
+            height: '85vh',
+            maxHeight: '90vh',
+            panelClass: 'grados-dialog',
             data: {
               title: `Agregar ${this.titulo}`,
-              valores: { laboral },
+              valores: {
+                laboral: laboral,
+                docente: laboral[0]
+              },
               modo: 0
             }
           });
           dialogRef.afterClosed().subscribe(result => {
-            //if (result) {
             this.cargartabla();
-            // }
           });
-
-
         });
-        /* const dialogRef = this.dialog.open(LaboraldlgComponent, {
-           width: '500px',
-           height:'550px',
-           data: {
-             title: `Agregar ${this.titulo}`,
-             valores:{},
-             modo:0
-           }
-         });
-         dialogRef.afterClosed().subscribe(result => {
-           //if (result) {
-             this.cargartabla();
-          // }
-         });*/
+      } else {
+        Swal.fire('Error', 'El código de docente no existe', 'error');
       }
     });
-
-    /*const dialogRef = this.dialog.open(LaboraldlgComponent, {
-      width: '500px',
-      height:'550px',
-      data: {
-        title: `Agregar ${this.titulo}`,
-        valores:{},
-        modo:0
-      }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      //if (result) {
-        this.cargartabla();
-     // }
-    });*/
   }
+
   editar(element: any) {
     console.log("******************************************");
     console.log(element);
 
     const dialogRef = this.dialog.open(GradodlgComponent, {
-      width: '1000px',
-      height: '750px',
+      width: '1200px',
+      maxWidth: '95vw',
+      height: '85vh',
+      maxHeight: '90vh',
+      panelClass: 'grados-dialog',
       data: {
         title: `Editar ${this.titulo}`,
         valores: {
@@ -208,47 +226,91 @@ export class GradoComponent {
           bga: this.cartabla.dataSeleccionada.bga,
           prestamoc: this.cartabla.dataSeleccionada.prestamoc,
           prestamo: this.cartabla.dataSeleccionada.prestamo,
-          docente: element.Docente
-          /* revalidado: this.cartabla.dataSeleccionada.revalidado,
-           lugar_obtencion: this.cartabla.dataSeleccionada.lugar_obtencion,
-           fecha_obtencion: this.cartabla.dataSeleccionada.fecha_obtencion,
-           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
-           profesion: this.cartabla.dataSeleccionada.profesion,*/
-
+          docente: element.Docente || element.docente
         },
         modo: 1
       }
     });
     dialogRef.afterClosed().subscribe(result => {
-      // if (result) {
       this.cargartabla();
-      //  }
     });
-
   }
+
   eliminar(element: any) {
     console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
-      Swal.fire({
-        title: "Eliminado",
-        text: "Continuar",
-        icon: "info"
-      });
-      this.cargartabla();
-    })
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción eliminará permanentemente el registro',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.mservice.delete(element.id).subscribe(data => {
+          console.log("Eliminado");
+          Swal.fire('Eliminado', 'El registro ha sido eliminado', 'success');
+          this.cargartabla();
+        });
+      }
+    });
   }
 
-  separar_data(elemento: any) {
-    let dat_tojson = JSON.parse(elemento);
-    //console.log(dat_tojson);
+  // ✅ Método separar_data corregido para manejar el nuevo formato
+  separar_data(elemento: any): string {
+    if (!elemento) return '';
+
+    let dat_tojson: any[] = [];
+
+    // Manejar diferentes formatos de entrada
+    if (typeof elemento === 'string') {
+      try {
+        // Limpiar caracteres de escape si es necesario
+        const cleaned = elemento.replace(/\\"/g, '"');
+        dat_tojson = JSON.parse(cleaned);
+      } catch (e) {
+        console.error('Error parsing JSON:', e);
+        return 'Error al cargar datos';
+      }
+    } else if (Array.isArray(elemento)) {
+      dat_tojson = elemento;
+    } else {
+      return '';
+    }
+
+    if (!dat_tojson.length) return '';
+
     let cadena = "";
 
     for (let i = 0; i < dat_tojson.length; i++) {
-      cadena += `-Grado: ${dat_tojson[i].grade}\n-Titulo: ${dat_tojson[i].titulo}\n-Fecha: ${dat_tojson[i].fecha}\n-Lugar: ${dat_tojson[i].lugar}\n-Revalidado: ${dat_tojson[i].revalidado}\n----------------------------------\n`
+      const grado = dat_tojson[i];
+
+      // Formatear fechas correctamente
+      const formatFecha = (fecha: any): string => {
+        if (!fecha) return 'No registrada';
+        try {
+          const date = new Date(fecha);
+          if (isNaN(date.getTime())) return fecha;
+          return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+        } catch {
+          return fecha;
+        }
+      };
+
+      cadena += `🎓 Grado: ${grado.grade || 'No especificado'}\n`;
+      cadena += `📜 Título: ${grado.titulo || 'No especificado'}\n`;
+      cadena += `📅 Fecha: ${formatFecha(grado.fecha)}\n`;
+      cadena += `🏛️ Institución: ${grado.lugar || 'No especificada'}\n`;
+      cadena += `🌍 País: ${grado.pais || 'No especificado'}\n`;
+      cadena += `✅ SUNEDU: ${grado.revalidado ? 'Sí' : 'No'}\n`;
+      if (grado.fechaRevalidado) {
+        cadena += `📅 Fecha Revalidación: ${formatFecha(grado.fechaRevalidado)}\n`;
+      }
+      cadena += `─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─\n`;
     }
+
     return cadena;
-
   }
-
 }

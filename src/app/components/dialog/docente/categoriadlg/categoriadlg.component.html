@@ -1,285 +1,195 @@
-<table>
+<div class="dialog-container" [formGroup]="formularioCategoria">
+  <div class="dialog-title">
+    <span class="title-accent"></span>
+    <span>{{ funcion }} Categoría Docente</span>
+  </div>
 
-    <h2 class="titulo">Docente: {{verificarInfo(this.data.valores.docente)}}</h2>
-    <tr>
-        <td>
-            <form [formGroup]="formularioCategoria" class="formulario">
-                <div class="general">
+  <div class="docente-info" *ngIf="data.valores?.docente">
+    Docente: {{ verificarInfo(this.data.valores.docente) }}
+  </div>
 
-                    <div class="form">
-                        <mat-form-field class="example-full-width">
-                            <mat-label>Codigo docente</mat-label>
-                            <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
-                        </mat-form-field>
-                    </div>
+  <mat-tab-group class="dialog-tabs">
 
-                    <div class="form">
-                        <mat-form-field class="example-full-width calendario">
-                            <mat-label>Fecha contrato</mat-label>
-                            <input matInput [matDatepicker]="picker2" formControlName="fecha"
-                                (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                            <mat-hint>DD/MM/YYYY</mat-hint>
-                            <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-                            <mat-datepicker #picker2></mat-datepicker>
-                        </mat-form-field>
+    <!-- TAB 1: Información Actual -->
+    <mat-tab label="Información Actual">
+      <div class="tab-form">
 
-                    </div>
+        <!-- Sección: Identificación y Contrato -->
+        <div class="form-section">
+          <span class="section-title">Identificación y Contrato</span>
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Código Docente</mat-label>
+              <input matInput formControlName="codigoDocente" placeholder="Código" readonly>
+            </mat-form-field>
+            <!-- ✅ CAMBIO AQUI: readonly="true" -->
+            <mat-form-field appearance="outline" class="formato">
+              <mat-label>Fecha contrato</mat-label>
+              <input matInput [matDatepicker]="picker1" formControlName="fecha" placeholder="DD/MM/YYYY" readonly>
+              <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </mat-form-field>
+          </div>
+        </div>
 
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Tipo</mat-label>
-                        <mat-select formControlName="tipo">
-                            <mat-option>Seleccionar tipo</mat-option>
-                            @for (tipo of tipos; track tipo) {
-                            <mat-option [value]="tipo">{{tipo}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
+        <!-- Sección: Configuración Actual -->
+        <div class="form-section">
+          <span class="section-title">Configuración Actual</span>
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo</mat-label>
+              <mat-select formControlName="tipo" placeholder="Seleccionar tipo">
+                @for (tipo of tipos; track tipo) { <mat-option [value]="tipo">{{ tipo }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Dedicación</mat-label>
+              <mat-select formControlName="dedicacion" placeholder="Seleccionar dedicación">
+                @for (dedi of dedicacion; track dedi) { <mat-option [value]="dedi">{{ dedi }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Labor Administrativa</mat-label>
+              <mat-select formControlName="labor" placeholder="Seleccionar si tiene labor">
+                @for (labi of lab; track labi) { <mat-option [value]="labi">{{ labi }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Ratificado</mat-label>
+              <mat-select formControlName="ratificado" placeholder="Seleccionar"
+                (selectionChange)="onCategoryChangeRatificado($event)">
+                @for (ra of ratificado; track ra) { <mat-option [value]="ra">{{ ra }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
 
-                    <!--<mat-form-field class="example-full-width">
-                        <mat-label>Categoria</mat-label>
-                        <mat-select formControlName="categoria">
-                            <mat-option>Seleccionar categoria</mat-option>
-                            @for (categoria of categorias; track categoria) {
-                            <mat-checkbox [(ngModel)]="categoria.seleccionada" [ngModelOptions]="{standalone: true}"
-                                class="mch">
-                                <mat-form-field class="example-full-width calendario" class="cal">
-                                    <mat-label>{{categoria.nombre}}</mat-label>
-                                    <input matInput [matDatepicker]="picker2" [(ngModel)]="categoria.fecha"
-                                        [ngModelOptions]="{standalone: true}"
-                                        (paste)="onPaste($event,categoria.nombre)">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker2></mat-datepicker>
-                                </mat-form-field>
-                            </mat-checkbox>
-                            }
-                        </mat-select>
-                    </mat-form-field>-->
+        <!-- Sección: DAP y Condición -->
+        <div class="form-section">
+          <span class="section-title">Categoría y Condición DAP</span>
+          <div class="grid-2">
+            <mat-form-field appearance="outline">
+              <mat-label>Categoría DAP</mat-label>
+              <mat-select formControlName="categoriadap" placeholder="Seleccionar Categoria"
+                (selectionChange)="onCategoryChange($event)">
+                @for (cat of categoriasdap; track cat) { <mat-option [value]="cat">{{ cat }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Condiciones DAP</mat-label>
+              <mat-select formControlName="condiciondap" placeholder="Seleccionar condicion"
+                (selectionChange)="onCategoryChange2($event)">
+                @for (cond of condicionesdap; track cond) { <mat-option [value]="cond">{{ cond }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+          </div>
 
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Dedicacion</mat-label>
-                        <mat-select formControlName="dedicacion">
-                            <mat-option>Seleccionar dedicacion</mat-option>
-                            @for (dedi of dedicacion; track dedi) {
-                            <mat-option [value]="dedi">{{dedi}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
+          <!-- Radios condicionales -->
+          <div class="form-section-inner" *ngIf="formularioCategoria.get('categoriadap')?.value === 'Extraordinario'">
+            <span class="section-title">Tipo Extraordinario</span>
+            <mat-radio-group formControlName="rg1" class="example-radio-group">
+              @for (ext of extraordinarios; track ext) {
+              <mat-radio-button class="example-radio-button" [value]="ext">{{ ext }}</mat-radio-button>
+              }
+            </mat-radio-group>
+          </div>
 
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Labor administrativa</mat-label>
-                        <mat-select formControlName="labor">
-                            <mat-option>Seleccionar si tiene labor</mat-option>
-                            @for (labi of lab; track labi) {
-                            <mat-option [value]="labi">{{labi}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Ratificado</mat-label>
-                        <mat-select formControlName="ratificado" (selectionChange)="onCategoryChangeRatificado($event)">
-                            <mat-option>Seleccionar</mat-option>
-                            @for (ra of ratificado; track ra) {
-                            <mat-option [value]="ra">{{ra}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                    <div class="example-full-width chkgrp">
-                        <section class="example-section">
-                            <mat-checkbox formControlName="chk1">Desempeño Académico</mat-checkbox><br>
-                            <mat-checkbox formControlName="chk2">Investigación</mat-checkbox><br>
-                            <mat-checkbox formControlName="chk3">Desempeño administrativo</mat-checkbox><br>
-                            <mat-checkbox formControlName="chk4">Capacitación continua</mat-checkbox><br>
-                            <mat-checkbox formControlName="chk5">No Aplica</mat-checkbox><br>
-                        </section>
-                    </div>
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Categoria DAP</mat-label>
-                        <mat-select formControlName="categoriadap" (selectionChange)="onCategoryChange($event)">
-                            <mat-option>Seleccionar Categoria</mat-option>
-                            @for (categoriadap of categoriasdap; track categoriadap) {
-                            <mat-option [value]="categoriadap">{{categoriadap}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
+          <div class="form-section-inner" *ngIf="formularioCategoria.get('condiciondap')?.value === 'Inactivo'">
+            <span class="section-title">Motivo Inactividad</span>
+            <mat-radio-group formControlName="rg2" class="example-radio-group">
+              @for (ina of inactivos; track ina) {
+              <mat-radio-button class="example-radio-button" [value]="ina">{{ ina }}</mat-radio-button>
+              }
+            </mat-radio-group>
+          </div>
+        </div>
 
-                    <mat-form-field class="example-full-width">
-                        <mat-label>Condiciones DAP</mat-label>
-                        <mat-select formControlName="condiciondap" (selectionChange)="onCategoryChange2($event)">
-                            <mat-option>Seleccionar condicion</mat-option>
-                            @for (condiciondap of condicionesdap; track condiciondap) {
-                            <mat-option [value]="condiciondap">{{condiciondap}}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                    
-                    <!--<div class="rg1">
-                        <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group "
-                            formControlName="rg1">
-                            @for (extraordinario of extraordinarios; track extraordinario) {
-                            <mat-radio-button class="example-radio-button"
-                                [value]="extraordinario">{{extraordinario}}</mat-radio-button>
-                            }
-                        </mat-radio-group>
-                    </div>
-                    <div class="rg2">
-                        <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group"
-                            formControlName="rg2">
-                            @for (inactivo of inactivos; track inactivo) {
-                            <mat-radio-button class="example-radio-button"
-                                [value]="inactivo">{{inactivo}}</mat-radio-button>
-                            }
-                        </mat-radio-group>
-                    </div>-->
-                    <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group "
-                            formControlName="rg1">
-                            @for (extraordinario of extraordinarios; track extraordinario) {
-                            <mat-radio-button class="example-radio-button"
-                                [value]="extraordinario">{{extraordinario}}</mat-radio-button>
-                            }
-                        </mat-radio-group>
-                    <mat-radio-group aria-labelledby="example-radio-group-label" class="example-radio-group"
-                            formControlName="rg2">
-                            @for (inactivo of inactivos; track inactivo) {
-                            <mat-radio-button class="example-radio-button"
-                                [value]="inactivo">{{inactivo}}</mat-radio-button>
-                            }
-                        </mat-radio-group>
-                    <br>
+        <!-- Sección: Criterios de Ratificación -->
+        <div class="form-section" *ngIf="formularioCategoria.get('ratificado')?.value === 'Ratificado'">
+          <span class="section-title">Criterios de Ratificación</span>
+          <div class="checkbox-grid">
+            <mat-checkbox formControlName="chk1">Desempeño Académico</mat-checkbox>
+            <mat-checkbox formControlName="chk2">Investigación</mat-checkbox>
+            <mat-checkbox formControlName="chk3">Desempeño Administrativo</mat-checkbox>
+            <mat-checkbox formControlName="chk4">Capacitación Continua</mat-checkbox>
+            <mat-checkbox formControlName="chk5">No Aplica</mat-checkbox>
+          </div>
+        </div>
 
-                </div>
-                <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
-                    (click)="add_grado()">{{funcion}}</button>
-            </form>
-        </td>
-        <td class="contenedortd">
-            <div class="contenedor">
-                <h2 class="titulo2"><u>Histórico</u></h2>
-                <form [formGroup]="formularioHistorico" class="formulario">
-                    <table>
-                        <tr>
-                             <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha Jefe Práctica</mat-label>
-                                    <input matInput [matDatepicker]="picker3" formControlName="jefepractica"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker3"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker3></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                            <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha Ayudante</mat-label>
-                                    <input matInput [matDatepicker]="picker4" formControlName="ayudante"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker4"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker4></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                        </tr>
-                        <tr>
-                             <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha Asistente</mat-label>
-                                    <input matInput [matDatepicker]="picker5" formControlName="asistente"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker5"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker5></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                            <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha Instructor</mat-label>
-                                    <input matInput [matDatepicker]="picker6" formControlName="instructor"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker6"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker6></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha Profesor visitante</mat-label>
-                                    <input matInput [matDatepicker]="picker7" formControlName="profesorvisitante"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker7"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker7></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                            <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha contratado</mat-label>
-                                    <input matInput [matDatepicker]="picker8" formControlName="contratado"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker8"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker8></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha auxiliar</mat-label>
-                                    <input matInput [matDatepicker]="picker9" formControlName="auxiliar"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker9"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker9></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                            <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha asociado</mat-label>
-                                    <input matInput [matDatepicker]="picker10" formControlName="asociado"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker10"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker10></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                            
-                        </tr>
-                        <tr>
-                            <td>
-                                <mat-form-field class="example-full-width calendario">
-                                    <mat-label>Fecha principal</mat-label>
-                                    <input matInput [matDatepicker]="picker11" formControlName="principal"
-                                        (paste)="onPaste($event,'fecha')" (input)="onDateInput($event, 'fecha')">
-                                    <mat-hint>DD/MM/YYYY</mat-hint>
-                                    <mat-datepicker-toggle matIconSuffix [for]="picker11"></mat-datepicker-toggle>
-                                    <mat-datepicker #picker11></mat-datepicker>
-                                </mat-form-field>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <mat-form-field class="example-full-width">
-                                    <mat-label>Categoria Jubilación</mat-label>
-                                    <input matInput formControlName="categoriaJubilacion"
-                                        placeholder="Categoria jubilacion">
-                                </mat-form-field>
-                            </td>
-                            <td>
-                                <mat-form-field class="example-full-width">
-                                    <mat-label>Dedicación Jubilación</mat-label>
-                                    <input matInput formControlName="dedicacionJubilacion"
-                                        placeholder="Dedicación jubilacion">
-                                </mat-form-field>
-                            </td>
-                        </tr>
-                    </table>
+      </div>
+    </mat-tab>
 
+    <!-- TAB 2: Histórico -->
+    <mat-tab label="Histórico">
+      <div class="tab-form" [formGroup]="formularioHistorico">
+        <div class="form-section">
+          <span class="section-title">Registro de Ascensos y Fechas</span>
+          <div class="grid-3">
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Jefe Práctica</mat-label><input
+                matInput [matDatepicker]="p1" formControlName="jefepractica" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'jefepractica')"><mat-datepicker-toggle matIconSuffix
+                [for]="p1"></mat-datepicker-toggle><mat-datepicker #p1></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Ayudante</mat-label><input matInput
+                [matDatepicker]="p2" formControlName="ayudante" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'ayudante')"><mat-datepicker-toggle matIconSuffix
+                [for]="p2"></mat-datepicker-toggle><mat-datepicker #p2></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Asistente</mat-label><input matInput
+                [matDatepicker]="p3" formControlName="asistente" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'asistente')"><mat-datepicker-toggle matIconSuffix
+                [for]="p3"></mat-datepicker-toggle><mat-datepicker #p3></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Instructor</mat-label><input matInput
+                [matDatepicker]="p4" formControlName="instructor" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'instructor')"><mat-datepicker-toggle matIconSuffix
+                [for]="p4"></mat-datepicker-toggle><mat-datepicker #p4></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Prof. Visitante</mat-label><input
+                matInput [matDatepicker]="p5" formControlName="profesorvisitante" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'profesorvisitante')"><mat-datepicker-toggle matIconSuffix
+                [for]="p5"></mat-datepicker-toggle><mat-datepicker #p5></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Contratado</mat-label><input matInput
+                [matDatepicker]="p6" formControlName="contratado" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'contratado')"><mat-datepicker-toggle matIconSuffix
+                [for]="p6"></mat-datepicker-toggle><mat-datepicker #p6></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Auxiliar</mat-label><input matInput
+                [matDatepicker]="p7" formControlName="auxiliar" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'auxiliar')"><mat-datepicker-toggle matIconSuffix
+                [for]="p7"></mat-datepicker-toggle><mat-datepicker #p7></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Asociado</mat-label><input matInput
+                [matDatepicker]="p8" formControlName="asociado" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'asociado')"><mat-datepicker-toggle matIconSuffix
+                [for]="p8"></mat-datepicker-toggle><mat-datepicker #p8></mat-datepicker></mat-form-field>
+            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Principal</mat-label><input matInput
+                [matDatepicker]="p9" formControlName="principal" placeholder="DD/MM/YYYY"
+                (input)="onDateInput($event, 'principal')"><mat-datepicker-toggle matIconSuffix
+                [for]="p9"></mat-datepicker-toggle><mat-datepicker #p9></mat-datepicker></mat-form-field>
+          </div>
+          <div class="grid-2" style="margin-top: 12px;">
+            <mat-form-field appearance="outline">
+              <mat-label>Categoría Jubilación</mat-label>
+              <mat-select formControlName="categoriaJubilacion" placeholder="Seleccione">
+                @for (cat of cateJubilacion; track cat) { <mat-option [value]="cat">{{ cat }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Dedicación Jubilación</mat-label>
+              <mat-select formControlName="dedicacionJubilacion" placeholder="Seleccione">
+                @for (dedi of dedicacion; track dedi) { <mat-option [value]="dedi">{{ dedi }}</mat-option> }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
 
-                </form>
+  </mat-tab-group>
 
-            </div>
-        </td>
-    </tr>
-</table>
+  <!-- Barra de acciones -->
+  <div class="dialog-actions">
+    <div class="actions-left"></div>
+    <div class="actions-right">
+      <button mat-button (click)="onNoClick()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="add_grado()" class="btn-nav">{{ funcion }}</button>
+    </div>
+  </div>
+</div>

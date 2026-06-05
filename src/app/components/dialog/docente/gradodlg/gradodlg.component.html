@@ -1,129 +1,160 @@
-<form [formGroup]="formularioGrado" class="formulario">
-    <div class="general">
-        <div class="form">
-            <mat-form-field class="example-full-width">
-                <mat-label>Codigo docente</mat-label>
-                <input matInput formControlName="codigoDocente" placeholder="Codigo docente">
-            </mat-form-field>
+<div class="dialog-container" [formGroup]="formularioGrado">
+  <div class="dialog-title">
+    <span class="title-accent"></span>
+    <span>{{ funcion }} Grados y Títulos</span>
+  </div>
+
+  <div class="docente-info" *ngIf="data.valores?.docente">
+    Docente: {{ verificarInfo(data.valores.docente) }}
+  </div>
+
+  <div class="tab-form">
+    
+    <!-- Sección: Información Principal -->
+    <div class="form-section">
+      <span class="section-title">Información Principal</span>
+      
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Código Docente</mat-label>
+          <input matInput formControlName="codigoDocente" placeholder="Código" readonly>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Máximo Grado (Calculado automáticamente)</mat-label>
+          <input matInput formControlName="maximo_grado" placeholder="Se calcula automáticamente" readonly>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Sección: Grados y Títulos -->
+    <div class="form-section">
+      <span class="section-title">Grados y Títulos</span>
+      
+      <div class="table-header-actions">
+        <button mat-raised-button color="primary" (click)="agregarFilaTabla(true)" class="btn-add-row">
+          <mat-icon>add</mat-icon> Agregar Grado
+        </button>
+      </div>
+
+      <div class="table-container">
+        <table class="grados-table">
+          <thead>
+            <tr>
+              <th class="col-conservar">CONSERVAR</th>
+              <th class="col-grado">GRADO</th>
+              <th class="col-titulo">TÍTULO</th>
+              <th class="col-fecha">FECHA GRADO</th>
+              <th class="col-lugar">INSTITUCIÓN</th>
+              <th class="col-pais">PAÍS</th>
+              <th class="col-revalidado">SUNEDU</th>
+              <th class="col-fecha-rev">FECHA REV.</th>
+              <th class="col-acciones"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (fila of filasArray.controls; track $index) {
+              <tr [formGroup]="$any(fila)">
+                <td class="col-conservar">
+                  <mat-checkbox formControlName="conservar"></mat-checkbox>
+                </td>
+                <td class="col-grado">
+                  <mat-form-field appearance="outline" class="table-field">
+                    <mat-select formControlName="grade" (selectionChange)="actualizarGradoSuperior()">
+                      @for (opcion of opcionesSelect; track opcion.value) {
+                        <mat-option [value]="opcion.value">{{ opcion.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+                <td class="col-titulo">
+                  <mat-form-field appearance="outline" class="table-field">
+                    <input matInput formControlName="titulo" placeholder="Título">
+                  </mat-form-field>
+                </td>
+                <td class="col-fecha">
+                  <mat-form-field appearance="outline" class="table-field date-field">
+                    <input matInput [matDatepicker]="pickerFecha_$index" formControlName="fecha" placeholder="DD/MM/YYYY">
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerFecha_$index"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerFecha_$index></mat-datepicker>
+                  </mat-form-field>
+                </td>
+                <td class="col-lugar">
+                  <mat-form-field appearance="outline" class="table-field">
+                    <input matInput formControlName="lugar" placeholder="Universidad/Institución">
+                  </mat-form-field>
+                </td>
+                <td class="col-pais">
+                  <mat-form-field appearance="outline" class="table-field">
+                    <mat-select formControlName="pais">
+                      @for (pais of opcionesPais; track pais.value) {
+                        <mat-option [value]="pais.value">{{ pais.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+                <td class="col-revalidado">
+                  <mat-checkbox formControlName="revalidado"></mat-checkbox>
+                </td>
+                <td class="col-fecha-rev">
+                  <mat-form-field appearance="outline" class="table-field date-field">
+                    <input matInput [matDatepicker]="pickerRev_$index" formControlName="fechaRevalidado" placeholder="DD/MM/YYYY">
+                    <mat-datepicker-toggle matIconSuffix [for]="pickerRev_$index"></mat-datepicker-toggle>
+                    <mat-datepicker #pickerRev_$index></mat-datepicker>
+                  </mat-form-field>
+                </td>
+                <td class="col-acciones">
+                  <button mat-icon-button color="warn" (click)="eliminarFila($index)" class="btn-delete-row">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        
+        @if (filasArray.length === 0) {
+          <div class="empty-table">
+            <mat-icon>info_outline</mat-icon>
+            <span>No hay grados registrados. Haz clic en "Agregar Grado" para comenzar.</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Sección: Observaciones Adicionales -->
+    <div class="form-section">
+      <span class="section-title">Observaciones Adicionales</span>
+      
+      <div class="grid-2">
+        <div class="checkbox-field">
+          <mat-checkbox formControlName="bgac" class="checkbox-label">BGA (Buen Desempeño Docente)</mat-checkbox>
+          <mat-form-field appearance="outline">
+            <mat-label>Detalle BGA</mat-label>
+            <textarea matInput formControlName="bga" placeholder="Ingresa aquí el detalle" rows="2"></textarea>
+          </mat-form-field>
         </div>
 
-        <div class="form tabla">
-            <h2 class="titulo">Docente: {{verificarInfo(this.data.valores.docente)}}</h2>
-            <div class="grados">
-                <mat-form-field>
-                    <mat-label>Maximo grado</mat-label>
-                    <mat-select formControlName="maximo_grado">
-                        <mat-option *ngFor="let opcion of opcionesSelect"
-                            [value]="opcion.value">{{opcion.label}}</mat-option>
-
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field>
-                    <mat-label>Pais grado</mat-label>
-                    <mat-select formControlName="pais_grado">
-                        <mat-option *ngFor="let opcion of paises" [value]="opcion.pais">{{opcion.pais}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-
-            <button mat-raised-button color="primary" (click)="agregarFilaTabla(true)">
-                Agregar Fila
-            </button>
-
-            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-
-
-                <ng-container matColumnDef="conservar">
-                    <th mat-header-cell *matHeaderCellDef>CONSERVAR</th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <input type="checkbox" [formControl]="element.get('conservar')" />
-                    </td>
-                </ng-container>
-
-                <!-- Columna Select -->
-                <ng-container matColumnDef="grado">
-                    <th mat-header-cell *matHeaderCellDef> Grado </th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <select [formControl]="elemento(element.get('grade'))">
-                            <!--<select [formControl]="filasArray.at(i).get('grade')">-->
-                            <option *ngFor="let opcion of opcionesSelect" [value]="opcion.value"
-                                [disabled]="opcion.disabled">
-                                {{opcion.label}}
-                            </option>
-                        </select>
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="titulo">
-                    <th mat-header-cell *matHeaderCellDef> Titulo </th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <input type="text" [formControl]="element.get('titulo')" />
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="fecha">
-                    <th mat-header-cell *matHeaderCellDef> Fecha grado </th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <input type="date" [formControl]="element.get('fecha')" />
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="lugar">
-                    <th mat-header-cell *matHeaderCellDef> Lugar de obtencion</th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <input type="text" [formControl]="element.get('lugar')" />
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="revalidado">
-                    <th mat-header-cell *matHeaderCellDef>Inscrito en SUNEDU</th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <input type="checkbox" [formControl]="element.get('revalidado')" />
-                    </td>
-                </ng-container>
-
-                <ng-container matColumnDef="fechaRevalidado">
-                    <th mat-header-cell *matHeaderCellDef> Fecha Revalidado </th>
-                    <td mat-cell *matCellDef="let element; let i = index">
-                        <input type="date" [formControl]="element.get('fechaRevalidado')" />
-                    </td>
-                </ng-container>
-
-                <!-- Fila de encabezado -->
-                <tr mat-header-row *matHeaderRowDef="columnas"></tr>
-                <!-- Filas de datos -->
-                <tr mat-row *matRowDef="let row; columns: columnas;"></tr>
-            </table>
-
-            <table>
-                <tr>
-                    <td class="col">
-                        <div class="divs">
-                            <mat-checkbox class="example-margin" formControlName="bgac">BGA</mat-checkbox>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Detalle BGA</mat-label>
-                                <textarea matInput placeholder="Ingresa acá detalle" formControlName="bga"></textarea>
-                            </mat-form-field>
-                        </div>
-                    </td>
-                    <td class="col">
-                        <div class="divs">
-                            <mat-checkbox class="example-margin" formControlName="prestamoc">Prestamos académicos</mat-checkbox>
-                            <mat-form-field class="example-full-width">
-                                <mat-label>Detalle Prestamos académicos</mat-label>
-                                <textarea matInput placeholder="Ingresa acá detalle" formControlName="prestamo"></textarea>
-                            </mat-form-field>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-
-
+        <div class="checkbox-field">
+          <mat-checkbox formControlName="prestamoc" class="checkbox-label">Préstamos Académicos</mat-checkbox>
+          <mat-form-field appearance="outline">
+            <mat-label>Detalle Préstamos</mat-label>
+            <textarea matInput formControlName="prestamo" placeholder="Ingresa aquí el detalle" rows="2"></textarea>
+          </mat-form-field>
         </div>
+      </div>
     </div>
-    <div>
 
+  </div>
+
+  <!-- Barra de acciones -->
+  <div class="dialog-actions">
+    <div class="actions-left"></div>
+    <div class="actions-right">
+      <button mat-button (click)="onNoClick()">Cancelar</button>
+      <button mat-raised-button color="primary" (click)="add_grado()" class="btn-nav">
+        {{ funcion }}
+      </button>
     </div>
-    <button class="btn add-bnt-grado" mat-raised-button color="primary" type="submit"
-        (click)="add_grado()">Agregar</button>
-</form>
+  </div>
+</div>

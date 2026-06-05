@@ -1,218 +1,240 @@
-.example-full-width{
-    margin-left: 20px;
-}
-.buttons{
-    margin-left: 20px;
-}
-.btn{
-    margin-left: 10px;
-    padding-right: 10px;
-}
-.mensaje{
-    color: red;
-}
-.titulo{
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
-}
-.example-full-width {
-    margin-left: 20px;
+// ─── Variables ──────────────────────────────────────────────────────────────
+$primary:       #5c6bc0;
+$primary-light: #e8eaf6;
+$primary-dark:  #3949ab;
+$accent:        #7c4dff;
+$error:         #e53935;
+$radius:        6px;
+$transition:    0.2s ease;
+
+// ─── Contenedor Principal ────────────────────────────────────────────────────
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 700px;
+  height: calc(100vh - 60px);
+  max-height: calc(100vh - 60px);
+  font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.buttons {
-    margin-left: 20px;
+// ─── Título ──────────────────────────────────────────────────────────────────
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $primary-dark;
+  margin: 10px 16px 2px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid $primary-light;
+  flex-shrink: 0;
+
+  .title-accent {
+    display: inline-block;
+    width: 5px;
+    height: 20px;
+    background: linear-gradient(to bottom, $accent, $primary);
+    border-radius: 3px;
+  }
 }
 
-.btn {
-    margin-left: 10px;
-    padding-right: 10px;
+// ─── Info Docente ────────────────────────────────────────────────────────────
+.docente-info {
+  background: $primary-light;
+  padding: 8px 16px;
+  margin: 8px 16px;
+  border-radius: $radius;
+  font-size: 0.9rem;
+  color: $primary-dark;
+  font-weight: 500;
+  border-left: 4px solid $primary;
 }
 
-.mensaje {
-    color: red;
+// ─── Formulario: Scroll interno ──────────────────────────────────────────────
+.tab-form {
+  width: 100%;
+  height: 100%;
+  padding: 8px 14px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c5cae9;
+    border-radius: 4px;
+  }
 }
 
-.titulo {
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
+// ─── Secciones ───────────────────────────────────────────────────────────────
+.form-section {
+  width: 100%;
+  background: #f9f9fc;
+  border: 1px solid #e3e6f5;
+  border-radius: $radius;
+  padding: 8px 12px 10px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+
+  .section-title {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: $primary;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid $primary-light;
+  }
 }
 
-.calendario {
-    width: 210px;
+// ─── Grids ───────────────────────────────────────────────────────────────────
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  align-items: start;
 }
 
-.general {
+.full-width {
+  width: 100%;
+}
+
+// ─── Barra de acciones ───────────────────────────────────────────────────────
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px 10px;
+  border-top: 1px solid #e0e0e0;
+  flex-shrink: 0;
+
+  .actions-right {
     display: flex;
-    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
 }
 
-.combo {
-    color: red;
-}
+// ─── Botón estilizado ────────────────────────────────────────────────────────
+.btn-nav {
+  position: relative;
+  cursor: pointer;
+  font-size: 12px;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  transition: border-radius $transition, box-shadow $transition;
 
-.nac {
-    width: 210px;
-}
-.full{
-    width: 440px;
-}
+  &::after,
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    transition: all 0.35s;
+  }
 
-.texto {
-    position: relative;
-    right: -20px;
-    font-weight: bold;
-}
+  &::after {
+    top: -1px;
+    left: -1px;
+    border-top: 3px solid $primary-dark;
+    border-left: 3px solid $primary-dark;
+  }
 
+  &::before {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 3px solid $primary-dark;
+    border-right: 3px solid $primary-dark;
+  }
 
+  &:hover {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: 0 3px 10px rgba($primary, 0.3);
 
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="3"] {
-    background-color: antiquewhite;
-    /* Cambia este color según tus necesidades */
-
-}
-
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="1"] {
-    background-color: rgb(211, 236, 171);
-    /* Cambia este color según tus necesidades */
-
-}
-
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="2"] {
-    background-color: rgb(211, 236, 171);
-    /* Cambia este color según tus necesidades */
-
-}
-
-
-
-.btm {
-    cursor: pointer;
-    position: relative;
-    padding: 10px 20px;
-    background: white;
-    color: black;
-    font-size: 14px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    transition: all 1s;
-
-    &:after,
-    &:before {
-        content: " ";
-        width: 10px;
-        height: 10px;
-        position: absolute;
-        border: 0px solid #fff;
-        transition: all 1s;
+    &::after,
+    &::before {
+      width: 100%;
+      height: 100%;
     }
-
-    &:after {
-        top: -1px;
-        left: -1px;
-        border-top: 5px solid black;
-        border-left: 5px solid black;
-    }
-
-    &:before {
-        bottom: -1px;
-        right: -1px;
-        border-bottom: 5px solid black;
-        border-right: 5px solid black;
-    }
-
-    &:hover {
-        border-top-right-radius: 0px;
-        border-bottom-left-radius: 0px;
-
-        // background:rgba(0,0,0,.5);
-        // color:white;
-        &:before,
-        &:after {
-
-            width: 100%;
-            height: 100%;
-            // border-color:white;
-        }
-    }
-
+  }
 }
 
-.btn-sgte {
-    right: -50px;
-    margin-left: 25px;
-}
+// ─── Overrides de Material ───────────────────────────────────────────────────
+::ng-deep {
+  .mat-mdc-form-field-infix {
+    min-height: 36px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
 
-.btn-ant {
-    right: 35px;
-    margin-left: 25px;
-}
+  .mat-mdc-text-field-wrapper {
+    padding: 0 8px !important;
+  }
 
-.btn {
-    right: -35px;
-}
+  .mat-mdc-floating-label {
+    font-size: 0.8rem;
+  }
 
-::ng-deep .mat-tab-label {
-    pointer-events: none;
-}
+  input.mat-mdc-input-element,
+  textarea.mat-mdc-input-element {
+    font-size: 0.82rem;
+  }
 
-.add-bnt-grado {
-    
-    left: 320px;
-}
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-radius: $radius;
+  }
 
+  .mat-mdc-form-field {
+    width: 100%;
+  }
 
-.btn-gra {
-    right: -150px;
-}
-.formulario {
-    position: relative;
-    top: 50px;
-}
-
-/* Estilos para las opciones del mat-select */
-::ng-deep .mat-mdc-select-panel .mat-mdc-option {
-    /* Color de fondo cuando se pasa el mouse */
-    background-color: #f5f5f5 !important;
-    /* Color de texto */
-    color: #333 !important;
-    /* Borde inferior como línea de separación */
-    border-bottom: 1px solid #ddd !important;
-    /* Espaciado interno para mejor lectura */
-    padding: 10px 16px !important;
-    /* Transición suave al pasar el mouse */
-    transition: background-color 0.2s ease;
-}
-
-/* Color de fondo cuando se selecciona una opción (hover) */
-::ng-deep .mat-mdc-select-panel .mat-mdc-option:hover {
-    background-color: #e0e0e0 !important;
-    color: #000 !important;
-}
-
-/* Color de fondo cuando la opción está seleccionada (si aplica) */
-::ng-deep .mat-mdc-select-panel .mat-mdc-option.mat-mdc-option-selected {
-    background-color: #bbdefb !important; /* Azul claro */
-    color: #000 !important;
-    font-weight: bold;
-}
-
-/* Elimina el borde inferior de la última opción para evitar doble línea */
-::ng-deep .mat-mdc-select-panel .mat-mdc-option:last-child {
-    border-bottom: none !important;
-}
-
-/* Opcional: Ajustar altura mínima si las opciones se ven muy juntas */
-::ng-deep .mat-mdc-select-panel .mat-mdc-option {
-    min-height: 40px !important;
-}
-
-/* Estilo opcional para el panel desplegable */
-::ng-deep .mat-mdc-select-panel {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+  .mat-mdc-select-panel {
+    border-radius: $radius !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
     overflow: hidden;
+
+    .mat-mdc-option {
+      background-color: #fafafa !important;
+      color: #333 !important;
+      border-bottom: 1px solid $primary-light !important;
+      padding: 8px 14px !important;
+      min-height: 36px !important;
+      font-size: 0.82rem;
+      transition: background-color $transition;
+
+      &:hover {
+        background-color: $primary-light !important;
+        color: $primary-dark !important;
+      }
+
+      &.mat-mdc-option-selected {
+        background-color: #c5cae9 !important;
+        color: $primary-dark !important;
+        font-weight: 600;
+      }
+
+      &:last-child {
+        border-bottom: none !important;
+      }
+    }
+  }
+}
+
+.formato {
+  gap: 10px 20px;
 }

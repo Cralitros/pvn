@@ -4,8 +4,15 @@
         <input matInput formControlName="codigo" placeholder="Código">
     </mat-form-field>
 </form>
-<button class="button-add" mat-raised-button color="primary" type="submit" (click)="dialogo()"> Añadir Cursos de Docente</button>
-<div class="contenedortabla">
+
+<div class="laboral-wrapper">
+    <!-- Botón -->
+    <button mat-raised-button (click)="abrirDialogoLaboral()" class="button-add">
+        {{ existeRegistro() ? 'Editar' : 'Añadir' }} Cursos de Docente
+    </button>
+
+    <!-- Tabla -->
+    <div class="contenedortabla">
     <app-tabla class="tabla" [columns]="columns" [dataSource]="dataSource" (edit)="editar($event)"
         (delete)="eliminar($event)"></app-tabla>
 </div>

@@ -1,10 +1,16 @@
-<button class="button-add" mat-raised-button color="primary" type="submit" (click)="dialogo()"> Añadir area</button>
-<div class="contenedortabla">
+<div class="laboral-wrapper">
+    <!-- Botón -->
+   
+    <button mat-raised-button class="button-add" type="submit" (click)="dialogo()"> Añadir area</button>
+
+    <!-- Tabla -->
+    <div class="contenedortabla">
     <app-tabla class="tabla"
     [columns]="columns" 
-    [report]="tipo"
     [dataSource]="dataSource"
+    [report]="tipo"
     (edit)="editar($event)" 
     (delete)="eliminar($event)"
    ></app-tabla>
 </div>
+

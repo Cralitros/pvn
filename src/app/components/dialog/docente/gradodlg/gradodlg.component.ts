@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, Inject, signal } from '@angular/core';
+import { Component, computed, inject, Inject, signal, ViewEncapsulation } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -14,13 +14,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import { MatTableModule } from '@angular/material/table';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import Swal from 'sweetalert2';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
 import { Aux1Service } from '../../../../services/aux1.service';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -34,18 +33,22 @@ export const MY_DATE_FORMATS = {
   },
 };
 
-interface Fila {
-  grade: string;
-  titulo: string;
-  fecha: string;
-  lugar: string;
-  revalidado: boolean;
-  fechaRevalidado: string;
-}
+// Orden de grados para determinar el superior
+const ORDEN_GRADOS: { [key: string]: number } = {
+  'Bachiller': 1,
+  'Licenciatura': 2,
+  'Segunda Especialidad': 3,
+  'Segunda Especialidad (PSE)': 3,
+  'Maestro': 4,
+  'Doctor': 5,
+  'Post Doctorado': 6,
+  'PHD.': 5
+};
 
 @Component({
   selector: 'app-gradodlg',
   standalone: true,
+  encapsulation: ViewEncapsulation.None,
   imports: [
     MatSelectModule,
     MatTabsModule,
@@ -63,123 +66,269 @@ interface Fila {
     MatAutocompleteModule,
     FormsModule,
     MatCheckboxModule
-
   ],
   templateUrl: './gradodlg.component.html',
   styleUrl: './gradodlg.component.scss',
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'es-Es' }, // Opcional: configura localidad
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
     { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
-
   ]
 })
-
 export class GradodlgComponent {
   formularioGrado?: FormGroup | any = null;
   grado_obt?: Grado[];
-  paises?:Nacionalidad[];
+  paises?: Nacionalidad[];
   funcion: any;
   fnc: boolean = true;
-  grados = ["Bachiller", "Licenciatura", "Maestro", "Doctor","Segunda Especialidad","Segunda Especialidad (PSE)","Otros"];
-  bgaControl?: FormControl;
-  prestamosControl?: FormControl;
-  c=0;
 
-  private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
-  private readonly _intl = inject(MatDatepickerIntl);
-  private readonly _locale = signal(inject<unknown>(MAT_DATE_LOCALE));
-  readonly dateFormatString = computed(() => {
-    if (this._locale() === 'ja-JP') {
-      return 'YYYY/MM/DD';
-    } else if (this._locale() === 'es-Es') {
-      return 'DD/MM/YYYY';
-    }
-    return '';
-  });
+  opcionesSelect = [
+    { value: '', label: 'Seleccione', disabled: false },
+    { value: 'Bachiller', label: 'Bachiller', disabled: false },
+    { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
+    { value: 'Maestro', label: 'Maestro', disabled: false },
+    { value: 'Doctor', label: 'Doctor', disabled: false },
+    { value: 'Post Doctorado', label: 'Post Doctorado', disabled: false },
+    { value: 'PHD.', label: 'PHD.', disabled: false },
+    { value: 'Segunda Especialidad', label: 'Segunda Especialidad', disabled: false },
+    { value: 'Segunda Especialidad (PSE)', label: 'Segunda Especialidad (PSE)', disabled: false }
+  ];
 
-  constructor(public dialogRef: MatDialogRef<GradodlgComponent>,
+  opcionesPais = [
+    { value: 'Perú', label: 'Perú' },
+    { value: 'Argentina', label: 'Argentina' },
+    { value: 'Bolivia', label: 'Bolivia' },
+    { value: 'Brasil', label: 'Brasil' },
+    { value: 'Chile', label: 'Chile' },
+    { value: 'Colombia', label: 'Colombia' },
+    { value: 'Ecuador', label: 'Ecuador' },
+    { value: 'Paraguay', label: 'Paraguay' },
+    { value: 'Uruguay', label: 'Uruguay' },
+    { value: 'Venezuela', label: 'Venezuela' },
+    { value: 'España', label: 'España' },
+    { value: 'México', label: 'México' },
+    { value: 'Estados Unidos', label: 'Estados Unidos' },
+    { value: 'Otro', label: 'Otro' }
+  ];
+
+  constructor(
+    public dialogRef: MatDialogRef<GradodlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
     private cgdepr: MaestrosserviceService,
-    private aux12:Aux1Service) {
+    private aux12: Aux1Service
+  ) { }
 
-    this.opcionesSelect = [
-      { value: '', label: 'Seleccione', disabled: false },
-      { value: 'Bachiller', label: 'Bachiller', disabled: false },
-      { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
-      { value: 'Maestro', label: 'Maestro', disabled: false },
-      { value: 'Doctor', label: 'Doctor', disabled: false },
-      { value: 'Post Doctorado', label: 'Doctor', disabled: false },
-      { value: 'PHD.', label: 'Doctor', disabled: false }
-    ];
+  ngOnInit(): void {
+    console.log(this.data);
 
+    this.formularioGrado = this.formBuilder.group({
+      id: [''],
+      gradosTabla: this.formBuilder.array([]),
+      codigoDocente: [''],
+      maximo_grado: [{ value: '', disabled: true }], // Deshabilitado, se calcula automáticamente
+      bgac: [false],
+      bga: [{ value: '', disabled: true }],
+      prestamoc: [false],
+      prestamo: [{ value: '', disabled: true }],
+    });
+
+    this.cargarPaises();
+
+    this.cgdepr.ponerurl("docentesgrado");
+    this.cgdepr.get().subscribe(data => {
+      this.grado_obt = data;
+    });
+
+    if (this.data.modo == 1) {
+      this.funcion = "Editar";
+      this.fnc = false;
+      this.poner_datos();
+    } else {
+      this.funcion = "Añadir";
+      this.fnc = true;
+      this.poner_codigo();
+    }
+
+    // Suscribirse a cambios en el FormArray para actualizar el grado superior
+    this.filasArray.valueChanges.subscribe(() => {
+      this.actualizarGradoSuperior();
+    });
+
+    this.formularioGrado.get('bgac')?.valueChanges.subscribe((checked: boolean) => {
+      const checkControl = this.formularioGrado.get('bga');
+      if (checked) {
+        checkControl.enable();
+      } else {
+        checkControl.disable();
+        checkControl.reset();
+      }
+    });
+
+    this.formularioGrado.get('prestamoc')?.valueChanges.subscribe((checked: boolean) => {
+      const checkControl = this.formularioGrado.get('prestamo');
+      if (checked) {
+        checkControl.enable();
+      } else {
+        checkControl.disable();
+        checkControl.reset();
+      }
+    });
   }
-  onPaste(event: ClipboardEvent) {
-    event.preventDefault();
-    const pastedText = event.clipboardData?.getData('text/plain') || '';
-    // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
-    const cleanText = pastedText.replace(/[^\d]/g, '');
-    // Formatear según diferentes patrones de entrada
-    let formattedDate = '';
-    // Caso 1: DDMMYYYY (8 dígitos)
-    if (cleanText.length === 8) {
-      const day = String(Number(cleanText.substring(0, 2)) + 1).padStart(2, '0');
-      const month = cleanText.substring(2, 4);
-      const year = cleanText.substring(4, 8);
-      formattedDate = `${year}-${month}-${day}`; // Formato YYYY-MM-DD que entiende el datepicker
+
+  // Actualizar el grado superior automáticamente
+  actualizarGradoSuperior() {
+    const grados = this.filasArray.controls
+      .filter(control => control.get('conservar')?.value === true)
+      .map(control => control.get('grade')?.value)
+      .filter(grado => grado && grado !== '');
+
+    if (grados.length === 0) {
+      this.formularioGrado.get('maximo_grado')?.setValue('');
+      return;
     }
-    // Caso 2: DD/MM/YYYY (con separadores)
-    else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-      const [day, month, year] = pastedText.split('/');
-      formattedDate = `${year}-${month}-${day}`;
+
+    // Encontrar el grado con mayor jerarquía
+    let gradoSuperior = '';
+    let maxOrden = 0;
+
+    for (const grado of grados) {
+      const orden = ORDEN_GRADOS[grado] || 0;
+      if (orden > maxOrden) {
+        maxOrden = orden;
+        gradoSuperior = grado;
+      }
     }
-    // Caso 3: Otros formatos podrían agregarse aquí
-    if (formattedDate) {
-      const fechaControl = this.formularioGrado.get('fecha_obtencion');
-      fechaControl?.patchValue(formattedDate);
-      // Forzar la actualización del datepicker si es necesario
-      setTimeout(() => {
-        fechaControl?.updateValueAndValidity();
+
+    this.formularioGrado.get('maximo_grado')?.setValue(gradoSuperior);
+  }
+
+  cargarPaises() {
+    this.aux12.ponerurl("nacionalidad");
+    this.aux12.get().subscribe(data => {
+      this.paises = data;
+    });
+  }
+
+  get filasArray(): FormArray {
+    return this.formularioGrado.get('gradosTabla') as FormArray;
+  }
+
+  agregarFilaTabla(manual: boolean, datos?: any) {
+    let fila: FormGroup;
+
+    if (!this.fnc && !manual && datos) {
+      fila = this.formBuilder.group({
+        grade: [datos.grade || ''],
+        titulo: [datos.titulo || ''],
+        fecha: [datos.fecha ? new Date(datos.fecha) : ''],
+        lugar: [datos.lugar || ''],
+        pais: [datos.pais || ''],
+        revalidado: [Boolean(datos.revalidado)],
+        fechaRevalidado: [datos.fechaRevalidado ? new Date(datos.fechaRevalidado) : ''],
+        conservar: [Boolean(datos.conservar !== undefined ? datos.conservar : true)],
+      });
+    } else {
+      fila = this.formBuilder.group({
+        grade: [''],
+        titulo: [''],
+        fecha: [''],
+        lugar: [''],
+        pais: [''],
+        revalidado: [false],
+        fechaRevalidado: [''],
+        conservar: [true],
       });
     }
-    // Si no es válido, marca error
-    //  this.fechaControl.setErrors({ invalidDate: true });
-  }
-  poner_datos() {
-    // Parsear el string JSON a un array de objetos
-    const gradosArray = JSON.parse(this.data.valores.grado);
 
-    // Limpiar el FormArray existente
+    this.filasArray.push(fila);
+
+    const revalidadoControl = fila.get('revalidado');
+    const fechaRevalidadoControl = fila.get('fechaRevalidado');
+
+    if (!revalidadoControl?.value) {
+      fechaRevalidadoControl?.disable();
+    }
+
+    revalidadoControl?.valueChanges.subscribe((checked: boolean) => {
+      if (checked) {
+        fechaRevalidadoControl?.enable();
+      } else {
+        fechaRevalidadoControl?.disable();
+        fechaRevalidadoControl?.reset();
+      }
+    });
+  }
+
+  eliminarFila(index: number) {
+    // Mostrar confirmación antes de eliminar
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción eliminará el grado de la lista',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.filasArray.removeAt(index);
+        Swal.fire('Eliminado', 'El grado ha sido eliminado', 'success');
+      }
+    });
+  }
+
+  poner_datos() {
+    let gradosArray = [];
+    try {
+      gradosArray = typeof this.data.valores.grado === 'string'
+        ? JSON.parse(this.data.valores.grado)
+        : this.data.valores.grado || [];
+    } catch (e) {
+      console.error('Error parsing grados:', e);
+      gradosArray = [];
+    }
+
     while (this.filasArray.length !== 0) {
       this.filasArray.removeAt(0);
     }
+
     if (gradosArray.length > 0) {
       for (let i = 0; i < gradosArray.length; i++) {
-        this.agregarFilaTabla(false, gradosArray[i]);
+        const grado = gradosArray[i];
+        this.agregarFilaTabla(false, {
+          grade: grado.grade || '',
+          titulo: grado.titulo || '',
+          fecha: grado.fecha || '',
+          lugar: grado.lugar || '',
+          pais: grado.pais || '',  // ← Asegurar que se carga el país
+          revalidado: grado.revalidado || false,
+          fechaRevalidado: grado.fechaRevalidado || '',
+          conservar: grado.conservar !== undefined ? grado.conservar : true,
+        });
       }
-
     }
 
-    // Establecer los otros valores del formulario
     this.formularioGrado.patchValue({
-      id: this.data.valores.id,
-      codigoDocente: this.data.valores.codigoDocente,
-      maximo_grado:this.data.valores.maximo_grado,
-      pais_grado:this.data.valores.pais_grado,
-      bgac:this.data.valores.bgac,
-      bga:this.data.valores.bga,
-      prestamoc:this.data.valores.prestamoc,
-      prestamo:this.data.valores.prestamo,
+      id: this.data.valores.id || '',
+      codigoDocente: this.data.valores.codigoDocente || '',
+      bgac: this.data.valores.bgac === true,
+      bga: this.data.valores.bga || '',
+      prestamoc: this.data.valores.prestamoc === true,
+      prestamo: this.data.valores.prestamo || '',
     });
 
-    // Habilita o deshabilita el campo 'bga' según el valor de 'bgac'
+    // Actualizar grado superior automáticamente después de cargar
+    setTimeout(() => {
+      this.actualizarGradoSuperior();
+    }, 100);
+
     if (this.data.valores.bgac === true) {
       this.formularioGrado.get('bga')?.enable();
     } else {
       this.formularioGrado.get('bga')?.disable();
     }
 
-    // Habilita o deshabilita el campo 'bga' según el valor de 'prestamoc'
     if (this.data.valores.prestamoc === true) {
       this.formularioGrado.get('prestamo')?.enable();
     } else {
@@ -187,277 +336,97 @@ export class GradodlgComponent {
     }
   }
 
-  get filasArray(): FormArray {
-    return this.formularioGrado.get('gradosTabla') as FormArray;
-  }
-
-  no_add_fila = true;
-  agregarFilaTabla(manual: boolean, datos?: any) {
-    let fila: any;
-
-    if (!this.fnc && !manual) {
-      console.log("da");
-      console.log(datos);
-
-
-      fila = this.formBuilder.group({
-        grade: [datos.grade],
-        titulo: [datos.titulo],
-        fecha: [datos.fecha],
-        lugar: [datos.lugar],
-        revalidado: [Boolean(datos.revalidado)],
-        fechaRevalidado: [datos.fechaRevalidado],
-        conservar: [Boolean(datos.conservar)],
-      });
-      
-
-    } else {
-      fila = this.formBuilder.group({
-        grade: [''],
-        titulo: [''],
-        fecha: [''],
-        lugar: [''],
-        fechaRevalidado: [''],
-        revalidado: [false],
-        conservar: [true],
-      });
-
+  poner_codigo() {
+    if (this.data.valores?.laboral?.[0]?.codigo) {
+      this.formularioGrado.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
     }
-
-    this.filasArray.push(fila);
-    // Deshabilitar o habilitar fechaRevalidado según el valor inicial de revalidado
-    const revalidadoControl = fila.get('revalidado');
-    const fechaRevalidadoControl = fila.get('fechaRevalidado');
-
-    // Establecer estado inicial
-    if (!revalidadoControl?.value) {
-      fechaRevalidadoControl?.disable();
-    }
-
-    // Suscribirse a los cambios del checkbox
-    revalidadoControl?.valueChanges.subscribe((checked: boolean) => {
-      if (checked) {
-        fechaRevalidadoControl?.enable();
-      } else {
-        fechaRevalidadoControl?.disable();
-        fechaRevalidadoControl?.reset(); // Opcional: limpia la fecha si se desmarca
-      }
-    });
-    console.log(this.filasArray);
-    this.dataSource.data = [...this.dataSource.data, fila];
-    //this.dataSource.data = [...this.dataSource.data, nuevaFila];
-
-    //this.dataSource.data = [...this.dataSource.data, fila];
-  }
-  elemento(datos: any) {
-    console.log(datos);
-    return datos;
   }
 
-  eliminarFila(index: number) {
-    this.filasArray.removeAt(index);
-    // 2. Actualizar el dataSource
-    for (let i = 0; i < this.filasArray.length; i++) {
-      this.agregarFilaTabla(false, this.filasArray.value[i])
-      //this.dataSource.data = [...this.dataSource.data, fila];
-    }
-    // this.dataSource.data = this.filasArray.controls.map(control => control.value);
-  }
-
-  private sincronizarDataSource() {
-    const datosActuales = [];
-
-    // Recorremos el FormArray manualmente
-    for (let i = 0; i < this.filasArray.length; i++) {
-      const control = this.filasArray.at(i);
-      datosActuales.push({
+  add_grado() {
+    // Filtrar solo las filas marcadas como "conservar"
+    const gradosGuardar = this.filasArray.controls
+      .filter(control => control.get('conservar')?.value === true)
+      .map(control => ({
         grade: control.get('grade')?.value,
         titulo: control.get('titulo')?.value,
         fecha: control.get('fecha')?.value,
         lugar: control.get('lugar')?.value,
+        pais: control.get('pais')?.value,
         revalidado: control.get('revalidado')?.value,
         fechaRevalidado: control.get('fechaRevalidado')?.value,
         conservar: control.get('conservar')?.value,
-      });
-    }
+      }));
 
-    this.dataSource.data = datosActuales;
-  }
-  ngOnInit(): void {
-    this.opcionesSelect = [
-      { value: '', label: 'Seleccione', disabled: false },
-      { value: 'Bachiller', label: 'Bachiller', disabled: false },
-      { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
-      { value: 'Maestro', label: 'Maestro', disabled: false },
-      { value: 'Doctor', label: 'Doctor', disabled: false },
-      { value: 'Post Doctorado', label: 'Post Doctor', disabled: false },
-      { value: 'PHD.', label: 'PHD.', disabled: false },
-      { value: 'Segunda Especialidad', label: 'Segunda Especialidad', disabled: false },
-      { value: 'Segunda Especialidad (PSE)', label: 'Segunda Especialidad (PSE)', disabled: false }
-    ];
-
-    console.log(this.data);
-
-    this.bgaControl = new FormControl(
-      { value:'',disabled: true },
-    );
-    this.prestamosControl = new FormControl(
-      { value:'',disabled: true },
-    );
-
-
-    this.formularioGrado = this.formBuilder.group({
-      id: [''],
-      gradosTabla: this.formBuilder.array([]),      
-      codigoDocente: [''],
-      maximo_grado:[''],
-      pais_grado:[''],
-      bgac:[''],
-      bga:this.bgaControl,
-      prestamoc:[''],
-      prestamo:this.prestamosControl,
-    });
-
-
-    this.cgdepr.ponerurl("docentesgrado");
-    this.cgdepr.get().subscribe(data => {
-      this.grado_obt = data;
-    });
-    if (this.data.modo == 1) {
-      this.funcion = "Editar";
-      this.fnc = false;
-      this.poner_datos();
-
-    } else {
-      this.funcion = "Añadir"
-      this.poner_codigo();
-      this.fnc = true;
-    }
-
-    this.pais();
-
-    this.formularioGrado.get('bgac')?.valueChanges.subscribe((checked: boolean) => {
-       const checkControl = this.formularioGrado.get('bga');
-      if (checked) {
-        checkControl.enable(); // Habilitar si está marcado
-      } else {
-        checkControl.disable(); // Deshabilitar si se desmarca
-        checkControl.reset();   // (Opcional) limpiar el campo
-      }
-    });
-
-    this.formularioGrado.get('prestamoc')?.valueChanges.subscribe((checked: boolean) => {
-       const checkControl = this.formularioGrado.get('prestamo');
-      if (checked) {
-        checkControl.enable(); // Habilitar si está marcado
-      } else {
-        checkControl.disable(); // Deshabilitar si se desmarca
-        checkControl.reset();   // (Opcional) limpiar el campo
-      }
-    });
-
-  }
-  pais(){
-     //ponerurl();
-    this.aux12.ponerurl("nacionalidad");
-    this.aux12.get().subscribe(data=>{
-      console.log(data);
-      this.paises=data;
-    });
-  }
-
-  ngAfterViewInit() {
-
-  }
-  poner_codigo() {
-    this.formularioGrado.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
-  }
-  add_grado() {
     let body = {
       id: this.formularioGrado.value?.id,
-      grado: this.filasArray.value.filter((item: any) => item.conservar),
-      /* revalidado: this.formularioGrado.value?.revalidado,
-       lugar_obtencion: this.formularioGrado.value?.lugar_obtencion,
-       fecha_obtencion: this.formularioGrado.value?.fecha_obtencion,*/
+      grado: JSON.parse(JSON.stringify(gradosGuardar)),
       codigoDocente: this.formularioGrado.value?.codigoDocente,
-      maximo_grado:this.formularioGrado.value?.maximo_grado,
-      pais_grado:this.formularioGrado.value?.pais_grado,
-      bgac:this.formularioGrado.value?.bgac,
-      bga:this.formularioGrado.value?.bga,
-      prestamoc:this.formularioGrado.value?.prestamoc,
-      prestamo:this.formularioGrado.value?.prestamo,
-      //      profesion: this.formularioGrado.value?.profesion,
-    }
-    this.cgdepr.ponerurl("docentesgrado")
-    if (this.formularioGrado?.valid) {
-      if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe(data => {
-          console.log("agregado");
+      maximo_grado: this.formularioGrado.get('maximo_grado')?.value,
+      bgac: this.formularioGrado.value?.bgac || false,
+      bga: this.formularioGrado.value?.bga || '',
+      prestamoc: this.formularioGrado.value?.prestamoc || false,
+      prestamo: this.formularioGrado.value?.prestamo || '',
+    };
+
+    this.cgdepr.ponerurl("docentesgrado");
+
+    if (this.fnc == true) {
+      this.cgdepr.add(body).subscribe({
+        next: (data) => {
+          console.log("agregado", data);
           Swal.fire({
             title: "Agregado",
-            text: "Continuar",
-            icon: "info"
+            text: "Los datos se han guardado correctamente",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false
           });
           this.dialogRef.close(this.formularioGrado.value);
-        })
-      } else {
-        this.cgdepr.update(body.codigoDocente, body).subscribe(data => {
-          console.log("actualizado");
+        },
+        error: (error) => {
+          console.error("Error al agregar:", error);
+          Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al guardar los datos",
+            icon: "error"
+          });
+        }
+      });
+    } else {
+      this.cgdepr.update(body.codigoDocente, body).subscribe({
+        next: (data) => {
+          console.log("actualizado", data);
           Swal.fire({
             title: "Actualizado",
-            text: "Continuar",
-            icon: "info"
+            text: "Los datos se han actualizado correctamente",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false
           });
           this.dialogRef.close(this.formularioGrado.value);
-        })
-      }
-
-      this.dialogRef.close(this.formularioGrado.value);
-    } else {
-      // Marcar campos como tocados para mostrar errores de validación
-      this.formularioGrado?.markAllAsTouched();
+        },
+        error: (error) => {
+          console.error("Error al actualizar:", error);
+          Swal.fire({
+            title: "Error",
+            text: "Ocurrió un error al actualizar los datos",
+            icon: "error"
+          });
+        }
+      });
     }
   }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
 
-
-  // Columnas a mostrar
-  columnas: string[] = ['conservar', 'grado', 'titulo', 'fecha', 'lugar', 'revalidado', 'fechaRevalidado'];
-
-  // Datos de la tabla (usando MatTableDataSource)
-  dataSource = new MatTableDataSource<Fila>([]);
-
-  // En tu componente:
-  opcionesSelect = [
-    { value: '', label: 'Seleccione', disabled: false },
-    { value: 'Bachiller', label: 'Bachiller', disabled: false },
-    { value: 'Licenciatura', label: 'Licenciatura', disabled: false },
-    { value: 'Maestro', label: 'Maestro', disabled: false },
-    { value: 'Doctor', label: 'Doctor', disabled: false },
-    { value: 'Doctor', label: 'Doctor', disabled: false },
-    { value: 'Post Doctorado', label: 'Doctor', disabled: false },
-    { value: 'PHD.', label: 'Doctor', disabled: false },
-    { value: '2da Especialidad (PSE)', label: 'Doctor', disabled: false },
-  ];
-
-
-
- verificarInfo(data:any){
-    //console.log(data);
-    if(data!=undefined){
-      console.log(data);
-      
-      return  `${data.nombres} ${data.apellidos}`
+  verificarInfo(data: any): string {
+    if (data && data !== undefined) {
+      return `${data.nombres || ''} ${data.apellidos || ''}`.trim();
     }
-    else{
-      console.log("data");
-      return "";
-    }
-    
+    return "";
   }
-
 }
 
 

@@ -10,6 +10,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
 import Swal from 'sweetalert2';
 
+
 @Component({
   selector: 'app-laboraldlg',
   standalone: true,

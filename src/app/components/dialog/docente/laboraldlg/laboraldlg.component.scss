@@ -1,167 +1,204 @@
-.example-full-width{
-    margin-left: 20px;
-}
-.buttons{
-    margin-left: 20px;
-}
-.btn{
-    margin-left: 10px;
-    padding-right: 10px;
-}
-.mensaje{
-    color: red;
-}
-.titulo{
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
-}
-.example-full-width {
-    margin-left: 20px;
+// ─── Variables ────────────────────────────────────────────────────────────────
+$primary:       #5c6bc0;
+$primary-light: #e8eaf6;
+$primary-dark:  #3949ab;
+$accent:        #7c4dff;
+$radius:        6px;
+$transition:    0.2s ease;
+
+// ─── Contenedor principal ─────────────────────────────────────────────────────
+.dialog-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-width: 600px;
+  font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-.buttons {
-    margin-left: 20px;
+// ─── Título compacto ──────────────────────────────────────────────────────────
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: $primary-dark;
+  margin: 10px 16px 2px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid $primary-light;
+  flex-shrink: 0;
+
+  .title-accent {
+    display: inline-block;
+    width: 5px;
+    height: 20px;
+    background: linear-gradient(to bottom, $accent, $primary);
+    border-radius: 3px;
+  }
 }
 
-.btn {
-    margin-left: 10px;
-    padding-right: 10px;
+// ─── Info del docente ─────────────────────────────────────────────────────────
+.docente-info {
+  background: $primary-light;
+  padding: 8px 16px;
+  margin: 8px 16px;
+  border-radius: $radius;
+  font-size: 0.9rem;
+  color: $primary-dark;
+  font-weight: 500;
+  border-left: 4px solid $primary;
 }
 
-.mensaje {
-    color: red;
+// ─── Formulario con scroll ────────────────────────────────────────────────────
+.dialog-form {
+  width: 100%;
+  flex: 1;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  min-height: 0;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #c5cae9;
+    border-radius: 4px;
+  }
 }
 
-.titulo {
-    font-weight: bold;
-    color: blueviolet;
-    margin-left: 10px;
-    margin-top: 10px;
+// ─── Secciones compactas ──────────────────────────────────────────────────────
+.form-section {
+  width: 100%;
+  background: #f9f9fc;
+  border: 1px solid #e3e6f5;
+  border-radius: $radius;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+
+  .section-title {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: $primary;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid $primary-light;
+  }
 }
 
-.calendario {
-    width: 210px;
+// ─── Grids ────────────────────────────────────────────────────────────────────
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  align-items: start;
 }
 
-.general {
-    display: flex;
-    flex-wrap: wrap;
+.span-2 {
+  grid-column: span 2;
 }
 
-.combo {
-    color: red;
+// ─── Campos ───────────────────────────────────────────────────────────────────
+.full-width {
+  width: 100%;
 }
 
-.nac {
-    width: 131px;
+// ─── Reducir tamaño de los inputs de Material ─────────────────────────────────
+::ng-deep {
+  .mat-mdc-form-field-infix {
+    min-height: 36px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    padding: 0 8px !important;
+  }
+
+  .mat-mdc-floating-label {
+    font-size: 0.8rem;
+  }
+
+  input.mat-mdc-input-element,
+  textarea.mat-mdc-input-element {
+    font-size: 0.82rem;
+  }
+
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-radius: $radius;
+  }
+
+  .mat-mdc-form-field {
+    width: 100%;
+  }
 }
 
-.texto {
-    position: relative;
-    right: -20px;
-    font-weight: bold;
+// ─── Barra de acciones ────────────────────────────────────────────────────────
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 16px;
+  border-top: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
+// ─── Botón estilizado ─────────────────────────────────────────────────────────
+.btn-nav {
+  position: relative;
+  cursor: pointer;
+  font-size: 12px;
+  border-top-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  transition: border-radius $transition, box-shadow $transition;
 
+  &::after,
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    position: absolute;
+    transition: all 0.35s;
+  }
 
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="3"] {
-    background-color: antiquewhite;
-    /* Cambia este color según tus necesidades */
+  &::after {
+    top: -1px;
+    left: -1px;
+    border-top: 3px solid $primary-dark;
+    border-left: 3px solid $primary-dark;
+  }
 
-}
+  &::before {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 3px solid $primary-dark;
+    border-right: 3px solid $primary-dark;
+  }
 
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="1"] {
-    background-color: rgb(211, 236, 171);
-    /* Cambia este color según tus necesidades */
+  &:hover {
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: 0 3px 10px rgba($primary, 0.3);
 
-}
-
-::ng-deep .mat-mdc-tab.mdc-tab[aria-posinset="2"] {
-    background-color: rgb(211, 236, 171);
-    /* Cambia este color según tus necesidades */
-
-}
-
-
-
-.btm {
-    cursor: pointer;
-    position: relative;
-    padding: 10px 20px;
-    background: white;
-    color: black;
-    font-size: 14px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    transition: all 1s;
-
-    &:after,
-    &:before {
-        content: " ";
-        width: 10px;
-        height: 10px;
-        position: absolute;
-        border: 0px solid #fff;
-        transition: all 1s;
+    &::after,
+    &::before {
+      width: 100%;
+      height: 100%;
     }
-
-    &:after {
-        top: -1px;
-        left: -1px;
-        border-top: 5px solid black;
-        border-left: 5px solid black;
-    }
-
-    &:before {
-        bottom: -1px;
-        right: -1px;
-        border-bottom: 5px solid black;
-        border-right: 5px solid black;
-    }
-
-    &:hover {
-        border-top-right-radius: 0px;
-        border-bottom-left-radius: 0px;
-
-        // background:rgba(0,0,0,.5);
-        // color:white;
-        &:before,
-        &:after {
-
-            width: 100%;
-            height: 100%;
-            // border-color:white;
-        }
-    }
-
-}
-
-.btn-sgte {
-    right: -50px;
-    margin-left: 25px;
-}
-
-.btn-ant {
-    right: 35px;
-    margin-left: 25px;
-}
-
-.btn {
-    right: -35px;
-}
-
-::ng-deep .mat-tab-label {
-    pointer-events: none;
-}
-
-.add-bnt-grado {
-    top: -70px;
-    left: 320px;
-}
-
-
-.btn-gra {
-    right: -150px;
+  }
 }

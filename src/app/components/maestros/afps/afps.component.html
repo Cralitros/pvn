@@ -1,5 +1,10 @@
-<button class="button-add" mat-raised-button color="primary" type="submit" (click)="dialogo()"> Añadir AFP</button>
-<div class="contenedortabla">
+<div class="laboral-wrapper">
+    <!-- Botón -->
+   
+    <button mat-raised-button class="button-add" type="submit" (click)="dialogo()"> Añadir AFP</button>
+
+    <!-- Tabla -->
+    <div class="contenedortabla">
     <app-tabla class="tabla"
     [columns]="columns" 
     [dataSource]="dataSource"
@@ -8,3 +13,4 @@
     (delete)="eliminar($event)"
    ></app-tabla>
 </div>
+

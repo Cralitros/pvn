@@ -57,3 +57,27 @@ $custom-theme: mat.define-light-theme((color:(primary:$custom-primary,
         white-space: pre-line;
     }
 }
+
+// Estilos para el diálogo de grados - FUERZA EL ANCHO
+.grados-dialog {
+  width: 1200px !important;
+  max-width: 95vw !important;
+  
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    
+    .mdc-dialog__surface {
+      border-radius: 12px !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      min-width: 1000px !important;
+    }
+  }
+}
+
+// También para cualquier diálogo de grados (por si no aplica la clase)
+mat-dialog-container.mat-mdc-dialog-container {
+  &.mat-dialog-container {
+    padding: 0 !important;
+  }
+}
