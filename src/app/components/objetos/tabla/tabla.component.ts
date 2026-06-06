@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
 import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'xlsx-js-style';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
 import Swal from 'sweetalert2';
@@ -114,7 +114,7 @@ export class TablaComponent {
 
   refresh() {
     // En lugar de llamar a this.tabla(), emitimos el evento al componente padre
-    this.refreshTable.emit(); 
+    this.refreshTable.emit();
   }
 
   // ===== FILTROS =====
@@ -397,14 +397,153 @@ export class TablaComponent {
   }
 
   exportToExcel() {
-    console.log(this.dataSource.data);
-    
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.dataSource.data);
-    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-    XLSX.writeFile(workbook, 'my-excel-file.xlsx');
-  }
+    let dataToExport: any[] = [];
+    let sheetName = 'Hoja1';
+    let fileName = 'reporte.xlsx';
 
+    // Helper para formatear fechas
+    const formatDate = (dateString: string): string => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    };
+
+    // ✅ Mapeo según tipo de tabla departamento
+    if (this.tipo === 'nacionalidad') {
+      sheetName = 'Nacionalidades';
+      fileName = 'Nacionalidades.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Nacionalidad': item.nombre,
+        'País': item.pais,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'departamento') {
+      sheetName = 'Departamentos';
+      fileName = 'Departamentos.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Departamento': item.nombre,
+        'Código telefónico': item.valor,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    }else if (this.tipo === 'provincia') {
+      sheetName = 'Provincias';
+      fileName = 'Provincias.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Provincia': item.nombre,
+        'Departamento': item.Departamento.nombre,
+        'Valor': item.valor,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    }else {
+      dataToExport = this.dataSource.data;
+    }
+
+    // ✅ Crear hoja de trabajo
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(dataToExport);
+
+    // ✅ ANCHOS DE COLUMNA AUTOAJUSTADOS
+    const colWidths = Object.keys(dataToExport[0] || {}).map(key => {
+      const maxDataLength = dataToExport.reduce((max, row) => {
+        const val = row[key] ? String(row[key]).length : 0;
+        return val > max ? val : max;
+      }, 0);
+      const headerLength = key.length;
+      return { wch: Math.max(maxDataLength, headerLength) + 4 };
+    });
+    worksheet['!cols'] = colWidths;
+
+    // ✅ ESTILOS DE CELDAS
+    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+        const cell = worksheet[cellAddress];
+        if (!cell) continue;
+
+        if (R === 0) {
+          // 🎨 **CABECERA**: Fondo azul oscuro, texto blanco, negrita
+          cell.s = {
+            font: {
+              bold: true,
+              color: { rgb: 'FFFFFF' },
+              sz: 11,
+              name: 'Calibri'
+            },
+            fill: {
+              fgColor: { rgb: '2E75B6' } // Azul profesional
+            },
+            alignment: {
+              horizontal: 'center',
+              vertical: 'center',
+              wrapText: true
+            },
+            border: {
+              top: { style: 'medium', color: { rgb: '1F4E79' } },
+              bottom: { style: 'medium', color: { rgb: '1F4E79' } },
+              left: { style: 'medium', color: { rgb: '1F4E79' } },
+              right: { style: 'medium', color: { rgb: '1F4E79' } },
+            },
+          };
+        } else {
+          // 📄 **CONTENIDO**: Fondo alternado (zebra), bordes suaves
+          const isEvenRow = R % 2 === 0;
+          cell.s = {
+            font: { sz: 10, name: 'Calibri' },
+            alignment: {
+              horizontal: C === 0 ? 'center' : 'left',
+              vertical: 'center'
+            },
+            border: {
+              top: { style: 'thin', color: { rgb: 'D9D9D9' } },
+              bottom: { style: 'thin', color: { rgb: 'D9D9D9' } },
+              left: { style: 'thin', color: { rgb: 'D9D9D9' } },
+              right: { style: 'thin', color: { rgb: 'D9D9D9' } },
+            },
+            fill: {
+              fgColor: { rgb: isEvenRow ? 'F2F2F2' : 'FFFFFF' } // Gris claro / Blanco
+            },
+          };
+        }
+      }
+    }
+
+    // ✅ ALTURA DE FILAS
+    worksheet['!rows'] = [{ hpt: 28 }]; // Cabecera más alta
+
+    // ✅ CONGELAR PANELES (cabecera fija)
+    worksheet['!freeze'] = { xSplit: 0, ySplit: 1 };
+
+    // ✅ Generar libro y descargar
+    const workbook: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+    XLSX.writeFile(workbook, fileName);
+  }
+  // ─── Helper para formatear fechas en Excel ──────────────────────────────────
+  private formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; // Si no es válida, devuelve el original
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${day}/${month}/${year} ${hours}:${minutes}`;
+  }
   llamarPDF(element: any) {
     const dialogRef = this.dialog.open(PdfDocenteComponent, {
       width: '800px',
