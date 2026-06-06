@@ -269,13 +269,25 @@
 
   <!-- Barra de acciones -->
   <div class="dialog-actions">
-    <div class="actions-left">
-      <button mat-stroked-button class="btn-nav" (click)="siguiente(selectedIndex - 1)"
-        [disabled]="selectedIndex === 0">← Anterior</button>
-    </div>
-    <div class="actions-right">
-      <button mat-button (click)="onNoClick()">Cancelar</button>
-      <button mat-raised-button color="primary" (click)="onSubmit()">{{ funcion }}</button>
-    </div>
+  <div class="actions-left">
+    <button mat-button color="warn" (click)="onNoClick()">Cancelar</button>
   </div>
+  
+  <div class="actions-right">
+    <!-- Botón Anterior: se deshabilita en la primera pestaña -->
+    <button mat-button (click)="anteriorTab()" [disabled]="selectedIndex === 0">
+      ← Anterior
+    </button>
+    
+    <!-- Botón Siguiente: se deshabilita en la última pestaña -->
+    <button mat-flat-button color="primary" (click)="siguienteTab()" [disabled]="esUltimoTab()">
+      Siguiente →
+    </button>
+    
+    <!-- Botón Guardar/Editar -->
+    <button mat-raised-button color="accent" (click)="onSubmit()">
+      {{ funcion }}
+    </button>
+  </div>
+</div>
 </div>

@@ -189,6 +189,17 @@ export class PersonaldlgComponent {
     } else {
       this.funcion = 'Añadir';
       this.fnc = true;
+      // ✅ CORRECCIÓN: Inicializar manualmente el país y nacionalidad por defecto 
+      // para que se dispare la lógica de llenado y habilitación de campos.
+      const paisDefault = 'Perú';
+      const nacDefault = this.nacionalidades.find(n => n.pais === paisDefault);
+
+      if (nacDefault) {
+        this.paisSeleccionado = nacDefault; // ✅ Clave para que se guarde el ID correcto al enviar
+        this.formulario1.get('pais')?.setValue(nacDefault.pais);
+        this.formulario1.get('nacionalidad')?.setValue(nacDefault.nombre);
+        this.actualizarNacionalidad(paisDefault, false);
+      }
     }
 
 
@@ -559,19 +570,41 @@ export class PersonaldlgComponent {
     }
   }
 
-  actualizarValidacionCuenta(selectedBanco: string, isEditMode = false): void {
+  // ─── Lógica de validación de cuenta ─────────────────────────────────────────
+  actualizarValidacionCuenta(selectedBancoId: any, isEditMode = false): void {
     const cuentaControl = this.formulario2.get('cuenta');
-    if (selectedBanco === 'No registrado') {
-      cuentaControl?.clearValidators();
-      if (!cuentaControl?.value) {
-        cuentaControl?.patchValue('0000000000');
-      }
-    } else {
-      cuentaControl?.setValidators([Validators.required]);
-    }
-    cuentaControl?.updateValueAndValidity();
-  }
+    if (!cuentaControl) return;
 
+    // 1. Identificar si la selección es "No registrado" o "No aplica"
+    // Buscamos tanto por el ID/valor directo como por el nombre en el arreglo
+    const bancoObj = this.bancosarr.find(b => String(b.id) === String(selectedBancoId));
+    const nombreBanco = bancoObj ? bancoObj.nombre : String(selectedBancoId);
+
+    const esSinBanco =
+      nombreBanco === 'No registrado' ||
+      nombreBanco === 'No aplica' ||
+      selectedBancoId === 'no_registrado' ||
+      selectedBancoId === 'no_aplica';
+
+    // 2. Aplicar lógica según la selección
+    if (esSinBanco) {
+      // Quitar validación de requerido y poner el valor por defecto
+      cuentaControl.clearValidators();
+      cuentaControl.patchValue('000-0000');
+    } else {
+      // Volver a hacer el campo obligatorio
+      cuentaControl.setValidators([Validators.required]);
+
+      // Si estamos en modo 'Añadir' y el campo tenía el valor por defecto, lo limpiamos 
+      // para que el usuario pueda escribir la cuenta real del nuevo banco.
+      if (!isEditMode && cuentaControl.value === '000-0000') {
+        cuentaControl.patchValue('');
+      }
+    }
+
+    // 3. Actualizar el estado del control
+    cuentaControl.updateValueAndValidity();
+  }
   // ─── Tabs ───────────────────────────────────────────────────────────────────
 
   tabActive(event: any): void {
@@ -724,5 +757,32 @@ export class PersonaldlgComponent {
       this.paisSeleccionado = nacObj;  // ✅ Esto es clave para que se guarde el ID
       this.actualizarNacionalidad(paisSeleccionadoStr);
     }
+  }
+
+  // ─── Navegación entre Tabs ──────────────────────────────────────────────────
+  // Ajusta este número si tu dialog tiene más de 2 pestañas
+  readonly totalTabs =3;
+
+  siguienteTab(): void {
+    // ✅ Opcional: No permite avanzar si el tab actual tiene campos inválidos
+    if (this.selectedIndex === 0 && this.formulario1.invalid) {
+      this.formulario1.markAllAsTouched();
+      return;
+    }
+
+    if (this.selectedIndex < this.totalTabs - 1) {
+      this.selectedIndex++;
+    }
+  }
+
+  anteriorTab(): void {
+    if (this.selectedIndex > 0) {
+      this.selectedIndex--;
+    }
+  }
+
+  // Helper para deshabilitar automáticamente el botón en el último tab
+  esUltimoTab(): boolean {
+    return this.selectedIndex === this.totalTabs - 1;
   }
 }
