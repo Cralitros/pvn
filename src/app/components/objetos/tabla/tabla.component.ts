@@ -413,6 +413,22 @@ export class TablaComponent {
       return `${day}/${month}/${year} ${hours}:${minutes}`;
     };
 
+    const formatDate2 = (dateString: string): string => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+
+      // Detectar si la cadena original no tenía hora
+      const hasTime = /[\sT]\d{2}:\d{2}/.test(dateString);
+
+      const day = String(date.getUTCDate()).padStart(2, '0');
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const year = date.getUTCFullYear();
+      const hours = hasTime ? String(date.getUTCHours()).padStart(2, '0') : '00';
+      const minutes = hasTime ? String(date.getUTCMinutes()).padStart(2, '0') : '00';
+
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    };
+
     // ✅ Mapeo según tipo de tabla departamento
     if (this.tipo === 'nacionalidad') {
       sheetName = 'Nacionalidades';
@@ -434,7 +450,7 @@ export class TablaComponent {
         'Fecha de creación': formatDate(item.createdAt),
         'Fecha de actualización': formatDate(item.updatedAt)
       }));
-    }else if (this.tipo === 'provincia') {
+    } else if (this.tipo === 'provincia') {
       sheetName = 'Provincias';
       fileName = 'Provincias.xlsx';
       dataToExport = this.dataSource.data.map(item => ({
@@ -442,6 +458,90 @@ export class TablaComponent {
         'Provincia': item.nombre,
         'Departamento': item.Departamento.nombre,
         'Valor': item.valor,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'distrito') {
+      sheetName = 'Distritos';
+      fileName = 'Distritos.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Distrito': item.nombre,
+        'Provincia': item.Provincium.nombre,
+        'Departamento': item.Provincium.Departamento.nombre,
+        'Valor': item.valor,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'banco') {
+      sheetName = 'Bancos';
+      fileName = 'Bancos.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Banco': item.nombre,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'afp') {
+      sheetName = 'Afps';
+      fileName = 'Afps.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'AFP': item.nombre,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'area') {
+      sheetName = 'Areas';
+      fileName = 'Areas.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Área': item.nombre,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'planacad') {
+      sheetName = 'PlanAcademico';
+      fileName = 'PlanAcademico.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Plan Académico': item.nombre,
+        'Nivel Académico': item.nivel_academico,
+        'Vigencia': formatDate2(item.vigencia),
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'unidad') {
+      sheetName = 'UnidadAcadémica';
+      fileName = 'UnidadAcadémica.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Unidad Académica': item.nombre,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'depacademico') {
+      sheetName = 'DepartamentoAcadémico';
+      fileName = 'DepartamentoAcadémico.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Departamento Académico': item.nombre,
+        'Unidad Académica': item.Facultad.nombre,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    }else if (this.tipo === 'programaacad') {
+      sheetName = 'EscuelayProgramaAcadémico';
+      fileName = 'EscuelayProgramaAcadémico.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'ID': item.id,
+        'Escuela y Programa Académico': item.programa,
+        'Gestor': item.gestor,
+        'Director': item.director,
+        'Inicio periodo': formatDate2(item.inicio),
+        'Fin periodo': formatDate2(item.fin),
+        'Departamento Académico': item.Escuela?.nombre ?? '',
+        'Unidad Académica': item.Escuela?.Facultad?.nombre?? '',
         'Fecha de creación': formatDate(item.createdAt),
         'Fecha de actualización': formatDate(item.updatedAt)
       }));

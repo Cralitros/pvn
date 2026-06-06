@@ -6,6 +6,7 @@
     <!-- Tabla -->
     <div class="contenedortabla">
         <app-tabla class="tabla" [columns]="columns" [report]="tipo" [dataSource]="dataSource" (edit)="editar($event)"
+        [tipo]="'distrito'" 
             (delete)="eliminar($event)" (refreshTable)="cargartabla()"></app-tabla>
     </div>
 </div>
