@@ -51,6 +51,20 @@ jobs:
           fi
           echo "OK: sólo está el index de la SPA"
 
+      - name: Comprobar el base href del index
+        run: |
+          # El sitio vive en /pvn/. Con un base href relativo ("./"), al abrir un
+          # enlace interno el navegador pediría los JS en la ruta equivocada y la
+          # aplicación se quedaría en blanco. Debe ser absoluto.
+          if grep -q '<base href="/pvn/">' dist/pvn/browser/index.html; then
+            echo "OK: base href = /pvn/"
+          else
+            echo "ERROR: el index no usa <base href=\"/pvn/\">."
+            echo "Revisa \"baseHref\": \"/pvn/\" en la configuración production de angular.json."
+            grep -o '<base[^>]*>' dist/pvn/browser/index.html || true
+            exit 1
+          fi
+
       - name: Comprobar el .htaccess de la SPA
         run: |
           # Sin este archivo, los enlaces internos y el F5 dan 404 en el servidor
