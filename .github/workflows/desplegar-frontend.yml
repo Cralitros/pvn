@@ -1,6 +1,6 @@
 name: Desplegar frontend
 
-# Se ejecuta al subir cambios a la rama master (o a mano desde la pestaÃ±a Actions).
+# Se ejecuta al subir cambios a la rama master (o a mano desde la pestaña Actions).
 on:
   push:
     branches: [master]
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Descargar el cÃ³digo
+      - name: Descargar el código
         uses: actions/checkout@v4
 
       - name: Preparar Node
@@ -23,10 +23,10 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Compilar Angular (producciÃ³n)
+      - name: Compilar Angular (producción)
         run: npm run build
 
-      - name: Comprobar que la API configurada estÃ¡ en el bundle
+      - name: Comprobar que la API configurada está en el bundle
         run: |
           echo "Buscando la URL de la API en el build..."
           if grep -rq "derechopucp.com/backendPucp2" dist/pvn/browser/*.js; then
@@ -37,11 +37,11 @@ jobs:
             exit 1
           fi
 
-      - name: Comprobar que NO se generaron pÃ¡ginas prerenderizadas
+      - name: Comprobar que NO se generaron páginas prerenderizadas
         run: |
-          # Con `prerender: false` sÃ³lo debe existir el index de la SPA.
-          # Si aparecen carpetas de rutas, es que el prerender estÃ¡ activo y esas
-          # pÃ¡ginas podrÃ­an exponer datos sin sesiÃ³n.
+          # Con `prerender: false` sólo debe existir el index de la SPA.
+          # Si aparecen carpetas de rutas, es que el prerender está activo y esas
+          # páginas podrían exponer datos sin sesión.
           rutas=$(find dist/pvn/browser -mindepth 1 -maxdepth 1 -type d | grep -v -E 'assets|media' || true)
           if [ -n "$rutas" ]; then
             echo "ERROR: se generaron carpetas de rutas prerenderizadas:"
@@ -49,9 +49,22 @@ jobs:
             echo "Pon \"prerender\": false en angular.json."
             exit 1
           fi
-          echo "OK: sÃ³lo estÃ¡ el index de la SPA"
+          echo "OK: sólo está el index de la SPA"
 
-      - name: Comprobar la configuraciÃ³n (Secrets)
+      - name: Comprobar el .htaccess de la SPA
+        run: |
+          # Sin este archivo, los enlaces internos y el F5 dan 404 en el servidor
+          # y las carpetas prerenderizadas antiguas podrían seguir sirviéndose.
+          if [ -f dist/pvn/browser/.htaccess ]; then
+            echo "OK: el build incluye .htaccess"
+          else
+            echo "ERROR: falta dist/pvn/browser/.htaccess."
+            echo "Revisa src/.htaccess y la lista \"assets\" de angular.json."
+            exit 1
+          fi
+
+      - name: Comprobar la configuración (Secrets)
+        id: config
         env:
           SERVIDOR: ${{ secrets.FTP_SERVER }}
           USUARIO: ${{ secrets.FTP_USUARIO }}
@@ -69,11 +82,17 @@ jobs:
             echo "Revisa: Settings > Secrets and variables > Actions"
             exit 1
           fi
-          echo "Los 4 secrets estÃ¡n definidos âœ…"
+          echo "Los 4 secrets están definidos ✅"
+
+          # La acción FTP exige que la carpeta destino termine en "/"
+          # ("server-dir should be a folder"). La normalizamos aquí para que
+          # funcione igual si escribes la barra final en el secret o no.
+          CARPETA="${CARPETA%/}/"
           case "$CARPETA" in
-            /*) echo "Carpeta destino: ruta absoluta âœ…" ;;
-            *)  echo "::warning::FTP_CARPETA_FRONT no empieza por '/'. Si tu cuenta FTP estÃ¡ restringida a una carpeta, usa la ruta relativa que ves en el File Manager (por ejemplo './')." ;;
+            /*) echo "Carpeta destino: $CARPETA" ;;
+            *)  echo "::warning::La carpeta no empieza por '/'. Si tu cuenta FTP está enjaulada, usa la ruta relativa que ves en el File Manager (por ejemplo './')." ;;
           esac
+          echo "carpeta=$CARPETA" >> "$GITHUB_OUTPUT"
 
       - name: Subir por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
@@ -82,9 +101,14 @@ jobs:
           username: ${{ secrets.FTP_USUARIO }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/pvn/browser/
-          server-dir: ${{ secrets.FTP_CARPETA_FRONT }}
-          # No se borra nada del servidor (asÃ­ no se pierde el .htaccess del sitio).
+          server-dir: ${{ steps.config.outputs.carpeta }}
+          # No se borra nada del servidor (así no se pierde nada que viva allí).
           dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**
+
+      - name: Aviso final
+        run: |
+          echo "Front desplegado. Si el navegador sigue mostrando la versión vieja,"
+          echo "recarga con Ctrl+F5 (el index.html se sirve sin caché)."
