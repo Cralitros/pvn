@@ -51,6 +51,30 @@ jobs:
           fi
           echo "OK: sólo está el index de la SPA"
 
+      - name: Comprobar la configuración (Secrets)
+        env:
+          SERVIDOR: ${{ secrets.FTP_SERVER }}
+          USUARIO: ${{ secrets.FTP_USUARIO }}
+          CLAVE: ${{ secrets.FTP_PASSWORD }}
+          CARPETA: ${{ secrets.FTP_CARPETA_FRONT }}
+        run: |
+          fallo=0
+          for variable in SERVIDOR USUARIO CLAVE CARPETA; do
+            if [ -z "${!variable}" ]; then
+              echo "::error::Falta el secret equivalente a $variable (FTP_SERVER / FTP_USUARIO / FTP_PASSWORD / FTP_CARPETA_FRONT)"
+              fallo=1
+            fi
+          done
+          if [ "$fallo" != "0" ]; then
+            echo "Revisa: Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          echo "Los 4 secrets están definidos ✅"
+          case "$CARPETA" in
+            /*) echo "Carpeta destino: ruta absoluta ✅" ;;
+            *)  echo "::warning::FTP_CARPETA_FRONT no empieza por '/'. Si tu cuenta FTP está restringida a una carpeta, usa la ruta relativa que ves en el File Manager (por ejemplo './')." ;;
+          esac
+
       - name: Subir por FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

@@ -15,7 +15,7 @@ En la máquina local, dentro de `D:\Proyectos\pvn`:
 ```bash
 git add -A
 git commit -m "Estado actual del proyecto"
-git remote add origin https://github.com/TU_USUARIO/pvn.git
+git remote add origin https://github.com/Cralitros/pvn.git
 git push -u origin master
 ```
 
