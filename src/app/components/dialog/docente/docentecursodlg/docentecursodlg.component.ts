@@ -14,9 +14,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DocenteCurso } from '../../../modelos/docentecurso';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { CursoApiService, DocenteCursoApiService } from '../../../../core/api';
 import { Curso } from '../../../modelos/cursos';
-import { Aux1Service } from '../../../../services/aux1.service';
 import Swal from 'sweetalert2';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { map, Observable, of, startWith } from 'rxjs';
@@ -62,13 +61,11 @@ export class DocentecursodlgComponent {
     public dialogRef: MatDialogRef<DocentecursodlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService,
-    private saux1: Aux1Service
+    private readonly docenteCursoApi: DocenteCursoApiService,
+    private readonly cursoApi: CursoApiService
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data);
-
     // Inicializar formulario PRIMERO
     this.formularioGrado = this.formBuilder.group({
       id: [''],
@@ -86,16 +83,14 @@ export class DocentecursodlgComponent {
     });
 
     // Cargar cursos primero
-    this.saux1.ponerurl("curso");
-    this.saux1.get().subscribe(cursosData => {
-      console.log("Cursos cargados:", cursosData);
+    this.cursoApi.listar().subscribe(cursosData => {
       this.cursos = cursosData;
 
       // Inicializar el observable de cursos filtrados
       this.cursosFiltrados = this.formularioGrado.get('cursoNombre')!.valueChanges.pipe(
         startWith(''),
-        map((value:any) => typeof value === 'string' ? value : (value?.nombre || '')),
-        map((name:any) => name ? this._filterCursos(name) : this.cursos || [])
+        map((value: any) => typeof value === 'string' ? value : (value?.nombre || '')),
+        map((name: any) => name ? this._filterCursos(name) : this.cursos || [])
       );
 
       // AHORA, después de cargar los cursos, poner los datos si es modo edición
@@ -110,22 +105,16 @@ export class DocentecursodlgComponent {
       }
     });
 
-    this.cgdepr.ponerurl("docentescurso");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.docenteCursoApi.listar().subscribe(data => {
       this.departamentos = data;
     });
   }
 
   poner_datos() {
-    console.log("Poner datos - valores recibidos:", this.data.valores);
-    console.log("Cursos disponibles:", this.cursos);
-
     // Buscar el nombre del curso basado en el código
     let nombreCurso = '';
     if (this.cursos && this.data.valores.codigoCurso) {
       const cursoEncontrado = this.cursos.find(c => c.codigo === this.data.valores.codigoCurso);
-      console.log("Curso encontrado:", cursoEncontrado);
       if (cursoEncontrado) {
         nombreCurso = cursoEncontrado.nombre;
       }
@@ -149,8 +138,6 @@ export class DocentecursodlgComponent {
       horas_semana: this.data.valores.horas_semana || '',
       horario: this.data.valores.horario || '',
     });
-
-    console.log("Formulario después de setValue:", this.formularioGrado.value);
   }
 
   // Filtrar cursos mientras se escribe
@@ -242,48 +229,61 @@ export class DocentecursodlgComponent {
   }
 
   add_grado() {
-    let body = {
-      id: this.formularioGrado.value?.id,
-      fecha_inicio: new Date(this.formularioGrado.value?.fecha_inicio),
-      fecha_fin: new Date(this.formularioGrado.value?.fecha_fin),
-      codigoCurso: this.formularioGrado.value?.codigoCurso,
-      codigoDocente: this.formularioGrado.value?.codigoDocente,
-      modalidad: this.formularioGrado.value?.modalidad,
-      tipo: this.formularioGrado.value?.tipo,
-      tipo_clase: this.formularioGrado.value?.tipo_clase,
-      estado: this.formularioGrado.value?.estado,
-      horas_semana: this.formularioGrado.value?.horas_semana,
-      horario: this.formularioGrado.value?.horario,
-    };
-
-    this.cgdepr.ponerurl("docentescurso");
+    let body:any   = {
+          id: this.formularioGrado.value?.id,
+          fecha_inicio: new Date(this.formularioGrado.value?.fecha_inicio),
+          fecha_fin: new Date(this.formularioGrado.value?.fecha_fin),
+          codigoCurso: this.formularioGrado.value?.codigoCurso,
+          codigoDocente: this.formularioGrado.value?.codigoDocente,
+          modalidad: this.formularioGrado.value?.modalidad,
+          tipo: this.formularioGrado.value?.tipo,
+          tipo_clase: this.formularioGrado.value?.tipo_clase,
+          estado: this.formularioGrado.value?.estado,
+          horas_semana: this.formularioGrado.value?.horas_semana,
+          horario: this.formularioGrado.value?.horario,
+        };
 
     if (this.formularioGrado?.valid) {
+      // Cierre SÓLO tras la respuesta: cerrar antes hacía que el listado
+      // recargara sin ver todavía el registro guardado.
       if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe(data => {
-          console.log("agregado");
-          Swal.fire({
-            title: "Agregado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formularioGrado.value);
+        this.docenteCursoApi.crear(body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Agregado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formularioGrado.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         });
       } else {
-        this.cgdepr.update(body.codigoDocente, body).subscribe(data => {
-          console.log("actualizado");
-          Swal.fire({
-            title: "Actualizado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formularioGrado.value);
+        this.docenteCursoApi.actualizar(body.codigoDocente, body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Actualizado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formularioGrado.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         });
       }
-      this.dialogRef.close(this.formularioGrado.value);
     } else {
       this.formularioGrado?.markAllAsTouched();
     }
+  }
+
+  /** Aviso común si el guardado falla: el diálogo se queda abierto para reintentar. */
+  private mostrarErrorAlGuardar(error: unknown): void {
+    console.error('Error al guardar:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'No se pudo guardar. Inténtalo de nuevo.',
+      icon: 'error'
+    });
   }
 
   onNoClick(): void {
@@ -292,10 +292,8 @@ export class DocentecursodlgComponent {
 
   verificarInfo(data: any) {
     if (data != undefined) {
-      console.log(data);
       return `${data.nombres} ${data.apellidos}`;
     } else {
-      console.log("data");
       return "";
     }
   }

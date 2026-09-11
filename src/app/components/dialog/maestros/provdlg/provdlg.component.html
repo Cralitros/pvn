@@ -36,9 +36,11 @@
     <mat-form-field appearance="outline" class="example-full-width">
       <mat-label>Departamento</mat-label>
       <mat-select formControlName="departamento_id" placeholder="Seleccionar departamento">
-        <mat-option *ngFor="let departamento of departamentos; track departamento" [value]="departamento.id">
+        @for (departamento of departamentos; track departamento.id) {
+        <mat-option [value]="departamento.id">
           {{ departamento.nombre }}
         </mat-option>
+        }
       </mat-select>
       <mat-error class="mensaje" *ngIf="formulario.get('departamento_id')?.hasError('required') && formulario.get('departamento_id')?.touched">
         Departamento es requerido.

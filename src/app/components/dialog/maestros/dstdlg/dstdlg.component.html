@@ -36,9 +36,11 @@
     <mat-form-field appearance="outline" class="example-full-width">
       <mat-label>Provincia</mat-label>
       <mat-select formControlName="provincia_id" placeholder="Seleccionar provincia">
-        <mat-option *ngFor="let prov of provincias; track prov" [value]="prov.id">
+        @for (prov of provincias; track prov.id) {
+        <mat-option [value]="prov.id">
           {{ prov.nombre }}
         </mat-option>
+        }
       </mat-select>
       <mat-error class="mensaje" *ngIf="formulario.get('provincia_id')?.hasError('required') && formulario.get('provincia_id')?.touched">
         Provincia es requerida.

@@ -1,9 +1,9 @@
-import { logins } from "./usuario";
+import { Usuario } from './usuario';
 
-export interface firma{
+export interface Firma{
     id?:string;
     firma:string;
     idLogin:string;
-    Login:logins;
+    Login:Usuario;
     codigoDocente:  string;
 }

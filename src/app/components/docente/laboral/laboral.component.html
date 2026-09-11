@@ -14,6 +14,8 @@
     <!-- Tabla -->
     <div class="contenedortabla">
         <app-tabla class="tabla" [columns]="columns" [dataSource]="dataSource" (edit)="editar($event)"
+        [tipo]="'laboral'" 
+        [recursoReporte]="'docenteslaboral'"
             (delete)="eliminar($event)" (refreshTable)="cargartabla()" (refreshTable)="cargartabla()"></app-tabla>
     </div>
 </div>

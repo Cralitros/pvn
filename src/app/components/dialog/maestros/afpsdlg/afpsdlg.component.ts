@@ -16,7 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Afp } from '../../../modelos/afp';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { AfpApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 import { Tablas, TipoTablaService } from '../../../../services/tipo-tabla.service';
 import { filter, Subject, takeUntil } from 'rxjs';
@@ -58,7 +58,7 @@ export class AfpsdlgComponent {
     public dialogRef: MatDialogRef<AfpsdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService,
+    private readonly afpApi: AfpApiService,
     private mensajeService: TipoTablaService
   ) {
     this.mensajeService.obtenerCanal(this.TABLA)
@@ -67,13 +67,11 @@ export class AfpsdlgComponent {
         filter(datos => datos !== null)
       )
       .subscribe(datos => {
-        console.log('Datos recibidos en diálogo:', datos);
         this.datosRecibidos = datos;
       });
   }
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id || '',
       nombre: this.data.valores.nombre || '',
@@ -86,9 +84,7 @@ export class AfpsdlgComponent {
       nombre: ['', [Validators.required, Validators.minLength(3)]],
     });
 
-    this.cgdepr.ponerurl("afps");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.afpApi.listar().subscribe(data => {
       this.planes = data;
     });
 
@@ -113,13 +109,10 @@ export class AfpsdlgComponent {
       nombre: this.formulario.value.nombre,
     };
 
-    this.cgdepr.ponerurl("afps");
-
     if (this.formulario?.valid) {
       if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe({
+        this.afpApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "La AFP se ha guardado correctamente",
@@ -139,9 +132,8 @@ export class AfpsdlgComponent {
           }
         });
       } else {
-        this.cgdepr.update(body.id, body).subscribe({
+        this.afpApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "La AFP se ha actualizado correctamente",

@@ -11,13 +11,28 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Investigador } from '../../modelos/investigador';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
+import {
+  detalleDeErrorHttp,
+  DocenteApiService,
+  DocenteInvestigacionApiService,
+  tituloDeErrorHttp,
+} from '../../../core/api';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { InvestigadlgComponent } from '../../dialog/docente/investigadlg/investigadlg.component';
+import {
+  ordenarPorAnioDescendente,
+  parsearReconocimientos,
+} from '../../dialog/docente/investigadlg/reconocimientos.util';
 import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
+
+/**
+ * Evita repetir el aviso de "backend desactualizado" en cada recarga de la
+ * tabla: sólo se muestra una vez por sesión.
+ */
+let avisoHistorialMostrado = false;
 
 @Component({
   selector: 'app-investigador',
@@ -61,6 +76,11 @@ export class InvestigadorComponent {
     { columnDef: 'registro', header: 'Registro', cell: (element: Investigador) => `${element.registro}` },
     { columnDef: 'rol', header: 'Rol', cell: (element: Investigador) => `${element.rol}` },
     { columnDef: 'reconocimiento', header: 'Reconocimiento', cell: (element: Investigador) => `${element.reconocimiento}` },
+    {
+      columnDef: 'reconocimientos',
+      header: 'Reconocimientos (historial)',
+      cell: (element: Investigador) => this.resumenReconocimientos(element.reconocimientos)
+    },
     { columnDef: 'contenido', header: 'Contenido', cell: (element: Investigador) => `${element.contenido}` },
   ];
   formulario?: FormGroup | any = null;
@@ -73,16 +93,13 @@ export class InvestigadorComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
+    private readonly docenteApi: DocenteApiService,
+    private readonly docenteInvestigacionApi: DocenteInvestigacionApiService,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
     private route: ActivatedRoute
   ) {
-
-    this.cargartabla();
-    console.log("************");
-    console.log(this.tablaDepartamento);
 
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
@@ -101,7 +118,6 @@ export class InvestigadorComponent {
       // const tipo = params['tipo'];
       const data = params['selectedRow'];
 
-      console.log('Selected Row:', data);
       this.cargartabla().then(() => {
         this.buscar(data);
       });
@@ -110,7 +126,10 @@ export class InvestigadorComponent {
   }
   // ✅ Método principal corregido
   async abrirDialogoLaboral(): Promise<void> {
-    const codigo = this.formulario?.value.codigo;
+    // Se limpia el código: si se pega con espacios, no coincidía con el de la
+    // tabla y el diálogo se abría en modo Añadir con la tabla vacía.
+    const codigo = `${this.formulario?.value.codigo ?? ''}`.trim();
+
     if (!codigo) {
       Swal.fire('Atención', 'Por favor ingrese un código de docente primero.', 'warning');
       return;
@@ -120,9 +139,8 @@ export class InvestigadorComponent {
       await this.cargartabla();
     }
 
-    // ✅ Usar conversión explícita con String() global o template literals
     const encontrado = this.tablaDepartamento.find(
-      item => `${item.codigoDocente}` === `${codigo}`
+      item => `${item.codigoDocente}`.trim() === codigo
     );
 
     if (encontrado) {
@@ -135,8 +153,7 @@ export class InvestigadorComponent {
 
   private async crearNuevo(codigo: string): Promise<void> {
     try {
-      this.mservice.ponerurl("docentes/cod");
-      const docenteData: any = await lastValueFrom(this.mservice.getid(codigo));
+      const docenteData: any = await lastValueFrom(this.docenteApi.obtenerPorCodigo(codigo));
 
       if (!docenteData || (Array.isArray(docenteData) && docenteData.length === 0)) {
         Swal.fire('Error', 'El código de docente no existe en el sistema.', 'error');
@@ -145,9 +162,22 @@ export class InvestigadorComponent {
 
       const docenteInfo = Array.isArray(docenteData) ? docenteData[0] : docenteData;
 
+      // Se comprueba contra la API si ya tiene registro. Antes se abría siempre
+      // en modo Añadir, con la tabla de reconocimientos vacía: parecía que no
+      // había nada guardado y al guardar se podía duplicar el registro.
+      const registros: any = await lastValueFrom(this.docenteInvestigacionApi.obtenerPorCodigo(codigo));
+      const existente = Array.isArray(registros) ? registros[0] : registros;
+
+      if (existente) {
+        this.cartabla.dataSeleccionada = existente;
+        this.editar(existente);
+        return;
+      }
+
       const dialogRef = this.dialog.open(InvestigadlgComponent, {
-        width: '750px',
-        height: '700px',
+        width: '1100px',
+        maxWidth: '95vw',
+        height: '850px',
         data: {
           title: `Agregar ${this.titulo}`,
           valores: {
@@ -165,7 +195,38 @@ export class InvestigadorComponent {
     }
   }
 
+  /**
+   * Resumen del historial para la columna de la tabla.
+   *
+   * Antes la lista no mostraba nada de los reconocimientos (sólo existía la
+   * columna del campo antiguo `reconocimiento`), así que parecía que no se había
+   * guardado nada. El detalle completo está en el diálogo.
+   */
+  private resumenReconocimientos(valor: unknown): string {
+    const filas = ordenarPorAnioDescendente(parsearReconocimientos(valor));
+
+    if (filas.length === 0) {
+      return '';
+    }
+
+    const masReciente = filas[0];
+    const etiqueta = [masReciente.anio, masReciente.nombre].filter(parte => !!parte).join(' - ')
+      || masReciente.categoria
+      || '(sin nombre)';
+
+    return filas.length === 1
+      ? etiqueta
+      : `${filas.length} reconocimientos · más reciente: ${etiqueta}`;
+  }
+
   async buscar(data: any) {
+    // Sin fila seleccionada no hay nada que buscar. Antes se hacía
+    // `setValue({ codigo: undefined })`, que lanza NG01002 cada vez que se
+    // entraba a la pantalla sin venir de una fila seleccionada.
+    if (data === undefined || data === null || `${data}`.trim() === '') {
+      return;
+    }
+
     this.formulario?.setValue({ 'codigo': data });
     await this.abrirDialogoLaboral();
   }
@@ -175,74 +236,98 @@ export class InvestigadorComponent {
     return this.tablaDepartamento.some(item => item.codigoDocente == codigo);
   }
   async cargartabla() {
-    this.mservice.ponerurl("docentesinvestiga");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
+    try {
+      const source$ = this.docenteInvestigacionApi.listar();
+      const finalNumber: any = await lastValueFrom(source$);
 
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento = this.cartabla.array;
-    console.log(this.tablaDepartamento);
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento = this.cartabla.array;
 
-    this.sctabla.setData(this.tablaDepartamento);
+      this.sctabla.setData(this.tablaDepartamento);
+
+      this.avisarSiLaApiNoDevuelveElHistorial(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
   }
-  dialogo() {
-    let laboral: any;
-    this.mservice.ponerurl("docentes/cod");
-    this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
-      console.log(data);
-      laboral = data;
-      if (data.length > 0) {//verifica si existe el docente
 
-        this.mservice.ponerurl("docentesinvestiga/cod");
-        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
-          console.log(data2);
-          if (data2.length == 0) {
-            const dialogRef = this.dialog.open(InvestigadlgComponent, {
-              width: '800px',
-              height: '900px',
-              data: {
-                title: `Agregar ${this.titulo}`,
-                valores: { laboral },
-                modo: 0
-              }
-            });
-            dialogRef.afterClosed().subscribe(result => {
-              //if (result) {
-              this.cargartabla();
-              // }
-            });
-          }
+  /**
+   * Avisa (una vez por sesión) si la API no devuelve el campo `reconocimientos`.
+   *
+   * Pasa cuando el backend desplegado todavía tiene el modelo antiguo. Sequelize
+   * ignora en silencio los campos que no conoce, así que el historial de
+   * reconocimientos parecería guardarse y se perdería sin ningún error.
+   */
+  private avisarSiLaApiNoDevuelveElHistorial(registros: unknown[]): void {
+    if (avisoHistorialMostrado || registros.length === 0) {
+      return;
+    }
 
-        });
-      }
+    const laApiLoTiene = registros.some(
+      registro => !!registro && typeof registro === 'object' && 'reconocimientos' in registro
+    );
+
+    if (laApiLoTiene) {
+      return;
+    }
+
+    avisoHistorialMostrado = true;
+    Swal.fire({
+      title: 'Backend desactualizado',
+      html: 'La API no devuelve el campo <b>reconocimientos</b>, así que el historial de ' +
+        'reconocimientos <b>no se va a guardar</b>.<br><br>' +
+        'Falta actualizar <code>models/DocenteInvestigador.js</code> y ejecutar el ' +
+        '<code>ALTER TABLE</code> en la base de datos.',
+      icon: 'warning'
     });
   }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la tabla',
+      showConfirmButton: false,
+      timer: 4000
+    });
+  }
+  /**
+   * Datos que recibe el diálogo de investigación.
+   *
+   * Lo usan tanto el lápiz de la tabla como la búsqueda por código, para que en
+   * los dos casos el historial de reconocimientos (`reconocimientos`) llegue al
+   * diálogo y no se pierda al guardar.
+   */
+  private valoresDelRegistro(registro: any, docente?: any): Record<string, unknown> {
+    return {
+      id: registro?.id,
+      orcid: registro?.orcid,
+      renacyt: registro?.renacyt,
+      grupo: registro?.grupo,
+      nivel: registro?.nivel,
+      registro: registro?.registro,
+      rol: registro?.rol,
+      reconocimiento: registro?.reconocimiento,
+      contenido: registro?.contenido,
+      codigoDocente: registro?.codigoDocente,
+      condicion: registro?.condicion,
+      semestresInvestigacion: registro?.semestresInvestigacion,
+      reconocimientos: registro?.reconocimientos,
+      docente: docente ?? registro?.Docente,
+    };
+  }
+
   editar(element: any) {
     const dialogRef = this.dialog.open(InvestigadlgComponent, {
-      width: '800px',
-      height: '900px',
+      width: '1100px',
+      maxWidth: '95vw',
+      height: '850px',
       data: {
         title: `Editar ${this.titulo}`,
-        valores: {
-          id: this.cartabla.dataSeleccionada.id,
-          orcid: this.cartabla.dataSeleccionada.orcid,
-          renacyt: this.cartabla.dataSeleccionada.renacyt,
-          grupo: this.cartabla.dataSeleccionada.grupo,
-          nivel: this.cartabla.dataSeleccionada.nivel,
-          registro: this.cartabla.dataSeleccionada.registro,
-          rol: this.cartabla.dataSeleccionada.rol,
-          reconocimiento: this.cartabla.dataSeleccionada.reconocimiento,
-          contenido: this.cartabla.dataSeleccionada.contenido,
-          codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
-          ri: this.cartabla.dataSeleccionada.ri,
-          pibpdu: this.cartabla.dataSeleccionada.pibpdu,
-          gadi: this.cartabla.dataSeleccionada.gadi,
-          sei: this.cartabla.dataSeleccionada.sei,
-          gadd: this.cartabla.dataSeleccionada.gadd,
-          gadit: this.cartabla.dataSeleccionada.gadit,
-          dfi: this.cartabla.dataSeleccionada.dfi,
-          docente: this.cartabla.dataSeleccionada.Docente,
-        },
+        valores: this.valoresDelRegistro(this.cartabla.dataSeleccionada),
         modo: 1
       }
     });
@@ -254,15 +339,25 @@ export class InvestigadorComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
-      Swal.fire({
-        title: "Eliminado",
-        text: "Continuar",
-        icon: "info"
-      });
-      this.cargartabla();
+    this.docenteInvestigacionApi.eliminar(element.id).subscribe({
+      next: () => {
+        Swal.fire({
+          title: "Eliminado",
+          text: "Continuar",
+          icon: "info"
+        });
+        this.cargartabla();
+      },
+      error: (error) => {
+        // Antes no había manejador: si el borrado fallaba, no pasaba nada y
+        // parecía que el botón no funcionaba. Ahora se ve el motivo real.
+        console.error('No se pudo eliminar el registro:', error);
+        Swal.fire({
+          title: tituloDeErrorHttp('No se pudo eliminar', error),
+          text: detalleDeErrorHttp(error).mensaje ?? 'Inténtalo de nuevo.',
+          icon: 'error'
+        });
+      }
     })
   }
 

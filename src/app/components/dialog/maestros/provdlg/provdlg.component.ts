@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { Departamento } from '../../../modelos/departamento';
 import { Provincia } from '../../../modelos/provincia';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { DepartamentoApiService, ProvinciaApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -36,11 +36,11 @@ export class ProvdlgComponent implements OnInit {
     public dialogRef: MatDialogRef<ProvdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly departamentoApi: DepartamentoApiService,
+    private readonly provinciaApi: ProvinciaApiService
   ) {}
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id,
       nombre: this.data.valores.nombre,
@@ -57,9 +57,7 @@ export class ProvdlgComponent implements OnInit {
       departamento_id: ['', Validators.required]
     });
 
-    this.cgdepr.ponerurl("departamentos");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.departamentoApi.listar().subscribe(data => {
       this.departamentos = data;
     });
 
@@ -83,10 +81,8 @@ export class ProvdlgComponent implements OnInit {
 
     if (this.formulario?.valid) {
       if (this.fnc === true) {
-        this.cgdepr.ponerurl("provincias");
-        this.cgdepr.add(body).subscribe({
+        this.provinciaApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "La provincia se agregó correctamente",
@@ -104,10 +100,8 @@ export class ProvdlgComponent implements OnInit {
           }
         });
       } else {
-        this.cgdepr.ponerurl("provincias");
-        this.cgdepr.update(body.id, body).subscribe({
+        this.provinciaApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "La provincia se actualizó correctamente",

@@ -16,7 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { Recurso, ReporteApiService } from '../../../core/api';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 import * as XLSX from 'xlsx-js-style';
@@ -62,6 +62,14 @@ export class TablaComponent {
   @Input() dataSource = new MatTableDataSource<any>([]);
   @Input() tipo: any;
   @Input() report: any;
+  /**
+   * Recurso de la API cuyo reporte en PDF abre el botón "Reporte".
+   *
+   * Antes este botón usaba la `apiUrl` mutable del servicio compartido, así que
+   * el PDF que se descargaba dependía del **último** `ponerurl()` ejecutado por
+   * cualquier componente de la aplicación.
+   */
+  @Input() recursoReporte?: Recurso;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort?: MatSort | any;
 
@@ -89,7 +97,7 @@ export class TablaComponent {
     private sctabla: CargatablaService,
     private das: ConversiontablaService,
     private router: Router,
-    private mservice: MaestrosserviceService,
+    private readonly reporteApi: ReporteApiService,
     public dialog: MatDialog
   ) { }
 
@@ -393,9 +401,50 @@ export class TablaComponent {
   }
 
   reporte() {
-    this.mservice.reporte();
+    const recurso = this.recursoReporte;
+    if (!recurso) {
+      Swal.fire('Reporte no disponible', 'Esta tabla no tiene un reporte configurado.', 'info');
+      return;
+    }
+
+    this.reporteApi.reporteDe(recurso).subscribe({
+      next: (respuesta: Blob) => {
+        const blob = new Blob([respuesta], { type: 'application/pdf' });
+        window.open(window.URL.createObjectURL(blob));
+      },
+      error: () => {
+        Swal.fire('Error', 'No se pudo generar el reporte.', 'error');
+      }
+    });
   }
 
+  // Función para calcular la edad
+  calcularEdad(fechaNacimiento: string | Date): number {
+    let nacimiento: Date;
+
+    if (typeof fechaNacimiento === 'string' && fechaNacimiento.includes('/')) {
+      // Convertir DD/MM/YYYY a YYYY/MM/DD
+      const partes = fechaNacimiento.split(' ')[0].split('/');
+      // partes[0] = día, partes[1] = mes, partes[2] = año
+      nacimiento = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+    } else {
+      nacimiento = new Date(fechaNacimiento);
+    }
+
+    if (isNaN(nacimiento.getTime())) {
+      return 0;
+    }
+
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+
+    return edad;
+  }
   exportToExcel() {
     let dataToExport: any[] = [];
     let sheetName = 'Hoja1';
@@ -530,7 +579,7 @@ export class TablaComponent {
         'Fecha de creación': formatDate(item.createdAt),
         'Fecha de actualización': formatDate(item.updatedAt)
       }));
-    }else if (this.tipo === 'programaacad') {
+    } else if (this.tipo === 'programaacad') {
       sheetName = 'EscuelayProgramaAcadémico';
       fileName = 'EscuelayProgramaAcadémico.xlsx';
       dataToExport = this.dataSource.data.map(item => ({
@@ -541,11 +590,132 @@ export class TablaComponent {
         'Inicio periodo': formatDate2(item.inicio),
         'Fin periodo': formatDate2(item.fin),
         'Departamento Académico': item.Escuela?.nombre ?? '',
-        'Unidad Académica': item.Escuela?.Facultad?.nombre?? '',
+        'Unidad Académica': item.Escuela?.Facultad?.nombre ?? '',
         'Fecha de creación': formatDate(item.createdAt),
         'Fecha de actualización': formatDate(item.updatedAt)
       }));
-    }else {
+    } else if (this.tipo === 'cursos') {
+      sheetName = 'cursos';
+      fileName = 'cursos.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'Código': item.codigo,
+        'Nombre del Curso': item.nombre,
+        'Créditos': item.creditos,
+        'Nivel académico': item.nivel,
+        'Área': item.areas,
+        'Semestre Creación': item.semestre,
+        'Plan académico': item.Plan.nombre,
+        'Unidad Académica': item.Programa?.Escuela?.Facultad?.nombre ?? '',
+        'Departamento Académico': item.Programa?.Escuela?.nombre ?? '',
+        'Escuela': item.Programa?.programa ?? '',
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'personal') {
+      sheetName = 'Personal';
+      fileName = 'Docentes.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'DNI': item.dni,
+        'Nombres': item.nombres,
+        'Apellidos': item.apellidos,
+        'Código': item.codigo,
+        'Digito verifcador': item.digito,
+        'Telefono': item.telefono,
+        'Celular': item.celular,
+        'Pasaporte': item.pasaporte,
+        'Especialidad': item.especialidad,
+        'Fecha nacimiento': formatDate2(item.fecha_nacimiento),
+        'Edad': this.calcularEdad(formatDate2(item.fecha_nacimiento)),
+        'Lugar nacimiento': item.lugarNacimiento.departamento + ", " + item.lugarNacimiento.provincia + ", " + item.lugarNacimiento.distrito,
+        'Nacionalidad': item.Nacionalidad?.nombre ?? '',
+        'Domicilio': item.domicilio,
+        'Estado civil': item.estado_civil,
+        'Número de hijos': item.numero_hijos,
+        'Sexo': item.sexo,
+        'Fallecimiento': item.fallecimiento,
+        'Fecha fallecimiento': item.fecha_fallecimiento,
+        'Banco': item.banco,
+        'Número de cuenta': item.cuenta,
+        'Sistema de pensiones': item.afp,
+        'CUSSP': item.cussp,
+        'Afiliación': item.afiliacion,
+        'RUC': item.ruc,
+        'Observaciones': item.observaciones,
+        'Fecha CV': formatDate2(item.fecha_cv),
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'laboral') {
+      sheetName = 'laboral';
+      fileName = 'laboral.xlsx';
+      dataToExport = this.dataSource.data.map(item => ({
+        'Código': item.id,
+        'DNI': item.Docente.dni,
+        'Nombres': item.Docente.nombres,
+        'Apellidos': item.Docente.apellidos,
+        'Cargo actual': item.cargo_actual,
+        'Tipo de empresa': item.tipo_empresa,
+        'Direccion empresa': item.direccion_empresa,
+        'Telefono empresa': item.telefono_empresa,
+        'Correo corporativo': item.correo_corporativo,
+        'Correo Personal': item.correo_personal,
+        'Correo Alternativo': item.correo_alternativo,
+        'Contacto de emergencia': item.contacto,
+        'Fecha de creación': formatDate(item.createdAt),
+        'Fecha de actualización': formatDate(item.updatedAt)
+      }));
+    } else if (this.tipo === 'grados') {
+      sheetName = 'grados';
+      fileName = 'grados.xlsx';
+
+      // Crear un array plano donde cada grado es una fila
+      const exportData: any[] = [];
+
+      this.dataSource.data.forEach(item => {
+        // Parsear grados
+        let gradosList: any[] = [];
+        try {
+          gradosList = typeof item.grado === 'string'
+            ? JSON.parse(item.grado)
+            : item.grado;
+        } catch (e) {
+          gradosList = [];
+        }
+
+        // Si no es array, convertirlo
+        if (!Array.isArray(gradosList)) {
+          gradosList = [gradosList];
+        }
+
+
+        // Crear fila por cada grado
+        gradosList.forEach((grado: any) => {
+          exportData.push({
+            'Código Docente': item.id,
+            'DNI': item.Docente?.dni || '',
+            'Nombres': item.Docente?.nombres || '',
+            'Apellidos': item.Docente?.apellidos || '',
+            'Grado': grado.grade || '',
+            'Título': grado.titulo || '',
+            'Fecha grado': grado.fecha ? formatDate2(grado.fecha) : '',
+            'Institución obtención grado': grado.lugar || '',
+            'País grado': grado.pais || '',
+            'SUNEDU': grado.revalidado ? 'Sí' : 'No',
+            'Fecha de revalidación': grado.fechaRevalidado ? formatDate2(grado.fechaRevalidado) : '',
+            'Máximo grado': item.maximo_grado || '',
+            'BGA': item.bgac || '',
+            'Prestamo académico': item.prestamoc || '',
+            'Detalle BGA': item.bga || '',
+            'Detalle prestamo': item.prestamo || '',
+            'Fecha de creación': formatDate(item.createdAt),
+            'Fecha de actualización': formatDate(item.updatedAt)
+          });
+        });
+      });
+
+      dataToExport = exportData;
+    }
+    else {
       dataToExport = this.dataSource.data;
     }
 

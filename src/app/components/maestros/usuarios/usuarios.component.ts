@@ -8,10 +8,10 @@ import { MatInputModule } from '@angular/material/input';
 import { TablaComponent } from '../../objetos/tabla/tabla.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { logins } from '../../modelos/usuario';
+import { Usuario } from '../../modelos/usuario';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { AuthApiService } from '../../../core/api';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
@@ -36,16 +36,16 @@ import Swal from 'sweetalert2';
   styleUrl: './usuarios.component.scss'
 })
 export class UsuariosComponent {
-  tablaDepartamento: logins[] = [];
+  tablaDepartamento: Usuario[] = [];
   columns: Column[] = [
-    { columnDef: 'id', header: 'No.', cell: (element: logins) => `${element.id}` },
-    { columnDef: 'dni', header: 'DNI', cell: (element: logins) => `${element.dni}` },
-    { columnDef: 'nivel', header: 'Nivel', cell: (element: logins) => `${element.nivel}` },
-    { columnDef: 'rol', header: 'Rol', cell: (element: logins) => `${element.rol}` },
-    { columnDef: 'nombres', header: 'Nombres', cell: (element: logins) => `${element.nombres}` },
-    { columnDef: 'apellidos', header: 'Apellidos', cell: (element: logins) => `${element.apellidos}` },
-    { columnDef: 'email', header: 'Email', cell: (element: logins) => `${element.email}` },
-    { columnDef: 'cargo', header: 'Cargo', cell: (element: logins) => `${element.cargo}` },
+    { columnDef: 'id', header: 'No.', cell: (element: Usuario) => `${element.id}` },
+    { columnDef: 'dni', header: 'DNI', cell: (element: Usuario) => `${element.dni}` },
+    { columnDef: 'nivel', header: 'Nivel', cell: (element: Usuario) => `${element.nivel}` },
+    { columnDef: 'rol', header: 'Rol', cell: (element: Usuario) => `${element.rol}` },
+    { columnDef: 'nombres', header: 'Nombres', cell: (element: Usuario) => `${element.nombres}` },
+    { columnDef: 'apellidos', header: 'Apellidos', cell: (element: Usuario) => `${element.apellidos}` },
+    { columnDef: 'email', header: 'Email', cell: (element: Usuario) => `${element.email}` },
+    { columnDef: 'cargo', header: 'Cargo', cell: (element: Usuario) => `${element.cargo}` },
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true }  // Columna de acciones
   ];
 
@@ -58,14 +58,10 @@ export class UsuariosComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
+    private readonly authApi: AuthApiService,
     private cartabla: ConversiontablaService,
     public dialog: MatDialog
   ) {
-
-    this.cargartabla();
-    console.log("************");
-    console.log(this.tablaDepartamento);
 
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
@@ -79,13 +75,11 @@ export class UsuariosComponent {
 
   async cargartabla() {
     try {
-      this.mservice.ponerurl("login");
-      const source$ = this.mservice.get();
+      const source$ = this.authApi.listarUsuarios();
       const finalNumber: any = await lastValueFrom(source$);
   
       this.cartabla.ponerdata(finalNumber);
       this.tablaDepartamento = this.cartabla.array;
-      console.log(this.tablaDepartamento);
   
       this.sctabla.setData(this.tablaDepartamento);
     } catch (error) {
@@ -141,9 +135,7 @@ export class UsuariosComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
+    this.authApi.eliminar(element.id).subscribe(data => {
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",

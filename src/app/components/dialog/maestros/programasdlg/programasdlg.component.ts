@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Programa } from '../../../modelos/programa';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { FacultadApiService, ProgramaApiService } from '../../../../core/api';
 import { Facultad } from '../../../modelos/facultad';
 import { Escuela } from '../../../modelos/escuela';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -45,12 +45,11 @@ export class ProgramasdlgComponent {
     public dialogRef: MatDialogRef<ProgramasdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly facultadApi: FacultadApiService,
+    private readonly programaApi: ProgramaApiService
   ) { }
 
   async poner_datos() {
-    console.log('Datos recibidos:', this.data);
-
     // Primero, cargar las facultades
     await this.combos();
 
@@ -63,9 +62,6 @@ export class ProgramasdlgComponent {
 
       // Buscar la escuela seleccionada por ID
       const escuelaSeleccionada = this.escuelas.find(e => e.id === this.data.valores.escuela);
-
-      console.log('Facultad encontrada:', facultadSeleccionada);
-      console.log('Escuela encontrada:', escuelaSeleccionada);
 
       // Ahora sí, establecer los valores del formulario
       this.formulario.setValue({
@@ -105,9 +101,7 @@ export class ProgramasdlgComponent {
   }
 
   async combos() {
-    this.cgdepr.ponerurl("facultad");
-    this.facultades = await firstValueFrom(this.cgdepr.get());
-    console.log("cmb", this.facultades);
+    this.facultades = await firstValueFrom(this.facultadApi.listar());
     this.escuelas = [];
   }
 
@@ -123,12 +117,9 @@ export class ProgramasdlgComponent {
     };
 
     if (this.formulario?.valid) {
-      this.cgdepr.ponerurl("programa");
-
       if (this.fnc) {
-        this.cgdepr.add(body).subscribe({
+        this.programaApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "El programa se agregó correctamente",
@@ -146,9 +137,8 @@ export class ProgramasdlgComponent {
           }
         });
       } else {
-        this.cgdepr.update(body.id, body).subscribe({
+        this.programaApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "El programa se actualizó correctamente",
@@ -181,7 +171,6 @@ export class ProgramasdlgComponent {
   }
 
   onCategoryChangeFacultad(event: any) {
-    console.log('Facultad seleccionada:', event.value);
     const facultadSeleccionada: any = this.facultades?.find(f => f.id === event.value.id);
     this.escuelas = facultadSeleccionada?.escuelas ?? []; // ✅ Corregido: 'escuelas' en minúscula
 
@@ -193,7 +182,6 @@ export class ProgramasdlgComponent {
 
   onCategoryChangeEscuela(event: any) {
     this.escuelaSelecionada = event.value;
-    console.log('Escuela seleccionada:', this.escuelaSelecionada);
   }
   trackById(index: number, item: any): number {
     return item.id;

@@ -11,7 +11,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Column } from '../../modelos/column';
 import { Programa } from '../../modelos/programa';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { ProgramaApiService } from '../../../core/api';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
@@ -54,15 +54,11 @@ export class ProgramaComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice:MaestrosserviceService,
+    private readonly programaApi: ProgramaApiService,
     private cartabla:ConversiontablaService,
     public dialog: MatDialog
   ) {
-    
-    this.cargartabla();
-    console.log("************");
-    console.log(this.tablaDepartamento);
-    
+
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
       nombre: ['', Validators.required]
@@ -74,15 +70,30 @@ export class ProgramaComponent {
    }
 
   async cargartabla(){
-    this.mservice.ponerurl("programa");
-    const source$ = this.mservice.get();
-    const finalNumber:any = await lastValueFrom(source$);
-  
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento=this.cartabla.array;
-    console.log(this.tablaDepartamento);
-    
-    this.sctabla.setData(this.tablaDepartamento);
+    try {
+      const source$ = this.programaApi.listar();
+      const finalNumber:any = await lastValueFrom(source$);
+
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento=this.cartabla.array;
+
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la lista de programas',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
   dialogo(){
     const dialogRef = this.dialog.open(ProgramasdlgComponent, {
@@ -101,8 +112,6 @@ export class ProgramaComponent {
     });
   }
   editar(element: any){
-    console.log(element);
-    console.log(this.cartabla.dataSeleccionada);
     
     const dialogRef = this.dialog.open(ProgramasdlgComponent, {
       width: '700px',
@@ -131,9 +140,7 @@ export class ProgramaComponent {
 
   }
   eliminar(element: any){
-    console.log("dep",element);
-    this.mservice.delete(element.id).subscribe(data=>{
-      console.log("Eliminado");
+    this.programaApi.eliminar(element.id).subscribe(data=>{
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",

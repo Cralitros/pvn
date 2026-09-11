@@ -59,70 +59,95 @@
                             </mat-select>
                         </mat-form-field>
                     </div>
+                    <div class="grid-2">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Semestres de investigación</mat-label>
+                            <input matInput formControlName="semestresInvestigacion" placeholder="Semestres de investigación">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Condición</mat-label>
+                            <mat-select formControlName="condicion" placeholder="Seleccionar condición">
+                                @for (c of condiciones; track c) { <mat-option [value]="c">{{ c }}</mat-option> }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
                 </div>
             </div>
         </mat-tab>
 
         <!-- TAB 2: Reconocimientos -->
-        <!-- TAB 2: Reconocimientos -->
         <mat-tab label="Reconocimientos">
             <div class="tab-form">
 
                 <div class="form-section">
-                    <span class="section-title">Detalles de Actividades y Logros</span>
+                    <span class="section-title">Historial de Reconocimientos</span>
 
-                    <!-- Lista de inputs individuales -->
-                    <div class="reconocimientos-list">
+                    <div class="table-header-actions">
+                        <button mat-raised-button color="primary" type="button" class="btn-add-row"
+                            (click)="agregarFilaReconocimiento()">
+                            <mat-icon>add</mat-icon> Agregar Reconocimiento
+                        </button>
+                    </div>
 
-                        <div class="grid-2 align-center">
-                            <label>Reconocimiento a la investigación</label>
-                            <mat-form-field appearance="outline" class="compact-input">
-                                <input matInput formControlName="ri" placeholder="Ej: Reconocimiento DAP 2022">
-                            </mat-form-field>
+                    <div class="reconocimientos-container">
+                        <table class="reconocimientos-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-anio">AÑO</th>
+                                    <th class="col-nombre">NOMBRE DEL RECONOCIMIENTO</th>
+                                    <th class="col-categoria">CATEGORÍA</th>
+                                    <th class="col-unidad">UNIDAD QUE LO OTORGA</th>
+                                    <th class="col-observaciones">OBSERVACIONES</th>
+                                    <th class="col-acciones"></th>
+                                </tr>
+                            </thead>
+                            <tbody formArrayName="reconocimientosTabla">
+                                @for (fila of reconocimientosArray.controls; track $index) {
+                                <tr [formGroup]="$any(fila)">
+                                    <td class="col-anio">
+                                        <mat-form-field appearance="outline" class="table-field">
+                                            <input matInput type="number" formControlName="anio" placeholder="2022"
+                                                min="1900" max="2100">
+                                        </mat-form-field>
+                                    </td>
+                                    <td class="col-nombre">
+                                        <mat-form-field appearance="outline" class="table-field">
+                                            <input matInput formControlName="nombre" placeholder="Ej: Reconocimiento DAP">
+                                        </mat-form-field>
+                                    </td>
+                                    <td class="col-categoria">
+                                        <mat-form-field appearance="outline" class="table-field">
+                                            <input matInput formControlName="categoria" placeholder="Ej: Premio a la innovación">
+                                        </mat-form-field>
+                                    </td>
+                                    <td class="col-unidad">
+                                        <mat-form-field appearance="outline" class="table-field">
+                                            <input matInput formControlName="unidad" placeholder="Ej: PUCP - DAP">
+                                        </mat-form-field>
+                                    </td>
+                                    <td class="col-observaciones">
+                                        <mat-form-field appearance="outline" class="table-field">
+                                            <input matInput formControlName="observaciones" placeholder="Observaciones">
+                                        </mat-form-field>
+                                    </td>
+                                    <td class="col-acciones">
+                                        <button mat-icon-button color="warn" type="button"
+                                            aria-label="Eliminar reconocimiento" (click)="eliminarFilaReconocimiento($index)">
+                                            <mat-icon>delete</mat-icon>
+                                        </button>
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        @if (reconocimientosArray.length === 0) {
+                        <div class="empty-reconocimientos">
+                            <mat-icon>info_outline</mat-icon>
+                            <span>No hay reconocimientos registrados. Haz clic en "Agregar Reconocimiento" para
+                                comenzar.</span>
                         </div>
-
-                        <div class="grid-2 align-center">
-                            <label>Premio a la innovación</label>
-                            <mat-form-field appearance="outline" class="compact-input">
-                                <input matInput formControlName="pibpdu" placeholder="Ej: 1er Lugar Innovación">
-                            </mat-form-field>
-                        </div>
-
-                        <div class="grid-2 align-center">
-                            <label>Alto desempeño investigación (3 años)</label>
-                            <mat-form-field appearance="outline" class="compact-input">
-                                <input matInput formControlName="gadi" placeholder="Ej: Periodo 2019-2022">
-                            </mat-form-field>
-                        </div>
-
-                        <div class="grid-2 align-center">
-                            <label>Semestre de estudios</label>
-                            <mat-form-field appearance="outline" class="compact-input">
-                                <input matInput formControlName="sei" placeholder="Ej: Universidad de Salamanca">
-                            </mat-form-field>
-                        </div>
-
-                        <div class="grid-2 align-center">
-                            <label>Alto desempeño docencia (2 años)</label>
-                            <mat-form-field appearance="outline" class="compact-input">
-                                <input matInput formControlName="gadd" placeholder="Ej: Periodo 2020-2022">
-                            </mat-form-field>
-                        </div>
-
-                        <div class="grid-2 align-center">
-                            <label>Semestre de estudios (Int.)</label>
-                            <mat-form-field appearance="outline" class="compact-input">
-                                <input matInput formControlName="gadit" placeholder="Ej: Universidad de Oxford">
-                            </mat-form-field>
-                        </div>
-
-                        <div class="grid-2 align-center">
-                            <label>Dirección de fomento de la investigación</label>
-                            <mat-form-field appearance="outline" class="compact-input">
-                                <input matInput formControlName="dfi" placeholder="Ej: Director de VRI 2023">
-                            </mat-form-field>
-                        </div>
-
+                        }
                     </div>
                 </div>
 

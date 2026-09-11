@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { logins } from '../../../modelos/usuario';
+import { Usuario } from '../../../modelos/usuario';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { AuthApiService } from '../../../../core/api';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
@@ -29,7 +29,7 @@ import Swal from 'sweetalert2';
 })
 export class UsuariosdlgComponent implements OnInit {
   formulario!: FormGroup;
-  usuarios?: logins[];
+  usuarios?: Usuario[];
   funcion: string = 'Añadir';
   fnc: boolean = true;
 
@@ -50,7 +50,7 @@ export class UsuariosdlgComponent implements OnInit {
     public dialogRef: MatDialogRef<UsuariosdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly authApi: AuthApiService
   ) { }
 
   ngOnInit(): void {
@@ -66,9 +66,7 @@ export class UsuariosdlgComponent implements OnInit {
       cargo: ['', Validators.required],
     });
 
-    this.cgdepr.ponerurl("login");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.authApi.listarUsuarios().subscribe(data => {
       this.usuarios = data;
     });
 
@@ -85,7 +83,6 @@ export class UsuariosdlgComponent implements OnInit {
   }
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id,
       dni: this.data.valores.dni,
@@ -114,10 +111,8 @@ export class UsuariosdlgComponent implements OnInit {
       };
 
       if (this.fnc) {
-        this.cgdepr.ponerurl("login/register");
-        this.cgdepr.add(body).subscribe({
+        this.authApi.registrar(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({ title: "Usuario agregado", text: "Continuar", icon: "success" });
             this.dialogRef.close(this.formulario.value);
           },
@@ -126,10 +121,8 @@ export class UsuariosdlgComponent implements OnInit {
           }
         });
       } else {
-        this.cgdepr.ponerurl("login");
-        this.cgdepr.update(body.id, body).subscribe({
+        this.authApi.actualizarUsuario(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({ title: "Usuario actualizado", text: "Continuar", icon: "success" });
             this.dialogRef.close(this.formulario.value);
           },

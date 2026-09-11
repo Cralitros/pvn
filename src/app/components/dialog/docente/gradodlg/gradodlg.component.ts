@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { DocenteGradoApiService, NacionalidadApiService } from '../../../../core/api';
 import { Grado } from '../../../modelos/grado';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepicker';
@@ -18,7 +18,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import Swal from 'sweetalert2';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
-import { Aux1Service } from '../../../../services/aux1.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
 export const MY_DATE_FORMATS = {
@@ -114,13 +113,11 @@ export class GradodlgComponent {
     public dialogRef: MatDialogRef<GradodlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService,
-    private aux12: Aux1Service
+    private readonly docenteGradoApi: DocenteGradoApiService,
+    private readonly nacionalidadApi: NacionalidadApiService
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data);
-
     this.formularioGrado = this.formBuilder.group({
       id: [''],
       gradosTabla: this.formBuilder.array([]),
@@ -134,8 +131,7 @@ export class GradodlgComponent {
 
     this.cargarPaises();
 
-    this.cgdepr.ponerurl("docentesgrado");
-    this.cgdepr.get().subscribe(data => {
+    this.docenteGradoApi.listar().subscribe(data => {
       this.grado_obt = data;
     });
 
@@ -203,8 +199,7 @@ export class GradodlgComponent {
   }
 
   cargarPaises() {
-    this.aux12.ponerurl("nacionalidad");
-    this.aux12.get().subscribe(data => {
+    this.nacionalidadApi.listar().subscribe(data => {
       this.paises = data;
     });
   }
@@ -368,12 +363,9 @@ export class GradodlgComponent {
       prestamo: this.formularioGrado.value?.prestamo || '',
     };
 
-    this.cgdepr.ponerurl("docentesgrado");
-
     if (this.fnc == true) {
-      this.cgdepr.add(body).subscribe({
+      this.docenteGradoApi.crear(body).subscribe({
         next: (data) => {
-          console.log("agregado", data);
           Swal.fire({
             title: "Agregado",
             text: "Los datos se han guardado correctamente",
@@ -393,9 +385,8 @@ export class GradodlgComponent {
         }
       });
     } else {
-      this.cgdepr.update(body.codigoDocente, body).subscribe({
+      this.docenteGradoApi.actualizar(body.codigoDocente, body).subscribe({
         next: (data) => {
-          console.log("actualizado", data);
           Swal.fire({
             title: "Actualizado",
             text: "Los datos se han actualizado correctamente",

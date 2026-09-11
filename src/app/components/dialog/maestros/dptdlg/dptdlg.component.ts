@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Departamento } from '../../../modelos/departamento';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { DepartamentoApiService } from '../../../../core/api';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
@@ -35,7 +35,7 @@ export class DptdlgComponent implements OnInit {
     public dialogRef: MatDialogRef<DptdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly departamentoApi: DepartamentoApiService
   ) {}
 
   ngOnInit(): void {
@@ -45,9 +45,7 @@ export class DptdlgComponent implements OnInit {
       valor: ['', Validators.required]
     });
 
-    this.cgdepr.ponerurl("departamentos");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.departamentoApi.listar().subscribe(data => {
       this.departamentos = data;
     });
 
@@ -62,7 +60,6 @@ export class DptdlgComponent implements OnInit {
   }
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id,
       nombre: this.data.valores.nombre,
@@ -79,10 +76,8 @@ export class DptdlgComponent implements OnInit {
       };
 
       if (this.fnc) {
-        this.cgdepr.ponerurl("departamentos");
-        this.cgdepr.add(body).subscribe({
+        this.departamentoApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "El departamento se agregó correctamente",
@@ -100,10 +95,8 @@ export class DptdlgComponent implements OnInit {
           }
         });
       } else {
-        this.cgdepr.ponerurl("departamentos");
-        this.cgdepr.update(body.id, body).subscribe({
+        this.departamentoApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "El departamento se actualizó correctamente",

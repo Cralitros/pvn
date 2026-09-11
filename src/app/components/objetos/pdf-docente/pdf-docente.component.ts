@@ -4,9 +4,7 @@ import { MatButton, MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Aux1Service } from '../../../services/aux1.service';
-import { HttpClient } from '@angular/common/http';
-import { DomSanitizer } from '@angular/platform-browser';
+import { FirmaApiService } from '../../../core/api';
 import { Personal } from '../../modelos/personal';
 import { DocenteCurso } from '../../modelos/docentecurso';
 import { Document, Paragraph, TextRun, Packer, AlignmentType, ImageRun, Media } from 'docx';
@@ -55,19 +53,12 @@ export class PdfDocenteComponent {
   firmaImagenBase64: string = ''; // la cadena que me diste
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private saux1: Aux1Service,
-    private http: HttpClient,
-    private sanitizer: DomSanitizer
-  ) {
-    console.log('Datos recibidos en diálogo:', data);
-    this.saux1.ponerurl("firma/dni/07628234");
-    saux1.get().subscribe(data => {
-      console.log(data);
-      this.firmaImagenBase64 = 'data:image/png;base64,' + data[0].firma;
-    })
-  }
+    private readonly firmaApi: FirmaApiService
+  ) { }
 
   ngOnInit(): void {
+
+    this.cargarFirma();
 
     // Asignar datos del docente
     this.docente = {
@@ -94,8 +85,32 @@ export class PdfDocenteComponent {
       ? this.obtenerIniciales(`${this.asistente.nombres} ${this.asistente.apellidos}`)
       : '';
     this.agrupados = this.agruparCursosPorCurso(this.data.persona.DocenteCursos);
-    console.log(this.agrupados);
 
+  }
+
+  /**
+   * Carga la firma del docente desde la API.
+   *
+   * Antes esta petición pedía siempre `firma/dni/07628234` (un DNI escrito a
+   * mano en el código), de modo que todos los certificados mostraban la misma
+   * firma; ahora usa el DNI del docente abierto.
+   */
+  private cargarFirma(): void {
+    const dni = this.data?.persona?.dni;
+
+    if (!dni) {
+      return;
+    }
+
+    this.firmaApi.obtenerPorDni(dni).subscribe({
+      next: (firmas) => {
+        const firma = firmas?.[0]?.firma;
+        this.firmaImagenBase64 = firma ? `data:image/png;base64,${firma}` : '';
+      },
+      error: (err: unknown) => {
+        console.error('Error al cargar la firma del docente:', err);
+      }
+    });
   }
 
   obtenerCampoYUltimaFecha(docente: any): { campo: string; fecha: Date } | null {

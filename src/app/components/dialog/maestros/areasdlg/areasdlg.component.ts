@@ -6,7 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Area } from '../../../modelos/area';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { AreaApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -32,7 +32,7 @@ export class AreasdlgComponent {
     public dialogRef: MatDialogRef<AreasdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly areaApi: AreaApiService
   ) { }
 
   poner_datos() {
@@ -48,8 +48,7 @@ export class AreasdlgComponent {
       nombre: ['', Validators.required],
     });
 
-    this.cgdepr.ponerurl("area");
-    this.cgdepr.get().subscribe(data => {
+    this.areaApi.listar().subscribe(data => {
       this.areas = data;
     });
 
@@ -69,16 +68,14 @@ export class AreasdlgComponent {
       nombre: this.formulario.value.nombre,
     };
 
-    this.cgdepr.ponerurl("area");
-
     if (this.formulario?.valid) {
       if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe(data => {
+        this.areaApi.crear(body).subscribe(data => {
           Swal.fire({ title: "Agregado", text: "Continuar", icon: "info" });
           this.dialogRef.close(this.formulario.value);
         });
       } else {
-        this.cgdepr.update(body.id, body).subscribe(data => {
+        this.areaApi.actualizar(body.id, body).subscribe(data => {
           Swal.fire({ title: "Actualizado", text: "Continuar", icon: "info" });
           this.dialogRef.close(this.formulario.value);
         });

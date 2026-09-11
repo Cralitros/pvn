@@ -3,7 +3,7 @@ import { Component, ElementRef, ViewChild, AfterViewInit, Inject } from '@angula
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import SignaturePad from 'signature_pad';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { FirmaApiService } from '../../../../core/api';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -42,7 +42,7 @@ export class FirmasdlgComponent {
     public dialogRef: MatDialogRef<FirmasdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly firmaApi: FirmaApiService
   ) {
     this.form = this.formBuilder.group({
       iniciales: [],
@@ -62,8 +62,6 @@ export class FirmasdlgComponent {
     }
   }
   poner_datos() {
-    console.log(this.data);
-
     this.form.setValue({
       iniciales: this.data.valores.iniciales || '',
       tipoFirma: '1',
@@ -76,7 +74,6 @@ export class FirmasdlgComponent {
       // reconstruir la imagen a partir del string Base64
       this.signatureText = this.data.valores.firma;
       this.signatureImg = `data:image/png;base64,${this.data.valores.firma}`;
-      console.log('Firma precargada en vista previa');
     }
 
     // 3️⃣ Reaccionar según tipo de firma
@@ -130,8 +127,6 @@ export class FirmasdlgComponent {
     const dataUrl = this.signaturePad.toDataURL('image/png');
     this.signatureImg = dataUrl;
     this.signatureText = dataUrl.replace(/^data:image\/(png|jpg|jpeg);base64,/, '');
-
-    console.log('Vista previa actualizada:', this.signatureText.substring(0, 50) + '...');
   }
 
   private destroySignaturePad(): void {
@@ -157,13 +152,9 @@ export class FirmasdlgComponent {
       firma: this.signatureText,
       idLogin: this.data.valores?.codigo?.id?this.data.valores?.codigo?.id:this.data.valores.id
     }
-    console.log(body);
-
-    this.cgdepr.ponerurl("firma")
 
     if (this.fnc == true) {
-      this.cgdepr.add(body).subscribe(data => {
-        console.log("agregado");
+      this.firmaApi.crear(body).subscribe(data => {
         Swal.fire({
           title: "Agregado",
           text: "Continuar",
@@ -172,8 +163,7 @@ export class FirmasdlgComponent {
         this.dialogRef.close(this.form.value);
       })
     } else {
-      this.cgdepr.update(body.id, body).subscribe(data => {
-        console.log("actualizado");
+      this.firmaApi.actualizar(body.id, body).subscribe(data => {
         Swal.fire({
           title: "Actualizado",
           text: "Continuar",
@@ -204,14 +194,12 @@ export class FirmasdlgComponent {
         return;
       }
       // si fileLoaded === true, signatureImg y signatureText ya están listos
-      console.log('Firma cargada Base64:', this.signatureText);
     } else {
       alert('Por favor selecciona un tipo de firma.');
       return;
     }
 
     // proceder a enviar/guardar
-    console.log('✅ Firma lista para guardar');
     this.salvar();
     // ej: this.dialogRef.close({ signatureText: this.signatureText, signatureImg: this.signatureImg });
   }
@@ -225,10 +213,6 @@ export class FirmasdlgComponent {
       const reader = new FileReader();
 
       reader.onload = (e: any) => {
-        console.log('Tipo de resultado:', typeof e.target.result);
-        console.log('Longitud Base64:', e.target.result.length);
-        console.log('Inicio Base64:', e.target.result.substring(0, 50));
-
         this.signatureImg = e.target.result;
         this.signatureText = this.signatureImg.replace(/^data:image\/(png|jpg|jpeg);base64,/, '');
         this.fileLoaded = true;
@@ -239,23 +223,17 @@ export class FirmasdlgComponent {
   }
 
   onFileSelected(event: any) {
-    console.log('📂 Evento change disparado');
     const file: File = event.target.files[0];
     if (!file) {
       console.warn('⚠️ No se seleccionó archivo');
       return;
     }
 
-    console.log('Archivo:', file.name, file.type, file.size);
     const reader = new FileReader();
 
-    reader.onloadstart = () => console.log('⏳ Iniciando lectura...');
-    reader.onloadend = () => console.log('✅ Lectura terminada');
     reader.onload = (e: any) => {
-      console.log('📦 Dentro de reader.onload');
       this.signatureImg = e.target.result;
       this.signatureText = this.signatureImg.replace(/^data:image\/(png|jpg|jpeg);base64,/, '');
-      console.log('✅ Imagen convertida correctamente');
     };
     reader.onerror = (e) => console.error('❌ Error al leer archivo', e);
 

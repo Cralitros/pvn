@@ -1,4 +1,4 @@
-export interface logins{
+export interface Usuario{
     id?:string;
     dni:string;
     password:string;

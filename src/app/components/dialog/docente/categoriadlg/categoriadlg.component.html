@@ -126,43 +126,60 @@
       <div class="tab-form" [formGroup]="formularioHistorico">
         <div class="form-section">
           <span class="section-title">Registro de Ascensos y Fechas</span>
-          <div class="grid-3">
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Jefe Práctica</mat-label><input
-                matInput [matDatepicker]="p1" formControlName="jefepractica" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'jefepractica')"><mat-datepicker-toggle matIconSuffix
-                [for]="p1"></mat-datepicker-toggle><mat-datepicker #p1></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Ayudante</mat-label><input matInput
-                [matDatepicker]="p2" formControlName="ayudante" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'ayudante')"><mat-datepicker-toggle matIconSuffix
-                [for]="p2"></mat-datepicker-toggle><mat-datepicker #p2></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Asistente</mat-label><input matInput
-                [matDatepicker]="p3" formControlName="asistente" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'asistente')"><mat-datepicker-toggle matIconSuffix
-                [for]="p3"></mat-datepicker-toggle><mat-datepicker #p3></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Instructor</mat-label><input matInput
-                [matDatepicker]="p4" formControlName="instructor" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'instructor')"><mat-datepicker-toggle matIconSuffix
-                [for]="p4"></mat-datepicker-toggle><mat-datepicker #p4></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Prof. Visitante</mat-label><input
-                matInput [matDatepicker]="p5" formControlName="profesorvisitante" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'profesorvisitante')"><mat-datepicker-toggle matIconSuffix
-                [for]="p5"></mat-datepicker-toggle><mat-datepicker #p5></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Contratado</mat-label><input matInput
-                [matDatepicker]="p6" formControlName="contratado" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'contratado')"><mat-datepicker-toggle matIconSuffix
-                [for]="p6"></mat-datepicker-toggle><mat-datepicker #p6></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Auxiliar</mat-label><input matInput
-                [matDatepicker]="p7" formControlName="auxiliar" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'auxiliar')"><mat-datepicker-toggle matIconSuffix
-                [for]="p7"></mat-datepicker-toggle><mat-datepicker #p7></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Asociado</mat-label><input matInput
-                [matDatepicker]="p8" formControlName="asociado" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'asociado')"><mat-datepicker-toggle matIconSuffix
-                [for]="p8"></mat-datepicker-toggle><mat-datepicker #p8></mat-datepicker></mat-form-field>
-            <mat-form-field appearance="outline" class="formato"><mat-label>Fecha Principal</mat-label><input matInput
-                [matDatepicker]="p9" formControlName="principal" placeholder="DD/MM/YYYY"
-                (input)="onDateInput($event, 'principal')"><mat-datepicker-toggle matIconSuffix
-                [for]="p9"></mat-datepicker-toggle><mat-datepicker #p9></mat-datepicker></mat-form-field>
+
+          <div class="table-header-actions">
+            <button mat-raised-button color="primary" type="button" class="btn-add-row"
+              (click)="agregarFilaAscenso()">
+              <mat-icon>add</mat-icon> Agregar Categoría
+            </button>
+          </div>
+
+          <div class="ascensos-container">
+            <table class="ascensos-table">
+              <thead>
+                <tr>
+                  <th class="col-categoria">CATEGORÍA</th>
+                  <th class="col-fecha">FECHA</th>
+                  <th class="col-acciones"></th>
+                </tr>
+              </thead>
+              <tbody formArrayName="ascensos">
+                @for (fila of ascensosArray.controls; track $index) {
+                <tr [formGroup]="$any(fila)">
+                  <td class="col-categoria">
+                    <mat-form-field appearance="outline" class="table-field">
+                      <mat-select formControlName="nombre" placeholder="Seleccione categoría">
+                        @for (cat of catalogoAscensos; track cat) {
+                        <mat-option [value]="cat">{{ cat }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td class="col-fecha">
+                    <mat-form-field appearance="outline" class="table-field">
+                      <input matInput [matDatepicker]="pickerAscenso_$index" formControlName="fecha"
+                        placeholder="DD/MM/YYYY">
+                      <mat-datepicker-toggle matIconSuffix [for]="pickerAscenso_$index"></mat-datepicker-toggle>
+                      <mat-datepicker #pickerAscenso_$index></mat-datepicker>
+                    </mat-form-field>
+                  </td>
+                  <td class="col-acciones">
+                    <button mat-icon-button color="warn" type="button" aria-label="Eliminar ascenso"
+                      (click)="eliminarFilaAscenso($index)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+
+            @if (ascensosArray.length === 0) {
+            <div class="empty-ascensos">
+              <mat-icon>info_outline</mat-icon>
+              <span>No hay ascensos registrados. Haz clic en "Agregar Categoría" para comenzar.</span>
+            </div>
+            }
           </div>
           <div class="grid-2" style="margin-top: 12px;">
             <mat-form-field appearance="outline">

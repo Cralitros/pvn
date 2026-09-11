@@ -3,8 +3,14 @@ export interface InfoDocencia{
     id:string;
     categoria:string;
     dedicacion:string;
+    estado:string;//nuevo
+    lineaActual:string;//nuevo
+    tipoDocente:string;//nuevo
+    fechaVigencia:string;//nuevo
+    resolucionVigente:string;//nuevo
     inicio_dictado:Date;
     fin_dictado:Date;
+    semestre:string;
     modo_ingreso:string;
     departamento:string;
     lugar_dictado:string;

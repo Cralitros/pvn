@@ -11,8 +11,8 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Categoria } from '../../modelos/categoria';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
+import { DocenteApiService, DocenteCategoriaApiService } from '../../../core/api';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { CategoriadlgComponent } from '../../dialog/docente/categoriadlg/categoriadlg.component';
@@ -65,7 +65,8 @@ export class CategoriaComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
+    private readonly docenteApi: DocenteApiService,
+    private readonly docenteCategoriaApi: DocenteCategoriaApiService,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
@@ -88,7 +89,6 @@ export class CategoriaComponent {
       // const tipo = params['tipo'];
       const data = params['selectedRow'];
 
-      console.log('Selected Row:', data);
       this.cargartabla().then(() => {
         this.buscar(data);
       });
@@ -122,8 +122,7 @@ export class CategoriaComponent {
 
   private async crearNuevo(codigo: string): Promise<void> {
     try {
-      this.mservice.ponerurl("docentes/cod");
-      const docenteData: any = await lastValueFrom(this.mservice.getid(codigo));
+      const docenteData: any = await lastValueFrom(this.docenteApi.obtenerPorCodigo(codigo));
 
       if (!docenteData || (Array.isArray(docenteData) && docenteData.length === 0)) {
         Swal.fire('Error', 'El código de docente no existe en el sistema.', 'error');
@@ -153,6 +152,13 @@ export class CategoriaComponent {
   }
 
   async buscar(data: any) {
+    // Sin fila seleccionada no hay nada que buscar. Antes se hacía
+    // `setValue({ codigo: undefined })`, que lanza NG01002 cada vez que se
+    // entraba a la pantalla sin venir de una fila seleccionada.
+    if (data === undefined || data === null || `${data}`.trim() === '') {
+      return;
+    }
+
     this.formulario?.setValue({ 'codigo': data });
     await this.abrirDialogoLaboral();
   }
@@ -163,29 +169,38 @@ export class CategoriaComponent {
   }
 
   async cargartabla() {
-    this.mservice.ponerurl("docentescategoria");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
+    try {
+      const source$ = this.docenteCategoriaApi.listar();
+      const finalNumber: any = await lastValueFrom(source$);
 
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento = this.cartabla.array;
-    console.log(this.tablaDepartamento);
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento = this.cartabla.array;
 
-    this.sctabla.setData(this.tablaDepartamento);
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la tabla',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
   dialogo() {
     let laboral: any;
-    this.mservice.ponerurl("docentes/cod");
-    this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
-      console.log(data);
-      console.log("categoria");
-
+    this.docenteApi.obtenerPorCodigo(this.formulario?.value.codigo).subscribe((data: any) => {
       laboral = data;
       if (data[0].DocenteCategoria.length == 0) {//verifica si existe el docente
 
-        this.mservice.ponerurl("docentescategoria");
-        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
-          console.log(data2);
+        this.docenteCategoriaApi.obtener(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
 
           const dialogRef = this.dialog.open(CategoriadlgComponent, {
             width: '1000px',
@@ -260,9 +275,7 @@ export class CategoriaComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.codigoDocente).subscribe(data => {
-      console.log("Eliminado");
+    this.docenteCategoriaApi.eliminar(element.codigoDocente).subscribe(data => {
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",

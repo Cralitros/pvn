@@ -1,78 +1,59 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { SafeUrlPipe } from './safe-url.pipe';
-import { Aux1Service } from '../../../services/aux1.service';
-import { HttpClient } from '@angular/common/http';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Subscription, tap } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Subscription } from 'rxjs';
 import { saveAs } from 'file-saver';
-import {MatIconModule} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+
+import { DocenteApiService } from '../../../core/api';
 
 @Component({
   selector: 'app-pdfview',
   standalone: true,
-  imports: [ MatIconModule,MatButtonModule],
+  imports: [MatIconModule, MatButtonModule],
   templateUrl: './pdfview.component.html',
   styleUrl: './pdfview.component.scss'
 })
 export class PdfviewComponent {
 
-  pdfSrc:  any ;
+  pdfSrc: any;
   private subscription: Subscription | null = null;
-  private apiUrl =  environment.direccion;
-  private direccion="";
+
   constructor(@Inject(MAT_DIALOG_DATA) public data: any,
-    private saux1: Aux1Service,
-    private http: HttpClient,
+    private readonly docenteApi: DocenteApiService,
     private sanitizer: DomSanitizer) {
-    console.log(data);
-    this.saux1.ponerurl(`docentes/contrato/${data.persona.codigo}`);
-
-  }
-
-  direc(dir:any){
-
-
   }
 
   ngAfterViewInit() {
     // Set the PDF source after the view is initialized
-    // this.pdfSrc = this.data.pdfUrl; // Adjust based on your data structure
     this.loadPdf();
   }
 
+  /**
+   * Carga en el visor el PDF del contrato del docente.
+   *
+   * La URL ya no se arma a mano contra `environment`: la construye
+   * `DocenteApiService`, que es el único punto que conoce las rutas de la API.
+   */
   loadPdf() {
-    const url = `${this.apiUrl}docentes/contrato/${this.data.persona.codigo}/${localStorage.getItem('dni')}`; // Ajusta la URL según tu API
-    console.log('Solicitando PDF para código:', this.data.codigo);
+    const codigo = this.data?.persona?.codigo;
+    const dni = localStorage.getItem('dni');
 
-    console.log(url);
-    
-    /*this.http.get(url, { responseType: 'blob' })
-    .subscribe((response: Blob) => {
-      const blob = new Blob([response], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      window.open(url);
-    });*/
+    if (!codigo || !dni) {
+      console.error('No se pudo cargar el contrato: falta el código del docente o el DNI en sesión.');
+      return;
+    }
 
-   this.subscription = this.http
-      .get(url, { responseType: 'blob' as const }) // 'as const' asegura el tipo literal
-      .subscribe({
-        next: (blob: Blob) => {
-          console.log('PDF recibido como Blob:', blob);
-          const blobUrl = URL.createObjectURL(blob);
-          this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
-          console.log('PDF asignado al visor:', blobUrl);
-        },
-        error: (err: any) => {
-          console.error('Error al cargar el PDF:', err);
-        },
-        complete: () => {
-          console.log('Carga del PDF completada');
-        }
-      });
+    this.subscription = this.docenteApi.descargarContrato(codigo, dni).subscribe({
+      next: (blob: Blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        this.pdfSrc = this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
+      },
+      error: (err: unknown) => {
+        console.error('Error al cargar el PDF:', err);
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -84,30 +65,25 @@ export class PdfviewComponent {
       URL.revokeObjectURL(this.pdfSrc as string);
     }
   }
-  
+
   /**********WORD */
   generarContratoDocx() {
-    //const url = `${this.apiUrl}docentes/contrato/${this.data.persona.codigo}/${localStorage.getItem('dni')}`; // Ajusta la URL según tu API
-    console.log(`${this.apiUrl}docentes/contratow/${this.data.persona.codigo}`);
-    
-    const url = `${this.apiUrl}docentes/contratow/${this.data.persona.codigo}`; // Ajusta la URL según tu API
-    /*return this.http.get(url, {
-      params: { codigo: this.data.persona.codigo },
-      responseType: 'blob' // Importante para recibir archivos
-    }).pipe(
-      tap((blob: Blob) => {
-        saveAs(blob, `contrato_docente_${this.data.persona.codigo}.docx`);
-      })
-    );*/
-    this.http.get(url, {
-      params: { codigo: this.data.persona.codigo },
-      responseType: 'blob'
-    }).subscribe((blob: Blob) => {
-      saveAs(blob, `contrato_docente_${this.data.persona.codigo}.docx`);
-      alert('El archivo ha sido descargado. Ábrelo desde tu carpeta de descargas.');
+    const codigo = this.data?.persona?.codigo;
+
+    if (!codigo) {
+      console.error('No se pudo generar el contrato: falta el código del docente.');
+      return;
+    }
+
+    this.docenteApi.descargarContratoWord(codigo).subscribe({
+      next: (blob: Blob) => {
+        saveAs(blob, `contrato_docente_${codigo}.docx`);
+        alert('El archivo ha sido descargado. Ábrelo desde tu carpeta de descargas.');
+      },
+      error: (err: unknown) => {
+        console.error('Error al generar el contrato en Word:', err);
+      }
     });
   }
-
-
 
 }

@@ -15,8 +15,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { InfoDocencia } from '../../modelos/infodocencia';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
+import { DocenteApiService, DocenteInfoApiService } from '../../../core/api';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { lastValueFrom } from 'rxjs';
@@ -93,16 +93,13 @@ export class InfoDocenciaComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
+    private readonly docenteApi: DocenteApiService,
+    private readonly docenteInfoApi: DocenteInfoApiService,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
     private route: ActivatedRoute
   ) {
-
-    this.cargartabla();
-    console.log("************");
-    console.log(this.tablaInfoDocencia);
 
     sctabla.setData(this.tablaInfoDocencia);
     this.departamentoForm = this.fb.group({
@@ -121,7 +118,6 @@ export class InfoDocenciaComponent {
       // const tipo = params['tipo'];
       const data = params['selectedRow'];
 
-      console.log('Selected Row:', data);
       this.cargartabla().then(() => {
         this.buscar(data);
       });
@@ -155,8 +151,7 @@ export class InfoDocenciaComponent {
 
   private async crearNuevo(codigo: string): Promise<void> {
     try {
-      this.mservice.ponerurl("docentes/cod");
-      const docenteData: any = await lastValueFrom(this.mservice.getid(codigo));
+      const docenteData: any = await lastValueFrom(this.docenteApi.obtenerPorCodigo(codigo));
 
       if (!docenteData || (Array.isArray(docenteData) && docenteData.length === 0)) {
         Swal.fire('Error', 'El código de docente no existe en el sistema.', 'error');
@@ -186,6 +181,13 @@ export class InfoDocenciaComponent {
   }
 
   async buscar(data: any) {
+    // Sin fila seleccionada no hay nada que buscar. Antes se hacía
+    // `setValue({ codigo: undefined })`, que lanza NG01002 cada vez que se
+    // entraba a la pantalla sin venir de una fila seleccionada.
+    if (data === undefined || data === null || `${data}`.trim() === '') {
+      return;
+    }
+
     this.formulario?.setValue({ 'codigo': data });
     await this.abrirDialogoLaboral();
   }
@@ -196,27 +198,38 @@ export class InfoDocenciaComponent {
   }
 
   async cargartabla() {
-    this.mservice.ponerurl("docentesinfo");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
+    try {
+      const source$ = this.docenteInfoApi.listar();
+      const finalNumber: any = await lastValueFrom(source$);
 
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaInfoDocencia = this.cartabla.array;
-    console.log(this.tablaInfoDocencia);
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaInfoDocencia = this.cartabla.array;
 
-    this.sctabla.setData(this.tablaInfoDocencia);
+      this.sctabla.setData(this.tablaInfoDocencia);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la tabla',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
   dialogo() {
     let laboral: any;
-    this.mservice.ponerurl("docentes/cod");
-    this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
-      console.log(data);
+    this.docenteApi.obtenerPorCodigo(this.formulario?.value.codigo).subscribe((data: any) => {
       laboral = data;
       if (data.length > 0) {//verifica si existe el docente
 
-        this.mservice.ponerurl("docentesinfo/cod");
-        this.mservice.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
-          console.log(data2);
+        this.docenteInfoApi.obtenerPorCodigo(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
           if (data2.length == 0) {
             const dialogRef = this.dialog.open(InfodocenciadlgComponent, {
               width: '850px',
@@ -268,6 +281,11 @@ export class InfoDocenciaComponent {
           codigoDocente: this.cartabla.dataSeleccionada.codigoDocente,
           docente: this.cartabla.dataSeleccionada.Docente,
           semestre: this.cartabla.dataSeleccionada.semestre,
+          estado: this.cartabla.dataSeleccionada.estado,
+          lineaActual: this.cartabla.dataSeleccionada.lineaActual,
+          tipoDocente: this.cartabla.dataSeleccionada.tipoDocente,
+          fechaVigencia: this.cartabla.dataSeleccionada.fechaVigencia,
+          resolucionVigente: this.cartabla.dataSeleccionada.resolucionVigente,
         },
         modo: 1
 
@@ -281,9 +299,7 @@ export class InfoDocenciaComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
+    this.docenteInfoApi.eliminar(element.id).subscribe(data => {
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",

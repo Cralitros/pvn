@@ -3,8 +3,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, 
 import { DateAdapter, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
-import { Aux1Service } from '../../../../services/aux1.service';
+import { DocenteInfoApiService, FacultadApiService, NacionalidadApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -20,7 +19,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Facultad } from '../../../modelos/facultad';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
-import { Aux2Service } from '../../../../services/aux2.service';
 
 @Component({
   selector: 'app-infodocenciadlg',
@@ -64,16 +62,14 @@ export class InfodocenciadlgComponent {
   constructor(public dialogRef: MatDialogRef<InfodocenciadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService,
-    private saux1: Aux1Service,
-    private saux2: Aux2Service,) {
+    private readonly docenteInfoApi: DocenteInfoApiService,
+    private readonly facultadApi: FacultadApiService,
+    private readonly nacionalidadApi: NacionalidadApiService,) {
 
 
 
   }
   poner_datos() {
-    console.log(this.data);
-
     this.formularioInfo.setValue({
       id: this.validar_datos(this.data.valores.id),
       categoria: this.validar_datos(this.data.valores.categoria),
@@ -95,7 +91,12 @@ export class InfodocenciadlgComponent {
       historico: this.validar_datos(this.data.valores.historico),
       felicitacion: this.validar_datos(this.data.valores.felicitacion),
       codigoDocente: this.validar_datos(this.data.valores.codigoDocente),
-      semestre:this.validar_datos(this.data.valores.semestre)
+      semestre:this.validar_datos(this.data.valores.semestre),
+      estado: this.validar_datos(this.data.valores.estado),
+      lineaActual: this.validar_datos(this.data.valores.lineaActual),
+      tipoDocente: this.validar_datos(this.data.valores.tipoDocente),
+      fechaVigencia: this.validar_datos(this.data.valores.fechaVigencia),
+      resolucionVigente: this.validar_datos(this.data.valores.resolucionVigente)
     });
     //this.form.value.id=this.data.valores.id;
   }
@@ -144,8 +145,6 @@ export class InfodocenciadlgComponent {
       fecha = new Date(year, month, day);
     }
 
-    console.log(fecha); // Para verificar en consola
-
     if (fecha) {
       const fechaControl = this.formularioInfo.get(campo);
       fechaControl?.patchValue(fecha);
@@ -180,7 +179,12 @@ export class InfodocenciadlgComponent {
       historico: [''],
       felicitacion: [''],
       codigoDocente: [''],
-      semestre:['']
+      semestre:[''],
+      estado: [''],
+      lineaActual: [''],
+      tipoDocente: [''],
+      fechaVigencia: [''],
+      resolucionVigente: ['']
     });
 
     if (this.data.modo == 1) {
@@ -201,17 +205,13 @@ export class InfodocenciadlgComponent {
     this.formularioInfo.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
   }
   cargar_unidades_academicas(){
-    this.saux1.ponerurl("facultad");
-    this.saux1.get().subscribe(data=>{
-      console.log(data);
+    this.facultadApi.listar().subscribe(data=>{
       this.unidades_academicas=data;
     });
 
   }
   cargar_nacionalidad(){
-    this.saux1.ponerurl("nacionalidad");
-    this.saux1.get().subscribe(data=>{
-      console.log(data);
+    this.nacionalidadApi.listar().subscribe(data=>{
       this.pais_dictado=data;
     });
   }
@@ -237,38 +237,56 @@ export class InfodocenciadlgComponent {
       historico: this.validar_datos(this.formularioInfo.value?.historico),
       felicitacion: this.validar_datos(this.formularioInfo.value?.felicitacion),
       codigoDocente: this.validar_datos(this.formularioInfo.value?.codigoDocente),
-      semestre:this.validar_datos(this.formularioInfo.value?.semestre)
+      semestre:this.validar_datos(this.formularioInfo.value?.semestre),
+      estado: this.validar_datos(this.formularioInfo.value?.estado),
+      lineaActual: this.validar_datos(this.formularioInfo.value?.lineaActual),
+      tipoDocente: this.validar_datos(this.formularioInfo.value?.tipoDocente),
+      fechaVigencia: this.validar_datos(this.formularioInfo.value?.fechaVigencia),
+      resolucionVigente: this.validar_datos(this.formularioInfo.value?.resolucionVigente)
     }
-    this.cgdepr.ponerurl("docentesinfo")
     if (this.formularioInfo?.valid) {
+      // Cierre SÓLO tras la respuesta: cerrar antes hacía que el listado
+      // recargara sin ver todavía el registro guardado.
       if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe(data => {
-          console.log("agregado");
-          Swal.fire({
-            title: "Agregado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formularioInfo.value);
+        this.docenteInfoApi.crear(body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Agregado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formularioInfo.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
       } else {
-        this.cgdepr.update(body.codigoDocente, body).subscribe(data => {
-          console.log("actualizado");
-          Swal.fire({
-            title: "Actualizado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formularioInfo.value);
+        this.docenteInfoApi.actualizar(body.codigoDocente, body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Actualizado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formularioInfo.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
       }
-
-      this.dialogRef.close(this.formularioInfo.value);
     } else {
       // Marcar campos como tocados para mostrar errores de validación
       this.formularioInfo?.markAllAsTouched();
     }
   }
+  /** Aviso común si el guardado falla: el diálogo se queda abierto para reintentar. */
+  private mostrarErrorAlGuardar(error: unknown): void {
+    console.error('Error al guardar:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'No se pudo guardar. Inténtalo de nuevo.',
+      icon: 'error'
+    });
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
@@ -276,12 +294,9 @@ export class InfodocenciadlgComponent {
   verificarInfo(data:any){
     //console.log(data);
     if(data!=undefined){
-      console.log(data);
-      
       return  `${data.nombres} ${data.apellidos}`
     }
     else{
-      console.log("data");
       return "";
     }
     

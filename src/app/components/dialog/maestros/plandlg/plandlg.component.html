@@ -27,9 +27,11 @@
     <mat-form-field appearance="outline" class="example-full-width">
       <mat-label>Nivel Académico</mat-label>
       <mat-select formControlName="nivel_academico" placeholder="Seleccionar nivel">
-        <mat-option *ngFor="let nvl of nivelesacad; track nvl" [value]="nvl">
+        @for (nvl of nivelesacad; track nvl) {
+        <mat-option [value]="nvl">
           {{ nvl }}
         </mat-option>
+        }
       </mat-select>
       <mat-error class="mensaje" *ngIf="formulario.get('nivel_academico')?.hasError('required') && formulario.get('nivel_academico')?.touched">
         Nivel académico es requerido.

@@ -11,7 +11,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Afp } from '../../modelos/afp';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { AfpApiService } from '../../../core/api';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom, Subject } from 'rxjs';
@@ -58,15 +58,11 @@ export class AfpsComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
+    private readonly afpApi: AfpApiService,
     private cartabla: ConversiontablaService,
     public dialog: MatDialog,
     private mensajeService: TipoTablaService
   ) {
-
-
-    this.cargartabla();
-    console.log(this.tablaDepartamento);
 
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
@@ -84,13 +80,29 @@ export class AfpsComponent {
   }
 
   async cargartabla() {
-    this.mservice.ponerurl("afps");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
+    try {
+      const source$ = this.afpApi.listar();
+      const finalNumber: any = await lastValueFrom(source$);
 
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento = this.cartabla.array;
-    this.sctabla.setData(this.tablaDepartamento);
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento = this.cartabla.array;
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la lista de AFP',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
 
   ngOnDestroy(): void {
@@ -136,9 +148,7 @@ export class AfpsComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
+    this.afpApi.eliminar(element.id).subscribe(data => {
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",

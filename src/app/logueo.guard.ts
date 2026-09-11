@@ -1,31 +1,30 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { AuthServiceService } from './services/auth-service.service';
+import { isPlatformBrowser } from '@angular/common';
 
-
+/**
+ * Impide volver al login si ya hay una sesión iniciada.
+ *
+ * Notas de la limpieza:
+ * - Se eliminó la inyección de `AuthServiceService` que no se usaba y los
+ *   `console.log` de depuración.
+ * - Se añadió la comprobación de plataforma: antes se leía `window.localStorage`
+ *   sin verificar que `window` existiera, lo que rompía durante el renderizado
+ *   en servidor (SSR/prerender). En el navegador el comportamiento es idéntico.
+ */
 export const logueoGuard: CanActivateFn = (route, state) => {
+  const platformId = inject(PLATFORM_ID);
 
-  console.log(route);
-  console.log(state);
-  let flg=inject(AuthServiceService);
-  console.log(localStorage);
-  
-  const isLocalStorageAvailable = typeof window !== 'undefined' && window.localStorage;
-    //localStorage.setItem("token","123456");
-    if(window.localStorage?.getItem("token") && window.localStorage?.getItem("token")!.length>10  ){
-      /* console.log("correcto");
-       this.router.navigate(['dash']);*/
-       inject(Router).navigate(['dashboard']);
-       return false;
-     }
-     else{
-      // console.log("incorrecto");
-       
-       return true;
-     }
+  if (!isPlatformBrowser(platformId)) {
+    return true;
+  }
 
-  
+  const token = window.localStorage?.getItem('token');
 
- return true;
-  
+  if (token && token.length > 10) {
+    inject(Router).navigate(['dashboard']);
+    return false;
+  }
+
+  return true;
 };

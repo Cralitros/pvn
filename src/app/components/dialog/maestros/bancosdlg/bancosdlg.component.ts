@@ -16,7 +16,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { Banco } from '../../../modelos/banco';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { BancoApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -52,11 +52,10 @@ export class BancosdlgComponent {
     public dialogRef: MatDialogRef<BancosdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly bancoApi: BancoApiService
   ) {}
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id || '',
       nombre: this.data.valores.nombre || '',
@@ -69,9 +68,7 @@ export class BancosdlgComponent {
       nombre: ['', [Validators.required, Validators.minLength(3)]],
     });
 
-    this.cgdepr.ponerurl("bancos");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.bancoApi.listar().subscribe(data => {
       this.planes = data;
     });
 
@@ -91,13 +88,10 @@ export class BancosdlgComponent {
       nombre: this.formulario.value.nombre,
     };
 
-    this.cgdepr.ponerurl("bancos");
-
     if (this.formulario?.valid) {
       if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe({
+        this.bancoApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "El banco se ha guardado correctamente",
@@ -117,9 +111,8 @@ export class BancosdlgComponent {
           }
         });
       } else {
-        this.cgdepr.update(body.id, body).subscribe({
+        this.bancoApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "El banco se ha actualizado correctamente",

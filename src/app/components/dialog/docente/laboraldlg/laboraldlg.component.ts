@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Laboral } from '../../../modelos/laboral';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { DocenteLaboralApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 
 
@@ -34,14 +34,12 @@ export class LaboraldlgComponent {
   constructor(public dialogRef: MatDialogRef<LaboraldlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr:MaestrosserviceService){
+    private readonly docenteLaboralApi: DocenteLaboralApiService){
       
       
       
   }
   poner_datos(){
-    console.log(this.data);
-    
     this.formulario.setValue({
 
       id:this.data.valores.id,
@@ -61,8 +59,6 @@ export class LaboraldlgComponent {
   }
 
   ngOnInit(): void {
-    console.log(this.data);
-    
     this.formulario = this.formBuilder.group({
       id:[''],
       trabajo: [''],
@@ -77,9 +73,7 @@ export class LaboraldlgComponent {
       codigoDocente: [''],
 
     });
-    this.cgdepr.ponerurl("docenteslaboral");
-    this.cgdepr.get().subscribe(data=>{
-      console.log(data);
+    this.docenteLaboralApi.listar().subscribe(data=>{
       this.departamentos=data;
     });
     if(this.data.modo==1){
@@ -111,48 +105,59 @@ export class LaboraldlgComponent {
       contacto: this.formulario.value?.contacto,
       codigoDocente: this.formulario.value?.codigoDocente
     }
-    this.cgdepr.ponerurl("docenteslaboral")
     if (this.formulario?.valid) {
-      if(this.fnc==true){
-        this.cgdepr.add(body).subscribe(data=>{
-          console.log("agregado");
-          Swal.fire({
-            title: "Agregado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formulario.value);
+      // El diálogo se cierra SÓLO cuando el guardado ha terminado. Antes había un
+      // `close()` aquí fuera: se cerraba antes de que respondiera la API, el
+      // listado recargaba y todavía no veía el registro nuevo.
+      if (this.fnc == true) {
+        this.docenteLaboralApi.crear(body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Agregado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
-      }else{
-        this.cgdepr.update(body.codigoDocente,body).subscribe(data=>{
-          console.log("actualizado");
-          Swal.fire({
-            title: "Actualizado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formulario.value);
+      } else {
+        this.docenteLaboralApi.actualizar(body.codigoDocente, body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Actualizado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
       }
-
-      this.dialogRef.close(this.formulario.value);
     } else {
       // Marcar campos como tocados para mostrar errores de validación
       this.formulario?.markAllAsTouched();
     }
   }
+  /** Aviso común si el guardado falla: el diálogo se queda abierto para reintentar. */
+  private mostrarErrorAlGuardar(error: unknown): void {
+    console.error('Error al guardar:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'No se pudo guardar. Inténtalo de nuevo.',
+      icon: 'error'
+    });
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
   verificarInfo(data:any){
     //console.log(data);
     if(data!=undefined){
-      console.log(data);
-      
       return  `${data.nombres} ${data.apellidos}`
     }
     else{
-      console.log("data");
       return "";
     }
     

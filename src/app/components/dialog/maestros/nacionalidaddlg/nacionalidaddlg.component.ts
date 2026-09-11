@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { NacionalidadApiService } from '../../../../core/api';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
@@ -35,7 +35,7 @@ export class NacionalidaddlgComponent implements OnInit {
     public dialogRef: MatDialogRef<NacionalidaddlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly nacionalidadApi: NacionalidadApiService
   ) {}
 
   ngOnInit(): void {
@@ -45,9 +45,7 @@ export class NacionalidaddlgComponent implements OnInit {
       pais: ['', Validators.required],
     });
 
-    this.cgdepr.ponerurl("nacionalidad");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.nacionalidadApi.listar().subscribe(data => {
       this.planes = data;
     });
 
@@ -62,7 +60,6 @@ export class NacionalidaddlgComponent implements OnInit {
   }
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id,
       nombre: this.data.valores.nombre,
@@ -79,10 +76,9 @@ export class NacionalidaddlgComponent implements OnInit {
       };
 
       if (this.fnc) {
-        this.cgdepr.ponerurl("nacionalidad"); // Ajusta a "nacionalidad/register" si tu API lo requiere
-        this.cgdepr.add(body).subscribe({
+        // Ajusta a "nacionalidad/register" si tu API lo requiere
+        this.nacionalidadApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "La nacionalidad se agregó correctamente",
@@ -99,10 +95,8 @@ export class NacionalidaddlgComponent implements OnInit {
           }
         });
       } else {
-        this.cgdepr.ponerurl("nacionalidad");
-        this.cgdepr.update(body.id, body).subscribe({
+        this.nacionalidadApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "La nacionalidad se actualizó correctamente",

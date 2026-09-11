@@ -7,7 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MaestrosserviceService } from '../../services/maestrosservice.service';
+import { ApiService, Recurso, RECURSOS } from '../../core/api';
 import { lastValueFrom } from 'rxjs';
 import { OrgaComponent } from "../maestros/orga/orga.component";
 
@@ -31,17 +31,22 @@ export class DashboardComponent {
   afps?: any;
   
   constructor(
-    private mservice: MaestrosserviceService,
+    private readonly api: ApiService,
   ) { }
 
-  maestros = ["afps", "departamentos", "provincias", "distritos",
-    "facultad", "escuela", "programa", "login", "bancos", "nacionalidad",
-    "area", "plan", "firma", "curso"
+  // Se mantienen el orden y los valores originales: la plantilla empareja
+  // estos arreglos por índice con `valores` y `valoresDocentes`.
+  maestros: Recurso[] = [
+    RECURSOS.afps, RECURSOS.departamentos, RECURSOS.provincias, RECURSOS.distritos,
+    RECURSOS.facultad, RECURSOS.escuela, RECURSOS.programa, RECURSOS.login,
+    RECURSOS.bancos, RECURSOS.nacionalidad, RECURSOS.area, RECURSOS.plan,
+    RECURSOS.firma, RECURSOS.curso
   ]
   // 👇 Nuevo arreglo: solo rutas de docentes
-  docentesRutas = [
-    'docentes', 'docenteslaboral', 'docentesgrado', 'docentescategoria',
-    'docentesinvestiga', 'docentescurso', 'docentesinfo'
+  docentesRutas: Recurso[] = [
+    RECURSOS.docentes, RECURSOS.docentesLaboral, RECURSOS.docentesGrado,
+    RECURSOS.docentesCategoria, RECURSOS.docentesInvestigacion,
+    RECURSOS.docentesCurso, RECURSOS.docentesInfo
   ];
   valores: number[] = [];
   valoresDocentes: number[] = [];
@@ -75,24 +80,23 @@ export class DashboardComponent {
   }
 
   async ngOnInit() {
-    //this.afps = await this.cargartabla("afps/total");
+    // Cada llamada construye su propia URL: ya no comparten la `apiUrl` mutable
+    // del servicio antiguo, que hacía que estas 21 peticiones simultáneas
+    // acabaran todas contra el mismo recurso.
     this.valores = await Promise.all(
-      this.maestros.map(entidad => this.cargartabla(`${entidad}/total`))
+      this.maestros.map(recurso => this.cargartabla(recurso))
     );
     this.valoresDocentes = await Promise.all(
-      this.docentesRutas.map(entidad => this.cargartabla(`${entidad}/total`))
+      this.docentesRutas.map(recurso => this.cargartabla(recurso))
     );
   }
 
-  async cargartabla(entidad: string): Promise<number> {
-    this.mservice.ponerurl(entidad);
-    const source$ = this.mservice.get();
+  async cargartabla(recurso: Recurso): Promise<number> {
     try {
-      const finalNumber: any = await lastValueFrom(source$);
-      console.log('Respuesta completa:', finalNumber);
-      return finalNumber.total || 0;
+      const respuesta = await lastValueFrom(this.api.contar(recurso));
+      return respuesta?.total ?? 0;
     } catch (error) {
-      console.error(`Error al cargar ${entidad}:`, error);
+      console.error(`Error al cargar ${recurso}:`, error);
       return 0;
     }
   }

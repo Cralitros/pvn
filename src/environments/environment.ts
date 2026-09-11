@@ -1,4 +1,4 @@
 export const environment = {
     production: true,
-    direccion: 'https://derechopucp.com/backendpucp/'
+    direccion: 'https://derechopucp.com/backendPucp2/'
 };

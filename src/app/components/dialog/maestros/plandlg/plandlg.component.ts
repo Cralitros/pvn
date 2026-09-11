@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Plan } from '../../../modelos/plan';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { PlanApiService } from '../../../../core/api';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDatepickerIntl, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
@@ -70,7 +70,7 @@ export class PlandlgComponent {
     public dialogRef: MatDialogRef<PlandlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly planApi: PlanApiService
   ) { }
 
   private readonly _adapter = inject<DateAdapter<unknown, unknown>>(DateAdapter);
@@ -87,7 +87,6 @@ export class PlandlgComponent {
   });
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id,
       nombre: this.data.valores.nombre,
@@ -116,9 +115,6 @@ export class PlandlgComponent {
       formattedDate = `${year}-${month}-${day}`;
     }
 
-    console.log(formattedDate);
-    console.log(Date.parse(formattedDate));
-
     if (formattedDate) {
       const fechaControl = this.formulario.get('vigencia');
       fechaControl?.patchValue(formattedDate);
@@ -137,9 +133,7 @@ export class PlandlgComponent {
       vigencia: ['', Validators.required],
     });
 
-    this.cgdepr.ponerurl("plan");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.planApi.listar().subscribe(data => {
       this.planes = data;
     });
 
@@ -161,13 +155,10 @@ export class PlandlgComponent {
       vigencia: this.formulario.value.vigencia // ✅ Corregido: "v igencia" → "vigencia"
     };
 
-    this.cgdepr.ponerurl("plan"); // ✅ Corregido: "plan " → "plan"
-
     if (this.formulario?.valid) {
       if (this.fnc === true) {
-        this.cgdepr.add(body).subscribe({
+        this.planApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "El plan se agregó correctamente",
@@ -185,9 +176,8 @@ export class PlandlgComponent {
           }
         });
       } else {
-        this.cgdepr.update(body.id, body).subscribe({
+        this.planApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "El plan se actualizó correctamente",

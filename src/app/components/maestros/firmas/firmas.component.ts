@@ -8,11 +8,11 @@ import { MatInputModule } from '@angular/material/input';
 import { TablaComponent } from '../../objetos/tabla/tabla.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { firma } from '../../modelos/firma';
+import { Firma } from '../../modelos/firma';
 import { Column } from '../../modelos/column';
 
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { AuthApiService, FirmaApiService } from '../../../core/api';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
@@ -40,12 +40,12 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './firmas.component.scss'
 })
 export class FirmasComponent {
-  tablaDepartamento: firma[] = [];
+  tablaDepartamento: Firma[] = [];
 
   columns: Column[] = [
     { columnDef: 'actions', header: 'Acciones', cell: () => '', isAction: true },  // Columna de acciones
-    { columnDef: 'id', header: 'No.', cell: (element: firma) => `${element.idLogin}` },
-    { columnDef: 'dni', header: 'dni', cell: (element: firma) => `${element.Login.dni}` },
+    { columnDef: 'id', header: 'No.', cell: (element: Firma) => `${element.idLogin}` },
+    { columnDef: 'dni', header: 'dni', cell: (element: Firma) => `${element.Login.dni}` },
 
 
   ];
@@ -58,14 +58,13 @@ export class FirmasComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
+    private readonly authApi: AuthApiService,
+    private readonly firmaApi: FirmaApiService,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
     private route: ActivatedRoute
   ) {
-
-    this.cargartabla();
 
     this.titulos.emit(this.titulo);
   }
@@ -82,14 +81,10 @@ export class FirmasComponent {
       // const tipo = params['tipo'];
       let data = params['selectedRow'];
 
-      this.mservice.ponerurl("login/dni");
-      this.mservice.getdni(data).subscribe((dat: any) => {
+      this.authApi.obtenerPorDni(data).subscribe((dat: any) => {
 
-        console.log("data selccionada");
-        console.log(dat);
         this.info = dat[0];
         data = dat[0];
-        console.log('Selected Row:', data);
         this.cargartabla().then(() => {
           this.buscar(data);
         });
@@ -109,10 +104,8 @@ export class FirmasComponent {
     const encontrado = this.tablaDepartamento.find(item => item.codigoDocente == data);
 
     if (encontrado) {
-      console.log("encontrado");
       this.formulario?.setValue({ 'codigo': data.dni });
       this.cartabla.dataSeleccionada = encontrado;
-      console.log(this.cartabla.dataSeleccionada);
       this.editar(this.cartabla.dataSeleccionada);
     } else {
       this.formulario?.setValue({ 'codigo': data.dni });
@@ -120,29 +113,39 @@ export class FirmasComponent {
     }
   }
   async cargartabla() {
-    this.mservice.ponerurl("firma");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
+    try {
+      const source$ = this.firmaApi.listar();
+      const finalNumber: any = await lastValueFrom(source$);
 
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento = this.cartabla.array;
-    console.log(this.tablaDepartamento);
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento = this.cartabla.array;
 
-    this.sctabla.setData(this.tablaDepartamento);
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la lista de firmas',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
 
   dialogo() {
     let laboral: any;
-    this.mservice.ponerurl("firma/dni");
-    this.mservice.getdni(this.formulario?.value.codigo).subscribe((data: any) => {
-      console.log(data);
+    this.firmaApi.obtenerPorDni(this.formulario?.value.codigo).subscribe((data: any) => {
       laboral = data;
       if (data.length > 0) {//verifica si existe el docente
 
-        this.mservice.ponerurl("firma/dni");
-        this.mservice.getdni(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
-          console.log(data2);
-          console.log("viendo");
+        this.firmaApi.obtenerPorDni(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
 
           if (data2.length == 0) {
             const dialogRef = this.dialog.open(FirmasdlgComponent, {
@@ -236,9 +239,7 @@ export class FirmasComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
+    this.firmaApi.eliminar(element.id).subscribe(data => {
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",

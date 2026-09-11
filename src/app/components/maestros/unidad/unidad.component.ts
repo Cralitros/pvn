@@ -11,7 +11,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Facultad } from '../../modelos/facultad';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { FacultadApiService } from '../../../core/api';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
@@ -52,14 +52,11 @@ export class FacultadComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice:MaestrosserviceService,
+    private readonly facultadApi: FacultadApiService,
     private cartabla:ConversiontablaService,
     public dialog: MatDialog
   ) {
-    
-    this.cargartabla();
-    console.log(this.tablaDepartamento);
-    
+
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
       nombre: ['', Validators.required]
@@ -71,13 +68,29 @@ export class FacultadComponent {
    }
 
   async cargartabla(){
-    this.mservice.ponerurl("facultad");
-    const source$ = this.mservice.get();
-    const finalNumber:any = await lastValueFrom(source$);
-  
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento=this.cartabla.array;
-    this.sctabla.setData(this.tablaDepartamento);
+    try {
+      const source$ = this.facultadApi.listar();
+      const finalNumber:any = await lastValueFrom(source$);
+
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento=this.cartabla.array;
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la lista de unidades',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
   dialogo(){
     const dialogRef = this.dialog.open(FacultaddlgComponent, {
@@ -116,9 +129,7 @@ export class FacultadComponent {
 
   }
   eliminar(element: any){
-    console.log("dep",element);
-    this.mservice.delete(element.id).subscribe(data=>{
-      console.log("Eliminado");
+    this.facultadApi.eliminar(element.id).subscribe(data=>{
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",

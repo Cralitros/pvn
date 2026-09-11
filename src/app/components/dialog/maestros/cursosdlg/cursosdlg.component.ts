@@ -12,8 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
-import { Aux1Service } from '../../../../services/aux1.service';
+import { AreaApiService, CursoApiService, DepartamentoAcademicoApiService, FacultadApiService, PlanApiService, ProgramaApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Observable, of } from 'rxjs';
@@ -63,32 +62,28 @@ export class CursosdlgComponent {
     public dialogRef: MatDialogRef<CursosdlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private service: MaestrosserviceService,
-    private auxService: Aux1Service
+    private readonly planApi: PlanApiService,
+    private readonly areaApi: AreaApiService,
+    private readonly facultadApi: FacultadApiService,
+    private readonly departamentoAcademicoApi: DepartamentoAcademicoApiService,
+    private readonly programaApi: ProgramaApiService,
+    private readonly cursoApi: CursoApiService
   ) { }
 
   // ✅ MÉTODO COMBOS AGREGADO
   async combos(): Promise<void> {
     // Cargar planes
-    this.auxService.ponerurl("plan");
-    this.planes = await firstValueFrom(this.auxService.get());
-    console.log("Planes cargados: ", this.planes);
+    this.planes = await firstValueFrom(this.planApi.listar());
 
     // Cargar áreas
-    this.auxService.ponerurl("area");
-    this.areas = await firstValueFrom(this.auxService.get());
-    console.log("Áreas cargadas: ", this.areas);
+    this.areas = await firstValueFrom(this.areaApi.listar());
 
     // Cargar FACULTADES
-    this.auxService.ponerurl("facultad");
-    this.facultades = await firstValueFrom(this.auxService.get());
-    console.log("Facultades cargadas: ", this.facultades);
+    this.facultades = await firstValueFrom(this.facultadApi.listar());
     this.facultadesFiltradas = of(this.facultades);
   }
 
   async ngOnInit(): Promise<void> {
-    console.log("Datos recibidos:", this.data);
-    
     // Inicializar formulario
     this.formularioGrado = this.formBuilder.group({
       id: [''],
@@ -174,7 +169,6 @@ export class CursosdlgComponent {
 
   async onFacultadSeleccionado(event: any): Promise<void> {
     const facultad = event.option.value;
-    console.log("Facultad seleccionada:", facultad);
     
     this.formularioGrado.patchValue({
       facultad: facultad,
@@ -190,16 +184,13 @@ export class CursosdlgComponent {
 
     // Cargar escuelas de esta facultad
     if (facultad && facultad.id) {
-      this.auxService.ponerurl(`escuela?facultadId=${facultad.id}`);
-      this.escuelas = await firstValueFrom(this.auxService.get());
-      console.log("Escuelas cargadas:", this.escuelas);
+      this.escuelas = await firstValueFrom(this.departamentoAcademicoApi.listarPorFacultad(facultad.id));
       this.escuelasFiltradas = of(this.escuelas);
     }
   }
 
   async onEscuelaSeleccionado(event: any): Promise<void> {
     const escuela = event.option.value;
-    console.log("Escuela seleccionada:", escuela);
     
     this.formularioGrado.patchValue({
       escuela: escuela,
@@ -213,9 +204,7 @@ export class CursosdlgComponent {
 
     // Cargar programas de esta escuela
     if (escuela && escuela.id) {
-      this.auxService.ponerurl(`programa?escuelaId=${escuela.id}`);
-      this.programas = await firstValueFrom(this.auxService.get());
-      console.log("Programas cargados:", this.programas);
+      this.programas = await firstValueFrom(this.programaApi.listarPorEscuela(escuela.id));
       this.programasFiltrados = of(this.programas);
     }
   }
@@ -230,14 +219,10 @@ export class CursosdlgComponent {
 
   async poner_datos(): Promise<void> {
     if (this.data.valores) {
-      console.log("Datos a cargar en edición:", this.data.valores);
-      
       // 1. Extraer los IDs de la estructura anidada
       const facultadId = this.data.valores.programa?.Escuela?.Facultad?.id;
       const escuelaId = this.data.valores.programa?.Escuela?.id;
       const programaId = this.data.valores.programa?.id;
-      
-      console.log("IDs extraídos:", { facultadId, escuelaId, programaId });
       
       // 2. Establecer valores básicos del formulario
       this.formularioGrado.patchValue({
@@ -257,7 +242,6 @@ export class CursosdlgComponent {
       // 3. Buscar y cargar facultad
       if (facultadId && this.facultades.length > 0) {
         const facultadEncontrada = this.facultades.find(f => f.id === facultadId);
-        console.log("Facultad encontrada:", facultadEncontrada);
         
         if (facultadEncontrada) {
           // Asignar el objeto completo de la facultad
@@ -273,17 +257,12 @@ export class CursosdlgComponent {
   }
 
   async cargarEscuelasPorFacultad(facultadId: number, escuelaIdSeleccionada?: number): Promise<void> {
-    console.log("Cargando escuelas para facultad:", facultadId);
-    
-    this.auxService.ponerurl(`escuela?facultadId=${facultadId}`);
-    this.escuelas = await firstValueFrom(this.auxService.get());
+    this.escuelas = await firstValueFrom(this.departamentoAcademicoApi.listarPorFacultad(facultadId));
     this.escuelasFiltradas = of(this.escuelas);
-    console.log("Escuelas cargadas:", this.escuelas);
     
     // Si hay una escuela seleccionada, buscarla y cargar programas
     if (escuelaIdSeleccionada) {
       const escuelaEncontrada = this.escuelas.find(e => e.id === escuelaIdSeleccionada);
-      console.log("Escuela encontrada:", escuelaEncontrada);
       
       if (escuelaEncontrada) {
         // Asignar el objeto completo de la escuela
@@ -299,17 +278,12 @@ export class CursosdlgComponent {
   }
 
   async cargarProgramasPorEscuela(escuelaId: number, programaIdSeleccionado?: number): Promise<void> {
-    console.log("Cargando programas para escuela:", escuelaId);
-    
-    this.auxService.ponerurl(`programa?escuelaId=${escuelaId}`);
-    this.programas = await firstValueFrom(this.auxService.get());
+    this.programas = await firstValueFrom(this.programaApi.listarPorEscuela(escuelaId));
     this.programasFiltrados = of(this.programas);
-    console.log("Programas cargados:", this.programas);
     
     // Si hay un programa seleccionado, buscarlo
     if (programaIdSeleccionado) {
       const programaEncontrado = this.programas.find(p => p.id === programaIdSeleccionado);
-      console.log("Programa encontrado:", programaEncontrado);
       
       if (programaEncontrado) {
         // Asignar el objeto completo del programa
@@ -339,13 +313,9 @@ export class CursosdlgComponent {
         programaId: this.formularioGrado.value.programa?.id || this.formularioGrado.value.programaId,
         programaNombre: this.formularioGrado.value.programa?.programa || this.formularioGrado.value.programa?.nombre
       };
-      
-      console.log( "Body a enviar: ", body);
-      
-      this.service.ponerurl( "curso");
-      
+
       if (this.fnc) {
-        this.service.add(body).subscribe({
+        this.cursoApi.crear(body).subscribe({
           next: () => {
             Swal.fire({
               title: "Agregado",
@@ -364,7 +334,7 @@ export class CursosdlgComponent {
           }
         });
       } else {
-        this.service.update(body.codigo, body).subscribe({
+        this.cursoApi.actualizar(body.codigo, body).subscribe({
           next: () => {
             Swal.fire({
               title: "Actualizado",

@@ -7,7 +7,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Condiciones } from '../../../modelos/condiciones';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { CategoriaApiService } from '../../../../core/api';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-condidlg',
@@ -31,14 +32,12 @@ export class CondidlgComponent {
   constructor(public dialogRef: MatDialogRef<CondidlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr:MaestrosserviceService){
+    private readonly categoriaApi: CategoriaApiService){
       
       
       
   }
   poner_datos(){
-    console.log(this.data);
-    
     this.formulario.setValue({
       id: this.data.valores.id,
       condicion: this.data.valores.condicion,
@@ -51,9 +50,7 @@ export class CondidlgComponent {
       id: [''],
       condicion: ['', Validators.required],
     });
-    this.cgdepr.ponerurl("categoria");
-    this.cgdepr.get().subscribe(data=>{
-      console.log(data);
+    this.categoriaApi.listar().subscribe(data=>{
       this.departamentos=data;
     });
     if(this.data.modo==1){
@@ -72,24 +69,43 @@ export class CondidlgComponent {
       id:this.formulario.value?.id,
       condicion:this.formulario.value.condicion,
     }
-    this.cgdepr.ponerurl("categoria")
     if (this.formulario?.valid) {
-      if(this.fnc==true){
-        this.cgdepr.add(body).subscribe(data=>{
-          console.log("agregado");
+      // El diálogo se cierra SÓLO cuando el guardado termina. Antes cerraba aquí
+      // mismo, sin esperar a la API ni avisar del resultado: el listado recargaba
+      // con datos viejos y los errores pasaban desapercibidos.
+      if (this.fnc == true) {
+        this.categoriaApi.crear(body).subscribe({
+          next: () => {
+            Swal.fire({ title: 'Agregado', text: 'Continuar', icon: 'info' });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
-      }else{
-        this.cgdepr.update(body.id,body).subscribe(data=>{
-          console.log("actualizado");
+      } else {
+        this.categoriaApi.actualizar(body.id, body).subscribe({
+          next: () => {
+            Swal.fire({ title: 'Actualizado', text: 'Continuar', icon: 'info' });
+            this.dialogRef.close(this.formulario.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
       }
-
-      this.dialogRef.close(this.formulario.value);
     } else {
       // Marcar campos como tocados para mostrar errores de validación
       this.formulario?.markAllAsTouched();
     }
   }
+
+  /** Aviso común si el guardado falla: el diálogo se queda abierto para reintentar. */
+  private mostrarErrorAlGuardar(error: unknown): void {
+    console.error('Error al guardar:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'No se pudo guardar. Inténtalo de nuevo.',
+      icon: 'error'
+    });
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }

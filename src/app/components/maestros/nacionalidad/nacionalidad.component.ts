@@ -12,7 +12,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Nacionalidad } from '../../modelos/nacionalidad';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
+import { NacionalidadApiService } from '../../../core/api';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
@@ -53,13 +53,10 @@ export class NacionalidadComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
+    private readonly nacionalidadApi: NacionalidadApiService,
     private cartabla: ConversiontablaService,
     public dialog: MatDialog
   ) {
-
-    this.cargartabla();
-    console.log(this.tablaDepartamento);
 
     sctabla.setData(this.tablaDepartamento);
     this.departamentoForm = this.fb.group({
@@ -72,13 +69,29 @@ export class NacionalidadComponent {
   }
 
   async cargartabla() {
-    this.mservice.ponerurl("nacionalidad");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
+    try {
+      const source$ = this.nacionalidadApi.listar();
+      const finalNumber: any = await lastValueFrom(source$);
 
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento = this.cartabla.array;
-    this.sctabla.setData(this.tablaDepartamento);
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento = this.cartabla.array;
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la lista de nacionalidades',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
   dialogo() {
     const dialogRef = this.dialog.open(NacionalidaddlgComponent, {
@@ -118,8 +131,6 @@ export class NacionalidadComponent {
 
   }
   eliminar(element: any) {
-    console.log("Elemento a eliminar:", element);
-
     // Verificar qué propiedad tiene el nombre (puede ser 'nombre', 'descripcion', etc.)
     const nombreElemento = element.nombre || element.descripcion || 'este elemento';
 
@@ -134,9 +145,8 @@ export class NacionalidadComponent {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.mservice.delete(element.id).subscribe({
+        this.nacionalidadApi.eliminar(element.id).subscribe({
           next: (data) => {
-            console.log("Eliminado", data);
             Swal.fire({
               title: "Eliminado",
               text: "El elemento ha sido eliminado correctamente",

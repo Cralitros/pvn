@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { FacultadApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -33,11 +33,10 @@ export class FacultaddlgComponent implements OnInit {
     public dialogRef: MatDialogRef<FacultaddlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly facultadApi: FacultadApiService
   ) {}
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id,
       nombre: this.data.valores.nombre,
@@ -68,10 +67,8 @@ export class FacultaddlgComponent implements OnInit {
 
     if (this.formulario?.valid) {
       if (this.fnc) {
-        this.cgdepr.ponerurl("facultad");
-        this.cgdepr.add(body).subscribe({
+        this.facultadApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "La unidad académica se agregó correctamente",
@@ -89,10 +86,8 @@ export class FacultaddlgComponent implements OnInit {
           }
         });
       } else {
-        this.cgdepr.ponerurl("facultad");
-        this.cgdepr.update(body.id, body).subscribe({
+        this.facultadApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "La unidad académica se actualizó correctamente",

@@ -8,11 +8,9 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { DashboardComponent } from '../dashboard/dashboard.component';
-import { DepartamentoComponent } from '../maestros/departamento/departamento.component';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { routes } from '../../app.routes';
+import { AuthServiceService } from '../../services/auth-service.service';
 
 @Component({
   selector: 'app-navigation',
@@ -36,7 +34,7 @@ export class NavigationComponent {
   nivel:any;
   private breakpointObserver = inject(BreakpointObserver);
 
-  constructor(private route:Router){
+  constructor(private readonly authService: AuthServiceService) {
     if (typeof window !== 'undefined' && window.localStorage) {
       this.nivel = localStorage.getItem('nivel');
     }
@@ -47,12 +45,9 @@ export class NavigationComponent {
       map(result => result.matches),
       shareReplay()
     );
-  
+
+  /** Cerrar sesión: la lógica vive en `AuthServiceService`, no duplicada aquí. */
   cerrar_sesion() {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      localStorage.removeItem("token");
-    }
-    this.route.navigate(['login']);
-    //inject(Router).navigate(['login']);
+    this.authService.logout();
   }
 }

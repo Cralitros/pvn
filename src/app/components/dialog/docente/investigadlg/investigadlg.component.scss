@@ -291,3 +291,104 @@ $transition:    0.2s ease;
     }
   }
 }
+
+// ─── Historial de reconocimientos (tabla de filas dinámicas) ──────────────────
+.table-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 6px;
+}
+
+.btn-add-row {
+  font-size: 12px;
+  line-height: 30px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+  }
+}
+
+.reconocimientos-container {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e3e6f5;
+  border-radius: $radius;
+  overflow-x: auto;
+}
+
+.reconocimientos-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+
+  th {
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $primary;
+    background: #f3f5fc;
+    border-bottom: 1px solid $primary-light;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 2px 6px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eef0f8;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .col-anio {
+    width: 90px;
+  }
+
+  .col-nombre {
+    width: 24%;
+  }
+
+  .col-categoria {
+    width: 22%;
+  }
+
+  .col-unidad {
+    width: 20%;
+  }
+
+  .col-observaciones {
+    width: 22%;
+  }
+
+  .col-acciones {
+    width: 44px;
+    text-align: center;
+  }
+
+  .table-field {
+    width: 100%;
+  }
+}
+
+.empty-reconocimientos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 10px;
+  font-size: 0.75rem;
+  color: #7a7f9a;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

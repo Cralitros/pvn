@@ -27,9 +27,11 @@
     <mat-form-field appearance="outline" class="example-full-width">
       <mat-label>Unidad académica</mat-label>
       <mat-select formControlName="idFacultad" placeholder="Seleccionar Unidad">
-        <mat-option *ngFor="let facultad of facultades; track facultad" [value]="facultad.id">
+        @for (facultad of facultades; track facultad.id) {
+        <mat-option [value]="facultad.id">
           {{ facultad.nombre }}
         </mat-option>
+        }
       </mat-select>
       <mat-error class="mensaje" *ngIf="formulario.get('idFacultad')?.hasError('required') && formulario.get('idFacultad')?.touched">
         Unidad es requerida.

@@ -171,6 +171,48 @@
       </div>
     </div>
 
+    <!-- Sección: Vigencia y Estado -->
+    <div class="form-section">
+      <span class="section-title">Vigencia y Estado</span>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Estado</mat-label>
+          <input matInput formControlName="estado" placeholder="Estado">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Línea Actual</mat-label>
+          <input matInput formControlName="lineaActual" placeholder="Línea actual">
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Docente</mat-label>
+          <input matInput formControlName="tipoDocente" placeholder="Tipo de docente">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="formato">
+          <mat-label>Fecha Vigencia</mat-label>
+          <input matInput [matDatepicker]="picker4" formControlName="fechaVigencia" 
+                 placeholder="DD/MM/YYYY" (input)="onDateInput($event, 'fechaVigencia')" 
+                 (paste)="onPaste($event, 'fechaVigencia')">
+          <mat-datepicker-toggle matIconSuffix [for]="picker4"></mat-datepicker-toggle>
+          <mat-datepicker #picker4></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="grid-2">
+        <mat-form-field appearance="outline">
+          <mat-label>Resolución Vigente</mat-label>
+          <input matInput formControlName="resolucionVigente" placeholder="Resolución vigente">
+        </mat-form-field>
+
+        <div></div> <!-- Espaciador -->
+      </div>
+    </div>
+
     <!-- Sección: Observaciones -->
     <div class="form-section">
       <span class="section-title">Observaciones y Registros</span>

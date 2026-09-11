@@ -13,12 +13,18 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { Categoria } from '../../../modelos/categoria';
+import { AscensoCategoria, Categoria } from '../../../modelos/categoria';
+import {
+  ascensosDesdeColumnas,
+  CATEGORIAS_ASCENSO,
+  derivarColumnasHistorico,
+  fechaMasReciente,
+  parsearCategoria,
+} from './ascensos.util';
 import { MatRadioModule } from '@angular/material/radio';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { DocenteCategoriaApiService } from '../../../../core/api';
 import { Condiciones } from '../../../modelos/condiciones';
-import { Aux1Service } from '../../../../services/aux1.service';
 import Swal from 'sweetalert2';
 
 
@@ -89,17 +95,8 @@ export class CategoriadlgComponent {
   cateJubilacion = ['Principal', 'Asociado', 'Auxiliar', 'Contratado'];
 
 
-  categorias = [
-    { nombre: 'Principal', seleccionada: false, fecha: null },
-    { nombre: 'Asociado', seleccionada: false, fecha: null },
-    { nombre: 'Auxiliar', seleccionada: false, fecha: null },
-    { nombre: 'Contratado', seleccionada: false, fecha: null },
-    { nombre: 'Profesor visitante', seleccionada: false, fecha: null },
-    { nombre: 'Instructor', seleccionada: false, fecha: null },
-    { nombre: 'Jefe de prácticas', seleccionada: false, fecha: null },
-    { nombre: 'Ayudante de docencia', seleccionada: false, fecha: null },
-    { nombre: 'Asistente de docencia', seleccionada: false, fecha: null },
-  ];
+  /** Categorías que se pueden registrar en el histórico de ascensos. */
+  readonly catalogoAscensos = CATEGORIAS_ASCENSO;
 
   trackByNombre(index: number, item: any) {
     return item.nombre;
@@ -122,8 +119,7 @@ export class CategoriadlgComponent {
   constructor(public dialogRef: MatDialogRef<CategoriadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService,
-    private saux1: Aux1Service) {
+    private readonly docenteCategoriaApi: DocenteCategoriaApiService) {
 
     //this.selectedCategory2=true;
 
@@ -154,21 +150,15 @@ export class CategoriadlgComponent {
       fecha = new Date(year, month, day);
     }
 
-    console.log(fecha); // Para verificar en consola
-
     if (fecha) {
       let fechaControl;
       if (campo == 'Principal') {
         let grupo = this.formularioCategoria.get("categoria") as FormGroup;
-        console.log(grupo);
         //console.log(grupo);
         // 2. Obtener el control específico de "Principal"
         const controlPrincipal = grupo.value;
-        console.log(controlPrincipal);
-        console.log(controlPrincipal[0]);
         controlPrincipal[0].fecha = '2025-04-16T05:00:00.000Z'
         fechaControl = grupo.get('0')?.value;
-        console.log(fechaControl);
 
       } else {
         fechaControl = this.formularioCategoria.get(campo);
@@ -181,34 +171,13 @@ export class CategoriadlgComponent {
       });
     }
   }
-  onDateInput(event: any, fieldName: string) {
-    const value = event.target.value;
-    const datePattern = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const matches = value.match(datePattern);
-
-    if (matches) {
-      const day = parseInt(matches[1], 10);
-      const month = parseInt(matches[2], 10) - 1;
-      const year = parseInt(matches[3], 10);
-      const date = new Date(year, month, day);
-
-      if (
-        date.getFullYear() === year &&
-        date.getMonth() === month &&
-        date.getDate() === day
-      ) {
-        this.formularioCategoria.get(fieldName)?.setValue(date);
-      }
-    }
-  }
   poner_datos() {
-    console.log(this.data);
     let g1 = "";
     let d1 = "";
     let g2 = "";
     let d2 = "";
-    let arr1 = this.data.valores.categoriadap.split('-');
-    let arr2 = this.data.valores.condiciondap.split('-');
+    let arr1 = (this.data.valores.categoriadap ?? '').split('-');
+    let arr2 = (this.data.valores.condiciondap ?? '').split('-');
     if (arr1.length > 1) {
       d1 = arr1[0];
       g1 = arr1[1];
@@ -226,12 +195,12 @@ export class CategoriadlgComponent {
       d2 = this.data.valores.condiciondap;
       g2 = "";
     }
-    let ratificado = JSON.parse(this.data.valores.ratificado);
+    let ratificado = this.parsearJson(this.data.valores.ratificado);
     this.formularioCategoria.setValue({
       id: this.data.valores.id,
       tipo: this.data.valores.tipo,
       fecha: new Date(this.data.valores.fecha),
-      categoria: JSON.parse(this.data.valores.categoria),
+      categoria: parsearCategoria(this.data.valores.categoria),
       condiciondap: d2,
       codigoDocente: this.data.valores.codigoDocente,
       dedicacion: this.data.valores.dedicacion,
@@ -247,23 +216,15 @@ export class CategoriadlgComponent {
       chk5: ratificado.chk5,
     });
 
-    this.formularioHistorico.setValue({
-      jefepractica: this.data.valores.jefepractica,
-      ayudante: this.data.valores.ayudante,
-      asistente: this.data.valores.asistente,
-      instructor: this.data.valores.instructor,
-      profesorvisitante: this.data.valores.profesorvisitante,
-      contratado: this.data.valores.contratado,
-      auxiliar: this.data.valores.auxiliar,
-      principal: this.data.valores.principal,
-      asociado: this.data.valores.asociado,
-
+    this.formularioHistorico.patchValue({
       dedicacionJubilacion: this.data.valores.dedicacionJubilacion,
       categoriaJubilacion: this.data.valores.categoriaJubilacion,
     });
 
+    // Las filas del histórico vienen de la lista JSON guardada en `categoria`.
+    this.cargarAscensos();
+
     let event = { value: ratificado.ratificado }
-    this.categorias = JSON.parse(this.data.valores.categoria);
     this.onCategoryChangeRatificado(event);
     //this.form.value.id=this.data.valores.id;
 
@@ -274,7 +235,6 @@ export class CategoriadlgComponent {
   }
 
   ngOnInit(): void {
-    console.log(this.data);
     this.formularioCategoria = this.formBuilder.group({
       id: [''],
       tipo: [''],
@@ -297,15 +257,8 @@ export class CategoriadlgComponent {
     });
 
     this.formularioHistorico = this.formBuilder.group({
-      jefepractica: [''],
-      ayudante: [''],
-      asistente: [''],
-      instructor: [''],
-      profesorvisitante: [''],
-      contratado: [''],
-      auxiliar: [''],
-      asociado: [''],
-      principal: [''],
+      // Filas dinámicas del histórico: cada fila es { categoría, fecha }.
+      ascensos: this.formBuilder.array([]),
       categoriaJubilacion: [''],
       dedicacionJubilacion: [''],
 
@@ -320,9 +273,7 @@ export class CategoriadlgComponent {
       this.actualizarFechaContrato();
     });
 
-    this.cgdepr.ponerurl("docentescategoria");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.docenteCategoriaApi.listar().subscribe(data => {
       this.departamentos = data;
     });
     if (this.data.modo == 1) {
@@ -356,13 +307,83 @@ export class CategoriadlgComponent {
      }*/
 
   }
+  // ─── Histórico de ascensos (filas dinámicas) ─────────────────────────────────
+
+  get ascensosArray(): FormArray {
+    return this.formularioHistorico.get('ascensos') as FormArray;
+  }
+
+  /** Añade una fila al histórico. Sin argumentos crea una fila vacía. */
+  agregarFilaAscenso(datos?: AscensoCategoria | null): void {
+    this.ascensosArray.push(this.formBuilder.group({
+      nombre: [datos?.nombre ?? ''],
+      fecha: [datos?.fecha ? new Date(datos.fecha) : ''],
+    }));
+  }
+
+  eliminarFilaAscenso(index: number): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'Esta acción eliminará el ascenso de la lista',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.ascensosArray.removeAt(index);
+      }
+    });
+  }
+
+  /** `JSON.parse` tolerante: devuelve `{}` si el valor viene vacío o corrupto. */
+  private parsearJson(valor: unknown): any {
+    if (typeof valor !== 'string' || valor.trim() === '') {
+      return {};
+    }
+
+    try {
+      return JSON.parse(valor);
+    } catch {
+      console.error('No se pudo interpretar un campo JSON del registro:', valor);
+      return {};
+    }
+  }
+
+  /**
+   * Rellena las filas del histórico al abrir el diálogo en modo edición.
+   *
+   * Primero usa la lista guardada en `categoria`. Si el registro es anterior a
+   * este cambio (la lista llegó vacía, con todas las fechas en null), la
+   * reconstruye desde las columnas `h*` para no perder lo ya registrado.
+   */
+  private cargarAscensos(): void {
+    while (this.ascensosArray.length > 0) {
+      this.ascensosArray.removeAt(0);
+    }
+
+    // Filas guardadas en la lista JSON, en su orden original.
+    const guardadas = parsearCategoria(this.data.valores?.categoria)
+      .filter(fila => !!fila?.nombre && !!fila.fecha);
+
+    guardadas.forEach(fila => this.agregarFilaAscenso({ nombre: fila.nombre, fecha: fila.fecha }));
+
+    // Completa con las columnas `h*` que no vinieran ya en la lista: son los
+    // registros anteriores a este cambio, que sólo tienen esas columnas.
+    const nombresCargados = new Set(guardadas.map(fila => fila.nombre));
+
+    ascensosDesdeColumnas(this.data.valores)
+      .filter(fila => !nombresCargados.has(fila.nombre))
+      .forEach(fila => this.agregarFilaAscenso(fila));
+  }
+
   poner_codigo() {
     this.formularioCategoria.get('codigoDocente').setValue(this.data.valores.laboral[0].codigo);
   }
   add_grado() {
-    let categ = this.categorias;
-    console.log(this.formularioCategoria.value);
-    let ratificado = {
+    const ratificado = {
       ratificado: this.formularioCategoria.value?.ratificado,
       chk1: this.formularioCategoria.value?.chk1 == undefined || this.formularioCategoria.value?.chk1 == "" ? false : this.formularioCategoria.value?.chk1,
       chk2: this.formularioCategoria.value?.chk2 == undefined || this.formularioCategoria.value?.chk2 == "" ? false : this.formularioCategoria.value?.chk2,
@@ -373,68 +394,99 @@ export class CategoriadlgComponent {
 
     let ratificadoString = JSON.stringify(ratificado);
 
+    // Filas del histórico: una categoría por fila con su fecha.
+    const ascensos = this.ascensosArray.controls
+      .map(control => ({
+        nombre: (control.get('nombre')?.value ?? '') as string,
+        fecha: control.get('fecha')?.value ?? null,
+      }))
+      .filter(fila => !!fila.nombre && !!fila.fecha);
+
+    const filasIncompletas = this.ascensosArray.controls
+      .filter(control => !!control.get('nombre')?.value && !control.get('fecha')?.value);
+
+    if (filasIncompletas.length > 0) {
+      Swal.fire({
+        title: 'Faltan fechas',
+        text: 'Hay ascensos con categoría pero sin fecha. Completa la fecha o elimina la fila.',
+        icon: 'warning'
+      });
+      return;
+    }
+
+    const categoriasGuardar: AscensoCategoria[] = ascensos.map(fila => ({
+      nombre: fila.nombre,
+      seleccionada: true,
+      fecha: fila.fecha,
+    }));
+
     let body = {
       id: this.formularioCategoria.value?.id,
       tipo: this.formularioCategoria.value?.tipo,
       fecha: this.formularioCategoria.value?.fecha,
-      categoria: JSON.stringify(this.categorias),
+      categoria: JSON.stringify(categoriasGuardar),
       condiciondap: this.formularioCategoria.value?.condiciondap,
       codigoDocente: this.formularioCategoria.value?.codigoDocente,
       dedicacion: this.formularioCategoria.value?.dedicacion,
       labor: this.formularioCategoria.value?.labor,
       categoriadap: this.formularioCategoria.value?.categoriadap,
       ratificado: ratificadoString,
-      hContratado: this.formularioHistorico.value?.contratado,
-      hAuxiliar: this.formularioHistorico.value?.auxiliar,
-      hPrincipal: this.formularioHistorico.value?.principal,
-      hAsociado: this.formularioHistorico.value?.asociado,
-      hProfesorVisita: this.formularioHistorico.value?.profesorvisitante,
-      hInstructor: this.formularioHistorico.value?.instructor,
-      hJefePract: this.formularioHistorico.value?.jefepractica,
-      hAyudante: this.formularioHistorico.value?.ayudante,
-      hAsistente: this.formularioHistorico.value?.asistente,
+      // Columnas heredadas, derivadas de las filas: las siguen leyendo los
+      // generadores de PDF/Word del backend.
+      ...derivarColumnasHistorico(ascensos),
       dedicacionJubilacion: this.formularioHistorico.value?.dedicacionJubilacion,
       categoriaJubilacion: this.formularioHistorico.value?.categoriaJubilacion,
     }
-    console.log(body);
     if (body.categoriadap == 'Extraordinario') {
       body.categoriadap = `Extraordinario-${this.formularioCategoria.value?.rg1}`
     }
     if (body.condiciondap == 'Inactivo') {
       body.condiciondap = `Inactivo-${this.formularioCategoria.value?.rg2}`
     }
-    console.log(body);
-
-    this.cgdepr.ponerurl("docentescategoria")
     if (this.formularioCategoria?.valid) {
+      // Cierre SÓLO tras la respuesta: cerrar antes hacía que el listado de
+      // categorías recargara sin ver todavía el registro guardado.
       if (this.fnc == true) {
-        this.cgdepr.add(body).subscribe(data => {
-          console.log("agregado");
-          Swal.fire({
-            title: "Agregado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formularioCategoria.value);
+        this.docenteCategoriaApi.crear(body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Agregado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formularioCategoria.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
       } else {
-        this.cgdepr.update(body.codigoDocente, body).subscribe(data => {
-          console.log("actualizado");
-          Swal.fire({
-            title: "Actualizado",
-            text: "Continuar",
-            icon: "info"
-          });
-          this.dialogRef.close(this.formularioCategoria.value);
+        this.docenteCategoriaApi.actualizar(body.codigoDocente, body).subscribe({
+          next: () => {
+            Swal.fire({
+              title: "Actualizado",
+              text: "Continuar",
+              icon: "info"
+            });
+            this.dialogRef.close(this.formularioCategoria.value);
+          },
+          error: (error) => this.mostrarErrorAlGuardar(error)
         })
       }
-
-      this.dialogRef.close(this.formularioCategoria.value);
     } else {
       // Marcar campos como tocados para mostrar errores de validación
       this.formularioCategoria?.markAllAsTouched();
     }
   }
+
+  /** Aviso común si el guardado falla: el diálogo se queda abierto para reintentar. */
+  private mostrarErrorAlGuardar(error: unknown): void {
+    console.error('Error al guardar:', error);
+    Swal.fire({
+      title: 'Error',
+      text: 'No se pudo guardar. Inténtalo de nuevo.',
+      icon: 'error'
+    });
+  }
+
   onNoClick(): void {
     this.dialogRef.close();
   }
@@ -488,61 +540,24 @@ export class CategoriadlgComponent {
   verificarInfo(data: any) {
     //console.log(data);
     if (data != undefined) {
-      console.log(data);
-
       return `${data.nombres} ${data.apellidos}`
     }
     else {
-      console.log("data");
       return "";
     }
 
   }
 
   /**
- * Calcula la fecha más reciente de todos los campos del histórico
+ * Calcula la fecha más reciente de todas las filas del histórico
  * y actualiza la Fecha Contrato automáticamente.
  */
   actualizarFechaContrato() {
     if (!this.formularioHistorico) return;
 
-    const historico = this.formularioHistorico.value;
+    // La fecha de contrato es la más reciente de las filas del histórico.
+    const fechas = this.ascensosArray.controls.map(control => control.get('fecha')?.value);
 
-    // Lista de todas las fechas que vienen del histórico
-    const fechasPosibles = [
-      historico.jefepractica,
-      historico.ayudante,
-      historico.asistente,
-      historico.instructor,
-      historico.profesorvisitante,
-      historico.contratado,
-      historico.auxiliar,
-      historico.asociado,
-      historico.principal
-    ];
-
-    // Filtramos nulos/vacíos y convertimos a objetos Date reales
-    const fechasValidas: Date[] = [];
-
-    fechasPosibles.forEach(fecha => {
-      if (fecha) {
-        const d = new Date(fecha);
-        if (!isNaN(d.getTime())) { // Verificamos que sea fecha válida
-          fechasValidas.push(d);
-        }
-      }
-    });
-
-    // Si no hay fechas, dejamos nulo
-    if (fechasValidas.length === 0) {
-      this.formularioCategoria.get('fecha')?.setValue(null);
-      return;
-    }
-
-    // Buscamos la fecha mayor (más reciente)
-    // Ordenamos descendente y tomamos la primera
-    fechasValidas.sort((a, b) => b.getTime() - a.getTime());
-
-    this.formularioCategoria.get('fecha')?.setValue(fechasValidas[0]);
+    this.formularioCategoria.get('fecha')?.setValue(fechaMasReciente(fechas));
   }
 }

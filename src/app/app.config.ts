@@ -17,6 +17,6 @@ export const appConfig: ApplicationConfig = {
     provideNativeDateAdapter(), 
     provideAnimations(),
    /// provideDateFnsAdapter, provideLuxonDateAdapter, provideMomentDateAdapter
-    { provide: LOCALE_ID, useValue: 'es-PE' }, provideAnimationsAsync()
+    { provide: LOCALE_ID, useValue: 'es-PE' }
   ]
 };

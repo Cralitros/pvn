@@ -7,7 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Facultad } from '../../../modelos/facultad';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
+import { DepartamentoAcademicoApiService, FacultadApiService } from '../../../../core/api';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -35,11 +35,11 @@ export class DepartamentoacaddlgComponent implements OnInit {
     public dialogRef: MatDialogRef<DepartamentoacaddlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService
+    private readonly facultadApi: FacultadApiService,
+    private readonly departamentoAcademicoApi: DepartamentoAcademicoApiService
   ) {}
 
   poner_datos() {
-    console.log(this.data);
     this.formulario.setValue({
       id: this.data.valores.id,
       nombre: this.data.valores.nombre,
@@ -55,9 +55,7 @@ export class DepartamentoacaddlgComponent implements OnInit {
     });
 
     // Cargar las facultades para el select
-    this.cgdepr.ponerurl("facultad");
-    this.cgdepr.get().subscribe(data => {
-      console.log(data);
+    this.facultadApi.listar().subscribe(data => {
       this.facultades = data;
     });
 
@@ -80,10 +78,8 @@ export class DepartamentoacaddlgComponent implements OnInit {
 
     if (this.formulario?.valid) {
       if (this.fnc) {
-        this.cgdepr.ponerurl("departamentoacad");
-        this.cgdepr.add(body).subscribe({
+        this.departamentoAcademicoApi.crear(body).subscribe({
           next: (data) => {
-            console.log("agregado", data);
             Swal.fire({
               title: "Agregado",
               text: "El departamento académico se agregó correctamente",
@@ -101,10 +97,8 @@ export class DepartamentoacaddlgComponent implements OnInit {
           }
         });
       } else {
-        this.cgdepr.ponerurl("departamentoacad");
-        this.cgdepr.update(body.id, body).subscribe({
+        this.departamentoAcademicoApi.actualizar(body.id, body).subscribe({
           next: (data) => {
-            console.log("actualizado", data);
             Swal.fire({
               title: "Actualizado",
               text: "El departamento académico se actualizó correctamente",

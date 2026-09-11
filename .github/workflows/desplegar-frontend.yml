@@ -1,0 +1,66 @@
+name: Desplegar frontend
+
+# Se ejecuta al subir cambios a la rama master (o a mano desde la pestaña Actions).
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  desplegar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar Angular (producción)
+        run: npm run build
+
+      - name: Comprobar que la API configurada está en el bundle
+        run: |
+          echo "Buscando la URL de la API en el build..."
+          if grep -rq "derechopucp.com/backendPucp2" dist/pvn/browser/*.js; then
+            echo "OK: el bundle apunta a backendPucp2"
+          else
+            echo "ERROR: el bundle NO contiene la URL esperada de la API."
+            echo "Revisa src/environments/environment.ts antes de desplegar."
+            exit 1
+          fi
+
+      - name: Comprobar que NO se generaron páginas prerenderizadas
+        run: |
+          # Con `prerender: false` sólo debe existir el index de la SPA.
+          # Si aparecen carpetas de rutas, es que el prerender está activo y esas
+          # páginas podrían exponer datos sin sesión.
+          rutas=$(find dist/pvn/browser -mindepth 1 -maxdepth 1 -type d | grep -v -E 'assets|media' || true)
+          if [ -n "$rutas" ]; then
+            echo "ERROR: se generaron carpetas de rutas prerenderizadas:"
+            echo "$rutas"
+            echo "Pon \"prerender\": false en angular.json."
+            exit 1
+          fi
+          echo "OK: sólo está el index de la SPA"
+
+      - name: Subir por FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USUARIO }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/pvn/browser/
+          server-dir: ${{ secrets.FTP_CARPETA_FRONT }}
+          # No se borra nada del servidor (así no se pierde el .htaccess del sitio).
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**

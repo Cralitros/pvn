@@ -36,7 +36,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatPaginatorModule } from '@angular/material/paginator';
 
 // Modelos
-import { Condiciones } from '../../../modelos/condiciones';
 import { Departamento } from '../../../modelos/departamento';
 import { Provincia } from '../../../modelos/provincia';
 import { Distrito } from '../../../modelos/distrito';
@@ -47,11 +46,16 @@ import { Afp } from '../../../modelos/afp';
 import { Nacionalidad } from '../../../modelos/nacionalidad';
 
 // Servicios
-import { MaestrosserviceService } from '../../../../services/maestrosservice.service';
-import { Aux1Service } from '../../../../services/aux1.service';
-import { Aux2Service } from '../../../../services/aux2.service';
-import { Aux3Service } from '../../../../services/aux3.service';
-import { Saux4Service } from '../../../../services/saux4.service';
+import {
+  AfpApiService,
+  BancoApiService,
+  DepartamentoApiService,
+  DistritoApiService,
+  DocenteApiService,
+  DocenteLaboralApiService,
+  NacionalidadApiService,
+  ProvinciaApiService,
+} from '../../../../core/api';
 
 // Componentes
 import { Tabla2Component } from '../../../objetos/tabla2/tabla2.component';
@@ -114,7 +118,6 @@ export class PersonaldlgComponent {
   formularioInvestigador?: FormGroup;
 
   // ─── Datos de catálogos ─────────────────────────────────────────────────────
-  condiciones: Condiciones[] = [];
   departamentos: Departamento[] = [];
   provincias: Provincia[] = [];
   distritos: Distrito[] = [];
@@ -166,11 +169,14 @@ export class PersonaldlgComponent {
     public dialogRef: MatDialogRef<PersonaldlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
-    private cgdepr: MaestrosserviceService,
-    private saux1: Aux1Service,
-    private saux2: Aux2Service,
-    private saux3: Aux3Service,
-    private saux4: Saux4Service,
+    private readonly docenteApi: DocenteApiService,
+    private readonly docenteLaboralApi: DocenteLaboralApiService,
+    private readonly departamentoApi: DepartamentoApiService,
+    private readonly provinciaApi: ProvinciaApiService,
+    private readonly distritoApi: DistritoApiService,
+    private readonly bancoApi: BancoApiService,
+    private readonly afpApi: AfpApiService,
+    private readonly nacionalidadApi: NacionalidadApiService,
   ) { }
 
   // ─── Ciclo de vida ──────────────────────────────────────────────────────────
@@ -255,20 +261,13 @@ export class PersonaldlgComponent {
   }
 
   private async loadDependencies(): Promise<void> {
-    this.saux1.ponerurl('departamentos');
-    this.departamentos = await lastValueFrom(this.saux1.get());
+    this.departamentos = await lastValueFrom(this.departamentoApi.listar());
 
-    this.saux2.ponerurl('bancos');
-    this.bancosarr = await lastValueFrom(this.saux2.get());
+    this.bancosarr = await lastValueFrom(this.bancoApi.listar());
 
-    this.saux3.ponerurl('afps');
-    this.afpsarr = await lastValueFrom(this.saux3.get());
+    this.afpsarr = await lastValueFrom(this.afpApi.listar());
 
-    this.saux4.ponerurl('nacionalidad');
-    this.nacionalidades = await lastValueFrom(this.saux4.get());
-
-    this.cgdepr.ponerurl('docentes');
-    this.condiciones = await lastValueFrom(this.cgdepr.get());
+    this.nacionalidades = await lastValueFrom(this.nacionalidadApi.listar());
   }
 
   private subscribeToFormChanges(): void {
@@ -524,8 +523,7 @@ export class PersonaldlgComponent {
     const value = event?.value ?? event;
     if (!value) return;
 
-    this.saux2.ponerurl('provincias');
-    this.saux2.getid(value).subscribe(data => {
+    this.provinciaApi.obtener(value).subscribe((data: any) => {
       this.provincias = data;
       if (this.data.modo === 1) {
         const provNombre = JSON.parse(this.data.valores.lugar_nacimiento)?.provincia;
@@ -540,8 +538,7 @@ export class PersonaldlgComponent {
     const value = event?.value ?? (event?.id ?? null);
     if (!value) return;
 
-    this.saux3.ponerurl('distritos');
-    this.saux3.getid(value).subscribe(data => {
+    this.distritoApi.obtener(value).subscribe((data: any) => {
       this.distritos = data;
       const provNombre = JSON.parse(this.data.valores.lugar_nacimiento)?.distrito;
       const distrito = this.distritos.find(p => Number(p.id) === Number(provNombre));
@@ -688,15 +685,13 @@ export class PersonaldlgComponent {
       especialidad: this.formulario1.value.especialidad,
     };
 
-    this.cgdepr.ponerurl('docentes');
-
     if (this.fnc) {
-      this.cgdepr.add(body).subscribe(() => {
+      this.docenteApi.crear(body).subscribe(() => {
         Swal.fire({ title: 'Agregado', text: 'Continuar', icon: 'info' });
         this.dialogRef.close(body);
       });
     } else {
-      this.cgdepr.update(body.codigo, body).subscribe(() => {
+      this.docenteApi.actualizar(body.codigo, body).subscribe(() => {
         Swal.fire({ title: 'Actualizado', text: 'Continuar', icon: 'info' });
         this.dialogRef.close(body);
       });
@@ -725,11 +720,10 @@ export class PersonaldlgComponent {
   }
 
   guardar_laboral(): void {
-    this.saux2.ponerurl('docenteslaboral');
     if (this.mensajeLaboral === 'guardar') {
-      this.saux2.add(this.formularioLaboral?.value).subscribe();
+      this.docenteLaboralApi.crear(this.formularioLaboral?.value).subscribe();
     } else {
-      this.saux2.update(
+      this.docenteLaboralApi.actualizar(
         this.formularioLaboral?.value.codigoDocente,
         this.formularioLaboral?.value
       ).subscribe();
@@ -740,13 +734,9 @@ export class PersonaldlgComponent {
 
   add_grado(): void { }
 
-  editar(element: any): void {
-    console.log('Editar:', element);
-  }
+  editar(element: any): void { }
 
-  eliminar(element: any): void {
-    console.log('Eliminar:', element);
-  }
+  eliminar(element: any): void { }
 
   onPaisChange(event: any): void {
     const paisSeleccionadoStr = event?.value ?? event;

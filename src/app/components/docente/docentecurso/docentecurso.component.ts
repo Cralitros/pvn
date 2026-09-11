@@ -11,13 +11,11 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DocenteCurso } from '../../modelos/docentecurso';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
-import { MaestrosserviceService } from '../../../services/maestrosservice.service';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
+import { DocenteApiService, DocenteCursoApiService } from '../../../core/api';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { DocentecursodlgComponent } from '../../dialog/docente/docentecursodlg/docentecursodlg.component';
-import { Aux1Service } from '../../../services/aux1.service';
-import { Aux2Service } from '../../../services/aux2.service';
 import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
 
@@ -66,8 +64,8 @@ export class DocentecursoComponent {
 
   constructor(private fb: FormBuilder,
     private sctabla: CargatablaService,
-    private mservice: MaestrosserviceService,
-    private saux2: Aux2Service,
+    private readonly docenteApi: DocenteApiService,
+    private readonly docenteCursoApi: DocenteCursoApiService,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
@@ -91,7 +89,6 @@ export class DocentecursoComponent {
       // const tipo = params['tipo'];
       const data = params['selectedRow'];
 
-      console.log('Selected Row:', data);
       this.cargartabla().then(() => {
         this.buscar(data);
       });
@@ -115,18 +112,17 @@ export class DocentecursoComponent {
       item => `${item.codigoDocente}` === `${codigo}`
     );
 
-    if (encontrado) {
+    /*if (encontrado) {
       this.cartabla.dataSeleccionada = encontrado;
       this.editar(encontrado);
-    } else {
+    } else {*/
       await this.crearNuevo(codigo);
-    }
+    //}
   }
 
   private async crearNuevo(codigo: string): Promise<void> {
     try {
-      this.mservice.ponerurl("docentes/cod");
-      const docenteData: any = await lastValueFrom(this.mservice.getid(codigo));
+      const docenteData: any = await lastValueFrom(this.docenteApi.obtenerPorCodigo(codigo));
 
       if (!docenteData || (Array.isArray(docenteData) && docenteData.length === 0)) {
         Swal.fire('Error', 'El código de docente no existe en el sistema.', 'error');
@@ -156,37 +152,55 @@ export class DocentecursoComponent {
   }
 
   async buscar(data: any) {
+    // Sin fila seleccionada no hay nada que buscar. Antes se hacía
+    // `setValue({ codigo: undefined })`, que lanza NG01002 cada vez que se
+    // entraba a la pantalla sin venir de una fila seleccionada.
+    if (data === undefined || data === null || `${data}`.trim() === '') {
+      return;
+    }
+
     this.formulario?.setValue({ 'codigo': data });
     await this.abrirDialogoLaboral();
   }
   existeRegistro(): boolean {
     const codigo = this.formulario?.value.codigo;
     // Usamos == para comparar sin importar si viene como número o texto
-    return this.tablaDepartamento.some(item => item.codigoDocente == codigo);
+    return false;
   }
 
   async cargartabla() {
-    this.mservice.ponerurl("docentescurso");
-    const source$ = this.mservice.get();
-    const finalNumber: any = await lastValueFrom(source$);
+    try {
+      const source$ = this.docenteCursoApi.listar();
+      const finalNumber: any = await lastValueFrom(source$);
 
-    this.cartabla.ponerdata(finalNumber);
-    this.tablaDepartamento = this.cartabla.array;
-    console.log(this.tablaDepartamento);
+      this.cartabla.ponerdata(finalNumber);
+      this.tablaDepartamento = this.cartabla.array;
 
-    this.sctabla.setData(this.tablaDepartamento);
+      this.sctabla.setData(this.tablaDepartamento);
+    } catch (error) {
+      this.mostrarErrorAlCargar(error);
+    }
+  }
+
+  /** La recarga falló: se avisa sin borrar lo que ya había en pantalla. */
+  private mostrarErrorAlCargar(error: unknown): void {
+    console.error('No se pudo actualizar la tabla:', error);
+    Swal.fire({
+      toast: true,
+      position: 'top-end',
+      icon: 'error',
+      title: 'No se pudo actualizar la tabla',
+      showConfirmButton: false,
+      timer: 4000
+    });
   }
   dialogo() {
     let laboral: any;
-    this.mservice.ponerurl("docentes/cod");
-    this.mservice.getid(this.formulario?.value.codigo).subscribe((data: any) => {
-      console.log(data);
+    this.docenteApi.obtenerPorCodigo(this.formulario?.value.codigo).subscribe((data: any) => {
       laboral = data;
       if (data.length > 0) {//verifica si existe el docente
 
-        this.saux2.ponerurl("docentescurso/docente");
-        this.saux2.getid(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
-          console.log(data2);
+        this.docenteCursoApi.obtenerPorDocente(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
 
           const dialogRef = this.dialog.open(DocentecursodlgComponent, {
             width: '800px',           // ✅ Aumentado de 500px
@@ -248,9 +262,7 @@ export class DocentecursoComponent {
 
   }
   eliminar(element: any) {
-    console.log("dep", element);
-    this.mservice.delete(element.id).subscribe(data => {
-      console.log("Eliminado");
+    this.docenteCursoApi.eliminar(element.id).subscribe(data => {
       Swal.fire({
         title: "Eliminado",
         text: "Continuar",
