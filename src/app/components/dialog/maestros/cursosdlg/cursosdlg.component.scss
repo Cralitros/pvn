@@ -1,223 +1,25 @@
-// ─── Variables ─────────────────────────────────────────────────────────────
-$primary: #5c6bc0; // Azul Indigo
-$primary-light: #e8eaf6;
-$primary-dark: #3949ab;
-$accent: #7c4dff;
-$error: #e53935;
-$radius: 6px;
-$transition: 0.2s ease;
+/* Estilos propios de este diálogo.
+
+   Lo común —contenedor, título, secciones, rejillas, franja del docente, botón
+   y barra de acciones— está en `src/styles.scss`, en el bloque «Estructura de
+   los formularios de diálogo». Aquí queda solo lo específico de esta pantalla. */
+
+// Paleta unificada con el resto de diálogos de maestros: antes este archivo
+// usaba un indigo propio mientras otros usaban violeta, así que el título
+// cambiaba de color según el diálogo que se abriera.
 
 // ─── Contenedor Principal ────────────────────────────────────────────────────
 :host {
   display: block;
   width: 100%;
-  min-width: 700px;
+  min-width: 0; // antes 700px: en móvil el diálogo se salía de la pantalla
   font-family: 'Segoe UI', sans-serif;
   box-sizing: border-box;
-}
-
-// ─── Título ──────────────────────────────────────────────────────────────────
-.dialog-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: $primary-dark;
-  margin: 10px 16px 2px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid $primary-light;
-  flex-shrink: 0;
-
-  .title-accent {
-    display: inline-block;
-    width: 5px;
-    height: 20px;
-    background: linear-gradient(to bottom, $accent, $primary);
-    border-radius: 3px;
-  }
-}
-
-// ─── Formulario: Scroll interno ──────────────────────────────────────────────
-.tab-form {
-  width: 100%;
-  padding: 8px 14px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: calc(90vh - 150px);
-
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #c5cae9;
-    border-radius: 4px;
-  }
-}
-
-// ─── Secciones ───────────────────────────────────────────────────────────────
-.form-section {
-  width: 100%;
-  background: #f9f9fc;
-  border: 1px solid #e3e6f5;
-  border-radius: $radius;
-  padding: 12px;
-  margin-bottom: 12px;
-  box-sizing: border-box;
-
-  .section-title {
-    display: block;
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: $primary;
-    margin-bottom: 8px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid $primary-light;
-  }
-}
-
-// ─── Grids ───────────────────────────────────────────────────────────────────
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  align-items: start;
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  align-items: start;
 }
 
 .full-width {
   grid-column: 1 / -1;
   width: 100%;
-}
-
-// ─── Barra de acciones ───────────────────────────────────────────────────────
-.dialog-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px 10px;
-  border-top: 1px solid #e0e0e0;
-  flex-shrink: 0;
-
-  .actions-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-}
-
-// ─── Overrides de Material ───────────────────────────────────────────────────
-::ng-deep {
-  .mat-mdc-form-field-infix {
-    min-height: 36px !important;
-    padding-top: 6px !important;
-    padding-bottom: 6px !important;
-  }
-
-  .mat-mdc-text-field-wrapper {
-    padding: 0 8px !important;
-  }
-
-  .mat-mdc-floating-label {
-    font-size: 0.8rem;
-  }
-
-  input.mat-mdc-input-element,
-  textarea.mat-mdc-input-element {
-    font-size: 0.82rem;
-  }
-
-  .mdc-text-field--outlined .mdc-notched-outline__leading,
-  .mdc-text-field--outlined .mdc-notched-outline__trailing {
-    border-radius: $radius;
-  }
-
-  .mat-mdc-form-field {
-    width: 100%;
-  }
-
-  .mat-mdc-select-panel {
-    border-radius: $radius !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
-    overflow: hidden;
-
-    .mat-mdc-option {
-      background-color: #fafafa !important;
-      color: #333 !important;
-      border-bottom: 1px solid $primary-light !important;
-      padding: 8px 14px !important;
-      min-height: 36px !important;
-      font-size: 0.82rem;
-      transition: background-color $transition;
-
-      &:hover {
-        background-color: $primary-light !important;
-        color: $primary-dark !important;
-      }
-
-      &.mat-mdc-option-selected {
-        background-color: #c5cae9 !important;
-        color: $primary-dark !important;
-        font-weight: 600;
-      }
-
-      &:last-child {
-        border-bottom: none !important;
-      }
-    }
-  }
-
-  .mat-mdc-autocomplete-panel {
-    border-radius: $radius !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
-    overflow: hidden;
-
-    .mat-mdc-option {
-      background-color: #fafafa !important;
-      color: #333 !important;
-      border-bottom: 1px solid $primary-light !important;
-      padding: 8px 14px !important;
-      min-height: 36px !important;
-      font-size: 0.82rem;
-      transition: background-color $transition;
-
-      &:hover {
-        background-color: $primary-light !important;
-        color: $primary-dark !important;
-      }
-
-      &.mat-mdc-option-active {
-        background-color: #c5cae9 !important;
-        color: $primary-dark !important;
-      }
-
-      &:last-child {
-        border-bottom: none !important;
-      }
-    }
-  }
-}
-
-// ─── Mensajes de error ───────────────────────────────────────────────────────
-.mensaje-error {
-  color: $error;
-  font-size: 0.75rem;
-  margin-top: 4px;
-  font-weight: 500;
 }
 
 // ─── Botones ─────────────────────────────────────────────────────────────────

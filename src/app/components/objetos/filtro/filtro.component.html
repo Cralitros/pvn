@@ -28,7 +28,9 @@
       <mat-icon>check</mat-icon>
     </button>
 
-    <button mat-icon-button color="warn" (click)="cancelarrFiltro()" matTooltip="Cancelar filtros">
+    <!-- Cancelar va neutro, como en los diálogos: el rojo del tema se reserva
+         para lo destructivo (eliminar), y cerrar un filtro no lo es. -->
+    <button mat-icon-button (click)="cancelarrFiltro()" matTooltip="Cancelar filtros">
       <mat-icon>close</mat-icon>
     </button>
   </div>

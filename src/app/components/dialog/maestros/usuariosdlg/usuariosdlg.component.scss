@@ -2,22 +2,12 @@
   display: block;
   padding: 24px;
   font-family: 'Roboto', 'Segoe UI', sans-serif;
-  min-width: 600px; /* Ancho mínimo para que se vea bien a 2 columnas */
-}
-
-.titulo {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #673ab7; /* Un tono violeta moderno */
-  margin-bottom: 20px;
-  text-align: center;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 12px;
+  min-width: 0; // antes 600px: en móvil el diálogo no cabía en la pantalla
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Dos columnas */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* Dos columnas */
   gap: 16px;
 }
 
@@ -25,24 +15,23 @@
   grid-column: 1 / -1; /* Ocupa todo el ancho */
 }
 
-.example-full-width {
-  width: 100%;
-}
-
 .mensaje {
-  color: #f44336;
+  color: var(--pvn-peligro); // antes un rojo fijo
   font-size: 0.75rem;
   margin-top: 4px;
   font-weight: 500;
 }
 
+// Barra de acciones unificada en los 15 diálogos de maestros: separador
+// superior y botones alineados a la derecha.
 .buttons {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pvn-borde);
 }
 
 .btn {
@@ -50,25 +39,12 @@
   font-weight: 500;
 }
 
-.rgroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
+// El tooltip .myTooltip ya se define para toda la aplicación en styles.scss.
 
-.rg2 {
-  display: flex;
-  gap: 16px;
-}
-
-/* Personalización del Tooltip de Angular Material */
-::ng-deep .myTooltip .mdc-tooltip__surface {
-  max-width: 350px !important;
-  padding: 10px 14px !important;
-  font-size: 0.875rem !important;
-  background-color: #333333 !important;
-  color: #ffffff !important;
-  border-radius: 6px !important;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+// ─── Responsive ──────────────────────────────────────────────────────────────
+// En pantallas estrechas las dos columnas se apilan en una sola.
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

@@ -1,0 +1,60 @@
+/* Tabla reducida (sin barra de herramientas ni filtros), usada dentro del
+   diálogo de datos personales.
+
+   El archivo estaba vacío, así que las filas seleccionada y resaltada —que la
+   plantilla marca con `[ngClass]`— se veían exactamente igual que el resto y no
+   había forma de saber qué fila estaba elegida. Se alinea con la tabla
+   principal para que ambas se lean igual. */
+
+:host {
+  display: block;
+}
+
+/* El contenedor venía con `mat-elevation-z8`, una sombra mucho más marcada que
+   la del resto de tarjetas del sistema. */
+.mat-elevation-z8 {
+  border: 1px solid var(--pvn-borde);
+  border-radius: var(--pvn-radio);
+  box-shadow: var(--pvn-sombra);
+  overflow: hidden;
+}
+
+table.mat-table {
+  width: 100%;
+  box-shadow: none;
+}
+
+th.mat-mdc-header-cell {
+  background: var(--pvn-fondo);
+  color: var(--pvn-primario-profundo);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+td.mat-mdc-cell {
+  color: var(--pvn-texto);
+  font-size: 0.86rem;
+}
+
+tr.mat-mdc-row:hover {
+  background: #f7f9fc;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+}
+
+.selected-row {
+  background-color: var(--pvn-primario-claro) !important;
+  font-weight: 600;
+}
+
+.highlighted-row {
+  background-color: #e0f4f2;
+}
+
+mat-paginator {
+  background: transparent;
+  font-size: 0.85rem;
+}

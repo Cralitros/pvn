@@ -7,7 +7,9 @@
     </a>
 
     <mat-nav-list>
-      <mat-expansion-panel hideToggle *ngIf="nivel==1">
+      <!-- Sin `hideToggle`: al ocultar la flecha, la cabecera no daba ninguna
+           pista de que la sección se pudiera desplegar. -->
+      <mat-expansion-panel *ngIf="nivel==1">
         <mat-expansion-panel-header>
           <mat-panel-description>
             Tablas Generales
@@ -33,7 +35,7 @@
 
 
       </mat-expansion-panel>
-      <mat-expansion-panel hideToggle *ngIf="nivel==1 || nivel==2">
+      <mat-expansion-panel *ngIf="nivel==1 || nivel==2">
         <mat-expansion-panel-header>
           <mat-panel-description>
             Docentes

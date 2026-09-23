@@ -4,7 +4,7 @@
     <span>{{ funcion }} Personal</span>
   </div>
 
-  <mat-tab-group [(selectedIndex)]="selectedIndex" (selectedTabChange)="tabActive($event)">
+  <mat-tab-group class="dialog-tabs" [(selectedIndex)]="selectedIndex" (selectedTabChange)="tabActive($event)">
 
     <!-- TAB 1: Identificación y Datos Personales -->
     <mat-tab label="Identificación y Datos Personales">
@@ -270,7 +270,10 @@
   <!-- Barra de acciones -->
   <div class="dialog-actions">
   <div class="actions-left">
-    <button mat-button color="warn" (click)="onNoClick()">Cancelar</button>
+    <!-- Neutro, como el resto de botones de cancelar de la aplicación: con
+         `color="warn"` salía en rojo, que es el color reservado a lo
+         destructivo (eliminar). -->
+    <button mat-button (click)="onNoClick()">Cancelar</button>
   </div>
   
   <div class="actions-right">
@@ -284,8 +287,10 @@
       Siguiente →
     </button>
     
-    <!-- Botón Guardar/Editar -->
-    <button mat-raised-button color="accent" (click)="onSubmit()">
+    <!-- Guardar/Editar. Era el único diálogo que usaba `color="accent"` para
+         confirmar; el resto usa `primary`, y el acento quedó para acciones
+         secundarias (exportar, aplicar filtros). -->
+    <button mat-raised-button color="primary" (click)="onSubmit()">
       {{ funcion }}
     </button>
   </div>

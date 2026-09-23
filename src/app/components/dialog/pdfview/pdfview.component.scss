@@ -1,25 +1,28 @@
-.container{
-    display: flex;
-    align-items:center;
-    align-content:center;
-    justify-content:center;
-    width: 100%;
-    height: 100%;
-    flex-flow: column wrap;
-    gap: 10px;
+/* Visor de PDF dentro de un diálogo. */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  /* Permite que el visor encoja dentro del contenedor flexible. */
+  min-height: 0;
 }
 
-.buttons-container{
-    width: 90%;
-    display: flex; /* or inline-flex */
-    flex-direction: row;
-    justify-content: flex-end ;
-    align-items:flex-end;
+.buttons-container {
+  display: flex;
+  justify-content: flex-end;
 }
-@media (max-width: 600px) {
 
-    .pdf-container,
-    .pdf-iframe {
-        height: 60vh; // Menor altura en pantallas pequeñas
-    }
+/* El visor traía `width="90%" height="90%"` como atributos del HTML, que dentro
+   de un contenedor flexible se quedan sin alto de referencia y colapsan. Aquí
+   ocupa todo el espacio disponible, con un mínimo para que siempre se vea. */
+iframe {
+  flex: 1 1 auto;
+  width: 100%;
+  height: auto;
+  min-height: 60vh;
+  border-radius: var(--pvn-radio-sm);
+  background: var(--pvn-superficie);
 }

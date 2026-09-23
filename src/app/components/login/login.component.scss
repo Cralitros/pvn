@@ -1,88 +1,125 @@
-body {
-  background: linear-gradient(135deg, #042354 50%, #355c7d 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /*height: 100vh;*/
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  color: #fff;
-  
+/* Pantalla de acceso. Antes este archivo estilizaba `body` (que está fuera del
+   componente, así que no hacía nada) y estiraba el fondo con `position: fixed`. */
+
+:host {
+  display: block;
 }
 
+/* Fondo a pantalla completa: basta con una altura mínima de ventana. El
+   `position: fixed` anterior sacaba el contenedor del flujo y daba problemas
+   con el teclado en pantalla de los móviles. */
 .login-contain {
-  position: fixed;
   display: flex;
-  justify-content: center;
   align-items: center;
-  width: 100%;
-  height: 100%;
-  background-color: #e1ebf5;
-  background: linear-gradient(135deg, #b8c8d8 50%, #355c7d 100%);
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, var(--pvn-primario-profundo) 0%, var(--pvn-primario) 60%, #4b659a 100%);
 }
 
 .login-box {
-  background-color: #f4f4f9; /* Color complementario suave */
-  padding: 2.5em 3em;
-  border-radius: 15px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  max-width: 400px;
   width: 100%;
+  max-width: 400px;
+  padding: 40px 36px;
+  border-radius: var(--pvn-radio-lg);
+  background: var(--pvn-superficie);
+  box-shadow: 0 24px 48px -24px rgba(4, 35, 84, 0.6);
+  text-align: center;
 
-}
+  /* El logo trae `width="300"` como atributo del HTML: en un móvil de 360px se
+     salía de la tarjeta y provocaba scroll horizontal. El CSS gana al
+     atributo, así que se acota aquí sin tocar la plantilla. */
+  img {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+  }
 
-.login-box h2 {
-  margin-bottom: 1.5em;
-  color: #042354;
-  font-size: 2em;
-  font-weight: 700;
+  h2 {
+    margin: 12px 0 28px;
+    color: var(--pvn-primario-profundo);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
 }
 
 .input-group {
-  margin-bottom: 1.5em;
+  margin-bottom: 18px;
   text-align: left;
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--pvn-texto);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--pvn-borde);
+    border-radius: var(--pvn-radio-sm);
+    background: #fbfcfe;
+    box-sizing: border-box;
+    color: var(--pvn-texto);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition:
+      border-color var(--pvn-transicion),
+      box-shadow var(--pvn-transicion),
+      background-color var(--pvn-transicion);
+
+    &:focus {
+      border-color: var(--pvn-primario);
+      background: var(--pvn-superficie);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(39, 76, 139, 0.15);
+    }
+  }
 }
 
-.input-group label {
-  display: block;
-  margin-bottom: 0.5em;
-  color: #333;
-  font-size: 1em;
-  font-weight: 600;
-}
-
-.input-group input {
+form button {
   width: 100%;
-  padding: 0.75em;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
-  font-size: 1em;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.input-group input:focus {
-  border-color: #042354;
-  background-color: #e1ebf5;
-  outline: none;
-  box-shadow: 0 0 8px rgba(4, 35, 84, 0.2);
-}
-
-button {
-  background-color: #355c7d; /* Color complementario suave */
-  color: #fff;
-  padding: 0.75em 1.5em;
+  height: 48px;
+  margin-top: 8px;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--pvn-radio-sm);
+  background: var(--pvn-primario);
+  color: #ffffff;
   cursor: pointer;
-  font-size: 1.2em;
-  font-weight: 700;
-  transition: background-color 0.3s, transform 0.3s;
-  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  transition:
+    background-color var(--pvn-transicion),
+    box-shadow var(--pvn-transicion),
+    transform var(--pvn-transicion);
+
+  &:hover {
+    background: var(--pvn-primario-oscuro);
+    box-shadow: 0 10px 20px -12px rgba(4, 35, 84, 0.8);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background: #b9c7de;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
 }
 
-button:hover {
-  background-color: #2c4a62;
-  transform: translateY(-2px);
+@media (max-width: 480px) {
+  .login-box {
+    padding: 28px 22px;
+
+    h2 {
+      font-size: 1.3rem;
+    }
+  }
 }

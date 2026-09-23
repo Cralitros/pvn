@@ -1,29 +1,42 @@
-/* ===== TOOLBAR HORIZONTAL ===== */
+/* Tabla de datos reutilizable: barra de herramientas, tabla y menús.
+
+   Se eliminaron las reglas heredadas de la plantilla de ejemplo de Material que
+   ya no usa nadie (`.example-element-detail`, `.example-element-diagram`,
+   `.expanded-row`, `.img`, `.expired`, `.no-stock-row`, `.low-stock`,
+   `.pre-formatted`, `.header-container`, `.example-margin`) y las de
+   `.mat-sort-header-*`, que no aplicaban: en un SCSS de componente un selector
+   sobre elementos internos de un componente hijo no llega sin `::ng-deep`. */
+
+/* ── Barra de herramientas ───────────────────────────────────────────────── */
+
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  background: white;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--pvn-borde);
+  border-radius: var(--pvn-radio);
+  background: var(--pvn-superficie);
+  box-shadow: var(--pvn-sombra);
 }
 
 .filter-field {
-  flex: 1;
-  max-width: 300px;
-  margin-bottom: 0;
-}
+  flex: 1 1 220px;
+  max-width: 320px;
 
-.filter-field ::ng-deep .mat-form-field-wrapper {
-  margin-bottom: 0;
-  padding-bottom: 0;
+  /* El buscador no valida nada, así que se oculta el hueco reservado para los
+     mensajes de error y la fila queda compacta. Acotado con `::ng-deep`
+     precedido de una clase: sigue estando encapsulado en este componente. */
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
 }
 
 .filter-checkbox {
-  margin-left: 8px;
+  margin-left: 4px;
+  font-size: 0.85rem;
 }
 
 .spacer {
@@ -35,224 +48,278 @@
   align-items: center;
   gap: 6px;
   font-weight: 500;
-  text-transform: none;
   letter-spacing: normal;
-}
+  text-transform: none;
 
-.toolbar-btn mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-/* ===== BOTONES Y ACCIONES ===== */
-.edit-btn {
-  position: relative;
-  margin-right: 10px;
-}
-
-.buttons {
-  display: flex;
-}
-
-.btncss {
-  display: inline-block;
-  outline: none;
-  cursor: pointer;
-  font-weight: 500;
-  border-radius: 3px;
-  padding: 0 15px;
-  border-radius: 4px;
-  color: #6200ee;
-  background: transparent;
-  line-height: 1.15;
-  font-size: 14px;
-  height: 36px;
-  word-spacing: 0px;
-  letter-spacing: .0892857143em;
-  text-decoration: none;
-  text-transform: uppercase;
-  min-width: 64px;
-  border: 1px solid #6200ee;
-  text-align: center;
-  transition: background 280ms cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    background: #f4f4f4;
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
   }
 }
 
-/* ===== FILAS DE LA TABLA ===== */
-.selected-row {
-  background-color: #c8e6c9 !important;
-  font-size: 15px;
-  font-weight: bold;
+/* ── Contenedor de la tabla ──────────────────────────────────────────────── */
+
+/* Un único contenedor con scroll: antes había dos anidados (400px dentro de
+   800px), lo que producía dos barras de desplazamiento para el mismo
+   contenido. */
+.table-container {
+  max-height: 62vh;
+  overflow: auto;
+  border: 1px solid var(--pvn-borde);
+  border-radius: var(--pvn-radio);
+  background: var(--pvn-superficie);
 }
 
-.highlighted-row {
-  background-color: #a3c1f0;
+.table-wrapper {
+  width: 100%;
 }
+
+table.mat-table {
+  width: 100%;
+  /* La tarjeta que envuelve la tabla ya tiene borde y sombra: sumarle la
+     elevación de Material duplicaba el efecto. */
+  box-shadow: none;
+}
+
+/* Cabecera fija: al desplazar una tabla larga se seguía perdiendo de vista el
+   nombre de las columnas. */
+th.mat-mdc-header-cell {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--pvn-fondo);
+  color: var(--pvn-primario-profundo);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+td.mat-mdc-cell {
+  font-size: 0.86rem;
+  color: var(--pvn-texto);
+  /* Un valor largo y sin espacios (un correo, un código concatenado) desbordaba
+     la celda y descuadraba el ancho de la tabla. */
+  overflow-wrap: anywhere;
+}
+
+/* Todas las celdas de datos se recortan a una línea.
+
+   Había columnas —la especialidad de personal, las observaciones, el grado— con
+   tanto texto que la fila crecía muchísimo y la tabla dejaba de ser legible. Como
+   el contenido completo está en la fila desplegada, aquí no hace falta verlo
+   entero: basta con un fragmento y una pista de que hay más.
+
+   El recorte va en un bloque interior y no en la propia celda: un `max-width`
+   sobre un `<td>` lo ignora el algoritmo de disposición de las tablas, así que
+   los puntos suspensivos no aparecerían. */
+.celda-texto {
+  display: block;
+  max-width: clamp(140px, 24vw, 300px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+tr.mat-mdc-row:hover {
+  background: #f7f9fc;
+}
+
+mat-paginator {
+  border-top: 1px solid var(--pvn-borde);
+  background: transparent;
+  font-size: 0.85rem;
+}
+
+/* ── Estados de fila ─────────────────────────────────────────────────────── */
 
 .example-element-row {
   cursor: pointer;
 }
 
-.example-expanded-row .example-element-detail {
+/* Los dos estados se distinguen entre sí y siguen la paleta: antes eran un
+   verde (#c8e6c9) y un azul suelto (#a3c1f0) que no pertenecían al tema. */
+.selected-row {
+  background-color: var(--pvn-primario-claro) !important;
+  font-weight: 600;
+}
+
+.highlighted-row {
+  background-color: #e0f4f2;
+}
+
+/* ── Filas desplegables ──────────────────────────────────────────────────── */
+
+.col-expandir {
+  width: 48px;
+  padding: 0 4px;
+  text-align: center;
+}
+
+.col-expandir button {
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+}
+
+.col-expandir mat-icon {
+  transition: transform var(--pvn-transicion);
+
+  /* La flecha apunta hacia abajo cuando está cerrada y hacia arriba cuando el
+     detalle está abierto. */
+  &.girada {
+    transform: rotate(180deg);
+  }
+}
+
+/* La fila de detalle no ocupa altura mientras está cerrada: la abre la
+   animación `detailExpand` del componente. */
+.fila-detalle {
+  height: 0;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+/* Fila abierta: se marca para que se vea a qué registro pertenece el panel que
+   aparece debajo. La barra de acento se pinta con `box-shadow` para no pelear
+   con los fondos de fila seleccionada / resaltada. */
+.fila-abierta {
+  background: #f3f6fb;
+  box-shadow: inset 3px 0 0 0 var(--pvn-primario);
+}
+
+.fila-abierta td.mat-mdc-cell {
+  font-weight: 500;
+}
+
+.celda-detalle {
+  padding: 0;
+  border-bottom: none;
+}
+
+/* Sin `overflow: hidden` la animación de altura dejaría ver el contenido
+   durante el cierre. */
+.detalle {
   overflow: hidden;
+}
+
+/* Aquí es donde el contenido tiene sitio. Cada campo ocupa una fila con su
+   etiqueta a la izquierda y el valor a la derecha, así que el valor dispone de
+   todo el ancho: antes iba en una rejilla de columnas de 200px y un valor largo
+   —el bloque de grados, por ejemplo— quedaba comprimido en una columna
+   estrechísima. */
+.detalle__campos {
+  display: grid;
+  grid-template-columns: minmax(140px, max-content) minmax(0, 1fr);
+  align-content: start;
+  gap: 6px 20px;
+  padding: 12px 18px;
+  max-height: 340px;
+  overflow: auto;
+  border-top: 1px solid var(--pvn-borde);
+  border-bottom: 1px solid var(--pvn-borde);
+  background: var(--pvn-superficie-suave);
+  /* Acompaña a la barra de acento de la fila abierta. */
+  box-shadow: inset 3px 0 0 0 var(--pvn-primario);
+}
+
+/* Con `display: contents` la etiqueta y el valor pasan a ser celdas directas de
+   la rejilla, así que cada campo ocupa exactamente una fila. */
+.detalle__campo {
+  display: contents;
+}
+
+.detalle__etiqueta {
+  color: var(--pvn-texto-suave);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.detalle__valor {
+  color: var(--pvn-texto);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  /* Los valores de grado y categoría llegan con saltos de línea deliberados
+     (un campo por línea). Sin esto, el HTML los colapsa y todo sale de corrido. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ── Acciones de fila ────────────────────────────────────────────────────── */
+
+.buttons {
   display: flex;
+  align-items: center;
 }
 
-.example-element-diagram {
-  width: 40%;
-}
+/* ── Menús contextuales (clic derecho y filtros) ─────────────────────────── */
 
-.example-element-description {
-  padding: 16px;
-}
-
-/* ===== MENÚS CONTEXTUALES ===== */
 .menu {
   position: fixed;
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
+  min-width: 190px;
+  padding: 6px;
+  border: 1px solid var(--pvn-borde);
+  border-radius: var(--pvn-radio-sm);
+  background: var(--pvn-superficie);
+  box-shadow: var(--pvn-sombra-alta);
 }
 
 .menu button {
   display: block;
   width: 100%;
-  text-align: left;
-  padding: 8px 16px;
+  padding: 8px 12px;
   border: none;
+  border-radius: 6px;
   background: none;
+  color: var(--pvn-texto);
   cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+
+  &:hover {
+    background-color: var(--pvn-primario-claro);
+    color: var(--pvn-primario-profundo);
+  }
 }
 
-.menu button:hover {
-  background-color: #f0f0f0;
+/* Botón de las acciones del menú contextual: eran morados (#6200ee) con el
+   texto en mayúsculas, restos de la plantilla de ejemplo. */
+.btncss {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--pvn-texto);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  transition: background-color var(--pvn-transicion);
+
+  &:hover {
+    background: var(--pvn-primario-claro);
+    color: var(--pvn-primario-profundo);
+  }
 }
 
 .filter-menu {
   position: fixed;
   z-index: 1000;
   padding: 10px;
-  background: #fff;
-  border: 1px solid #ccc;
-  margin-top: 10px;
-}
-
-/* ===== CONTENEDOR DE TABLA Y SCROLLBAR ===== */
-.table-container {
-  max-height: 400px;
-  overflow: auto;
-}
-
-.table-wrapper {
-  width: 100%;
-  max-height: 800px;
-  overflow-y: auto;
-  overflow-x: auto;
-}
-
-/* WebKit Scrollbar */
-.table-wrapper::-webkit-scrollbar {
-  width: 12px;
-}
-
-.table-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb {
-  background-color: #140101;
-  border-radius: 10px;
-  border: 3px solid #f1f1f1;
-}
-
-.table-wrapper::-webkit-scrollbar-thumb:hover {
-  background-color: #1633d4;
-}
-
-/* Firefox Scrollbar */
-.table-wrapper {
-  scrollbar-width: thin;
-  scrollbar-color: #263872 #f1f1f1;
-}
-
-/* ===== ESTADOS ESPECIALES ===== */
-.img {
-  cursor: pointer;
-  margin-left: 5px;
-}
-
-.expired {
-  background-color: red;
-  color: white;
-}
-
-.no-stock-row {
-  background-color: #f8d7da !important;
-  position: relative;
-  z-index: 0;
-}
-
-.low-stock {
-  background-color: #d1e0cf;
-  color: rgb(41, 2, 2);
-  font-weight: bold;
-  position: relative;
-  z-index: 1;
-}
-
-.pre-formatted {
-  white-space: pre-wrap;
-}
-
-/* ===== ENCABEZADOS Y FILTROS ===== */
-.header-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.header-container span {
-  margin-bottom: 5px;
-}
-
-app-inputs {
-  width: 100%;
-}
-
-ul {
-  list-style-type: none;
-  position: relative;
-  right: 40px;
-}
-
-.example-margin {
-  padding-right: 5px;
-}
-
-/* ===== SORT HEADERS ===== */
-.mat-sort-header-arrow {
-  font-size: 20px;
-  color: #9c27b0;
-  opacity: 1 !important;
-}
-
-.mat-sort-header-arrow-active {
-  color: #e91e63;
-}
-
-.mat-sort-header-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-mat-sort-header-arrow {
-  color: #e91e63 !important;
+  border: 1px solid var(--pvn-borde);
+  border-radius: var(--pvn-radio-sm);
+  background: var(--pvn-superficie);
+  box-shadow: var(--pvn-sombra-alta);
 }

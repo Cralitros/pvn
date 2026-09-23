@@ -1,0 +1,80 @@
+/* Patrón "listado": filtro por código + botón de alta + tabla.
+
+   Lo comparten las 22 pantallas de maestros y de docentes. Antes cada una
+   repetía este mismo bloque de 50 líneas (eran 22 archivos idénticos byte a
+   byte), así que cualquier ajuste había que hacerlo 22 veces; de hecho el azul
+   de los botones ya se había quedado en #2E4C83 mientras el tema usa #274c8b.
+   Se importa con `@use '../../../estilos/listado';` desde cada pantalla. */
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+/* El contenedor intermedio no aporta nada al diseño: con `display: contents`
+   sus hijos (el botón y la tarjeta de la tabla) pasan a colocarse directamente
+   en la fila de la pantalla, así que las tres variantes de HTML que existen
+   —con o sin este envoltorio— quedan alineadas igual. */
+.laboral-wrapper {
+  display: contents;
+}
+
+form {
+  margin: 0;
+}
+
+/* Antes eran 280px fijos: en una pantalla de móvil el campo se salía. */
+.example-full-width {
+  width: min(280px, 100%);
+}
+
+/* La tarjeta de la tabla, siempre en su propia fila y a todo el ancho.
+   El `margin-top` global sobra porque el hueco lo da el `gap` del contenedor. */
+.contenedortabla {
+  flex: 1 1 100%;
+  min-width: 0;
+  margin-top: 0;
+}
+
+/* Botón de alta: misma altura que el campo de texto (56px) y azul del tema.
+   La especificidad doble (`.button-add.mat-mdc-raised-button`) es necesaria
+   porque Material pinta el fondo desde `.mdc-button`; con un solo selector la
+   regla perdía y había que recurrir a `!important`. */
+.button-add.mat-mdc-raised-button {
+  height: 56px;
+  padding: 0 20px;
+  font-weight: 500;
+  background-color: var(--pvn-primario);
+  color: #ffffff;
+  box-shadow: 0 2px 6px -2px rgba(4, 35, 84, 0.5);
+  transition:
+    background-color var(--pvn-transicion),
+    box-shadow var(--pvn-transicion),
+    transform var(--pvn-transicion);
+
+  &:hover {
+    background-color: var(--pvn-primario-oscuro);
+    box-shadow: 0 6px 14px -6px rgba(4, 35, 84, 0.55);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px -2px rgba(4, 35, 84, 0.5);
+  }
+}
+
+/* En pantallas estrechas el filtro y el botón ocupan una fila cada uno. */
+@media (max-width: 600px) {
+  :host {
+    padding: 12px;
+  }
+
+  .example-full-width,
+  .button-add.mat-mdc-raised-button {
+    width: 100%;
+  }
+}

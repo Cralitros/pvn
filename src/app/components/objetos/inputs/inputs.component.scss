@@ -1,87 +1,96 @@
-/* From uiverse.io by @satyamchaudharydev */
-/* removing default style of button */
+/* Buscador con borde animado.
 
-.form button {
+   Nota: este componente no se usa en ninguna plantilla del proyecto (la tabla
+   tiene su propio campo de filtro). Se conserva y se alinea con la paleta por
+   si se vuelve a utilizar; sus colores eran morados y azules de la plantilla
+   original (#510d79, #2f2ee9, rgb(82, 10, 97)). */
+
+.form {
+  --timing: 0.3s;
+  --width-of-input: 200px;
+  --height-of-input: 40px;
+  --border-height: 2px;
+  --input-bg: var(--pvn-superficie);
+  --border-color: var(--pvn-primario);
+  --border-radius: 999px;
+  --after-border-radius: 4px;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: var(--width-of-input);
+  height: var(--height-of-input);
+  padding-inline: 0.8em;
+  border-radius: var(--border-radius);
+  background: var(--input-bg);
+  transition: border-radius 0.5s ease;
+
+  button {
     border: none;
     background: none;
-    color: #510d79;
-  }
-  /* styling of whole input container */
-  .form {
-    --timing: 0.3s;
-    --width-of-input: 200px;
-    --height-of-input: 40px;
-    --border-height: 2px;
-    --input-bg: #fff;
-    --border-color: #2f2ee9;
-    --border-radius: 30px;
-    --after-border-radius: 1px;
-    position: relative;
-    width: var(--width-of-input);
-    height: var(--height-of-input);
-    display: flex;
-    align-items: center;
-    padding-inline: 0.8em;
-    border-radius: var(--border-radius);
-    transition: border-radius 0.5s ease;
-    background: var(--input-bg,#fff);
-  }
-  /* styling of Input */
-  .input {
-    font-size: 0.9rem;
-    background-color: transparent;
-    width: 100%;
-    height: 100%;
-    padding-inline: 0.5em;
-    padding-block: 0.7em;
-    border: none;
+    color: var(--pvn-primario);
+    cursor: pointer;
   }
 
-  .input::placeholder {
-    color: rgb(82, 10, 97); /* Cambia el color según tus necesidades */
-    opacity: 1; /* Asegúrate de que la opacidad esté al 100% si quieres que el color sea sólido */
-  }
-  /* styling of animated border */
-  .form:before {
-    content: "";
-    position: absolute;
-    background: var(--border-color);
-    transform: scaleX(0);
-    transform-origin: center;
-    width: 100%;
-    height: var(--border-height);
-    left: 0;
-    bottom: 0;
-    border-radius: 1px;
-    transition: transform var(--timing) ease;
-  }
-  /* Hover on Input */
-  .form:focus-within {
-    border-radius: var(--after-border-radius);
-  }
-  
-  input:focus {
-    outline: none;
-  }
-  /* here is code of animated border */
-  .form:focus-within:before {
-    transform: scale(1);
-  }
-  /* styling of close button */
-  /* == you can click the close button to remove text == */
-  .reset {
-    border: none;
-    background: none;
-    opacity: 0;
-    visibility: hidden;
-  }
-  /* close button shown when typing */
-  input:not(:placeholder-shown) ~ .reset {
-    opacity: 1;
-    visibility: visible;
-  }
-  /* sizing svg icons */
-  .form svg {
+  svg {
     width: 17px;
     margin-top: 3px;
   }
+
+  /* Borde animado que se despliega al enfocar el campo. */
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--border-height);
+    border-radius: 1px;
+    background: var(--border-color);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform var(--timing) ease;
+  }
+
+  &:focus-within {
+    border-radius: var(--after-border-radius);
+
+    &::before {
+      transform: scale(1);
+    }
+  }
+}
+
+.input {
+  width: 100%;
+  height: 100%;
+  padding-inline: 0.5em;
+  padding-block: 0.7em;
+  border: none;
+  background-color: transparent;
+  color: var(--pvn-texto);
+  font-size: 0.9rem;
+
+  &::placeholder {
+    color: var(--pvn-texto-suave);
+    opacity: 1;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+/* Botón de limpiar: solo aparece cuando hay texto escrito. */
+.reset {
+  border: none;
+  background: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--pvn-transicion);
+}
+
+.input:not(:placeholder-shown) ~ .reset {
+  opacity: 1;
+  visibility: visible;
+}

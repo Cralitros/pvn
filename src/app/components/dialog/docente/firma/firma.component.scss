@@ -1,5 +1,6 @@
 canvas {
-  border: 2px solid #000;
+  // Negro puro sustituido por el azul profundo del tema.
+  border: 2px solid var(--pvn-primario-profundo);
   border-radius: 8px;
   background: #fff;
   display: block;
@@ -7,7 +8,7 @@ canvas {
 }
 
 img {
-  border: 1px solid #000;
+  border: 1px solid var(--pvn-primario-profundo);
   max-width: 300px;
   margin-top: 10px;
   display: block;
@@ -17,11 +18,11 @@ button {
   margin-right: 8px;
   padding: 6px 12px;
   border: none;
-  background: #007bff;
+  background: var(--pvn-primario);
   color: #fff;
   border-radius: 4px;
   cursor: pointer;
 }
 button:hover {
-  background: #0056b3;
+  background: var(--pvn-primario-oscuro);
 }

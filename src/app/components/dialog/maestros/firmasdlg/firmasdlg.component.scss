@@ -1,36 +1,44 @@
+// El lienzo y la vista previa nunca deben desbordar el diálogo en móvil.
 canvas {
-  border: 2px solid #000;
+  border: 2px solid var(--pvn-primario-profundo); // antes negro puro
   border-radius: 8px;
   background: #fff;
   display: block;
+  max-width: 100%;
   margin-bottom: 10px;
 }
 
 img {
-  border: 1px solid #000;
-  max-width: 300px;
+  border: 1px solid var(--pvn-primario-profundo); // antes negro puro
+  max-width: 100%; // antes 300px fijos: se salían en pantallas estrechas
+  height: auto; // conserva la proporción al reducirse
   margin-top: 10px;
   display: block;
 }
 
-button {
+// Antes era un selector desnudo `button`, que pintaba cualquier botón del
+// componente; ahora sólo los de la firma.
+.btn-firma {
   margin-right: 8px;
   padding: 6px 12px;
   border: none;
-  background: #007bff;
+  background: var(--pvn-primario); // antes un azul fijo
   color: #fff;
   border-radius: 4px;
   cursor: pointer;
 }
-button:hover {
-  background: #0056b3;
+
+.btn-firma:hover {
+  background: var(--pvn-primario-oscuro); // antes un azul oscuro fijo
 }
 
-.container{
+.container {
   display: flex; /* or inline-flex */
-  flex-direction: row 
+  flex-direction: row;
+  flex-wrap: wrap; /* evita que el lienzo y la vista previa se aplasten */
 }
-.cnt{
+
+.cnt {
   position: relative;
   left: 10px;
   top: 10px;

@@ -1,24 +1,29 @@
+/* Panel de filtros avanzados, que se abre como menú flotante sobre la tabla. */
+
 .filter-container {
+  /* Antes eran 400px fijos: en un móvil el panel se salía de la pantalla. */
+  min-width: min(400px, calc(100vw - 48px));
   padding: 16px;
-  min-width: 400px;
 }
 
 .filter-row {
   display: flex;
-  gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 12px;
-}
 
-.filter-row mat-form-field {
-  flex: 1;
+  mat-form-field {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
 }
 
 .filter-actions {
   display: flex;
-  gap: 8px;
   justify-content: flex-end;
+  gap: 8px;
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--pvn-borde);
 }

@@ -21,6 +21,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSort, Sort, MatSortModule } from '@angular/material/sort';
 import * as XLSX from 'xlsx-js-style';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { PdfviewComponent } from '../../dialog/pdfview/pdfview.component';
 import Swal from 'sweetalert2';
 import { FirmaComponent } from '../../dialog/docente/firma/firma.component';
@@ -53,7 +54,11 @@ import { PdfDocenteComponent } from '../pdf-docente/pdf-docente.component';
     MatSortModule,
     MatButtonModule,
     MatMenuModule,
-    MatDialogModule // Añadido para evitar errores con dialog.open
+    MatDialogModule, // Añadido para evitar errores con dialog.open
+    /* Faltaba: la plantilla ya usaba `matTooltip` en cinco sitios, pero como
+       atributo estático no daba error de compilación y, al no estar el módulo
+       importado, la directiva no existía y no aparecía ningún tooltip. */
+    MatTooltipModule
   ],
 })
 export class TablaComponent {
@@ -74,8 +79,24 @@ export class TablaComponent {
   @ViewChild(MatSort) sort?: MatSort | any;
 
   displayedColumns: string[] = [];
-  columnsToDisplayWithExpand?: string[];
+  /**
+   * Columnas que pintan la cabecera y las filas de datos: el botón de desplegar
+   * más las columnas reales.
+   *
+   * La fila de detalle **no** se incluye aquí. Si se incluye, la fila de datos
+   * renderiza además su propia copia del panel de detalle (el CDK crea una celda
+   * por cada columna de la lista), y al desplegar esa copia también se abre: la
+   * fila original crecía con el contenido repetido y el panel salía dos veces.
+   * El CDK tampoco lo permite en la cabecera: exige `*matHeaderCellDef` en toda
+   * columna y la de detalle solo aporta celda.
+   */
+  columnasCabecera: string[] = [];
   expandedElement: any | null;
+  /**
+   * Columnas que se repiten dentro de la fila desplegada (todas menos las de
+   * acciones, que ya tienen sus botones en la fila principal).
+   */
+  columnasDetalle: Column[] = [];
   dataSrc2: any;
   filterMenuVisible: boolean = false;
   filters: any;
@@ -111,7 +132,11 @@ export class TablaComponent {
 
   tabla() {
     this.displayedColumns = this.columns.map(c => c.columnDef);
-    this.columnsToDisplayWithExpand = [...this.displayedColumns, 'expandedDetail'];
+    this.columnasDetalle = this.columns.filter(c => !c.isAction);
+    // La primera columna es el botón que despliega la fila; la última, la fila
+    // de detalle. `columnsToDisplayWithExpand` ya existía, pero la plantilla
+    // usaba `displayedColumns`, así que la tabla desplegable nunca se pintó.
+    this.columnasCabecera = ['expandir', ...this.displayedColumns];
 
     this.sctabla.data$.subscribe(data => {
       this.dataSource.data = data;
@@ -318,6 +343,10 @@ export class TablaComponent {
     this.rowEmittedDbl.emit(row);
   }
 
+  /**
+   * Clic en una fila: selecciona el registro (de ahí salen el menú contextual,
+   * el PDF y la firma) y despliega u oculta su detalle.
+   */
   dataCliked(row: any, event: MouseEvent): void {
     this.cerrar();
     if (this.filterMenuVisible) {
@@ -328,6 +357,7 @@ export class TablaComponent {
     this.menuPosition.y = event.clientY;
     this.selectedRow = row;
     this.rowEmitted.emit(row);
+    this.alternarDetalle(row, event);
   }
 
   clkderecho(row: any, event: MouseEvent) {
@@ -361,6 +391,34 @@ export class TablaComponent {
 
   isRowExpanded(row: any): boolean {
     return this.expandedElement === row;
+  }
+
+  /**
+   * Despliega u oculta el detalle de una fila.
+   *
+   * Se llama desde el clic de la fila, así que la fila entera abre el detalle y
+   * la flecha queda como pista visual. Se ignora el clic que llega de los botones
+   * de acción (editar, eliminar, más opciones): sin esta comprobación, pulsar
+   * "editar" abriría o cerraría el panel de paso.
+   */
+  alternarDetalle(row: any, event: MouseEvent): void {
+    if ((event.target as HTMLElement | null)?.closest('.buttons')) {
+      return;
+    }
+
+    const abriendo = !this.isRowExpanded(row);
+    this.expandedElement = abriendo ? row : null;
+
+    if (!abriendo) {
+      return;
+    }
+
+    // Si la fila está al final del área visible, el detalle recién abierto queda
+    // fuera de la vista. `block: 'nearest'` solo desplaza lo mínimo necesario y
+    // no hace nada si ya se ve entero.
+    const fila = (event.target as HTMLElement).closest('tr');
+    const detalle = fila?.nextElementSibling as HTMLElement | null;
+    requestAnimationFrame(() => detalle?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }));
   }
 
   cerrar() {
@@ -842,17 +900,44 @@ export class TablaComponent {
   }
 
   datos(element: any, title: any) {
-    let cadena = '';
-    if (title.columnDef == 'categoria') {
-      let parseElement = JSON.parse(element);
-      parseElement.forEach((el: any) => {
-        if (el.seleccionada) {
-          cadena += el.nombre + " - Asignado:" + this.fechaformat(el.fecha) + "\n";
-        }
-      });
-      return cadena;
+    if (title?.columnDef === 'categoria') {
+      return this.resumenCategoria(element);
     }
     return element;
+  }
+
+  /**
+   * Resumen de la columna `categoria`, que la API entrega como texto JSON.
+   *
+   * Antes hacía `JSON.parse(element)` sin protección: con una fila sin categorías
+   * (`''` o el texto `undefined`) lanzaba una excepción dentro de la plantilla, y
+   * una excepción durante el change detection aborta el ciclo a media tabla: el
+   * resto de filas y columnas se quedaba sin pintar y el contenido solo aparecía
+   * al provocar nuevos ciclos.
+   *
+   * Devuelve un valor por línea, que en la fila desplegada se ve con sus saltos.
+   */
+  private resumenCategoria(element: any): string {
+    if (typeof element !== 'string' || element.trim() === '' || element === 'undefined') {
+      return '';
+    }
+
+    let categorias: unknown;
+    try {
+      categorias = JSON.parse(element);
+    } catch {
+      // No es JSON válido: se muestra el texto tal cual en lugar de romper la tabla.
+      return element;
+    }
+
+    if (!Array.isArray(categorias)) {
+      return '';
+    }
+
+    return categorias
+      .filter((categoria: any) => categoria?.seleccionada)
+      .map((categoria: any) => `${categoria?.nombre ?? ''} - Asignado: ${this.fechaformat(categoria?.fecha)}`)
+      .join('\n');
   }
 
   fechaformat(fechaParam?: Date | string) {

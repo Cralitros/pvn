@@ -1,4 +1,12 @@
+/* Organigrama: tarjetas de nodo y conectores dibujados con CSS.
+
+   Los conectores estaban mal colocados: las líneas se posicionaban con
+   `position: absolute` pero ni `.org-children` ni `.children-container` tenían
+   `position: relative`, así que se referenciaban al primer ancestro posicionado
+   que encontrasen (normalmente la página) y aparecían descolgadas. */
+
 .org-node {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -6,69 +14,82 @@
 }
 
 .node-content {
-  background: #e3f2fd;
-  border: 1px solid #90caf9;
-  border-radius: 8px;
-  padding: 12px;
-  text-align: center;
   min-width: 140px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 12px 16px;
+  border: 1px solid var(--pvn-borde);
+  border-radius: var(--pvn-radio-sm);
+  background: var(--pvn-primario-claro);
+  box-shadow: var(--pvn-sombra);
+  text-align: center;
 }
 
 .node-name {
-  font-weight: bold;
-  color: #0d47a1;
+  color: var(--pvn-primario-profundo);
+  font-weight: 600;
 }
 
 .node-title {
-  font-size: 0.85em;
-  color: #555;
   margin-top: 4px;
+  color: var(--pvn-texto-suave);
+  font-size: 0.82em;
 }
 
+/* ── Conectores ──────────────────────────────────────────────────────────── */
+
+/* Líneas de unión. El tono es intermedio a propósito: con el celeste claro de
+   la paleta (#e5e9f0) las líneas eran prácticamente invisibles sobre blanco. */
+$pvn-linea: #b9c7de;
+
 .org-children {
-  margin-top: 20px;
+  position: relative;
   width: 100%;
+  margin-top: 20px;
+
+  /* Línea vertical que baja del nodo padre hasta la barra horizontal. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 20px;
+    border-left: 1px dashed $pvn-linea;
+  }
 }
 
 .children-container {
+  position: relative;
   display: flex;
-  justify-content: center;
-  gap: 30px;
   flex-wrap: wrap;
-}
+  justify-content: center;
+  gap: 24px;
 
-/* Conectores (líneas simples con CSS) */
-.org-node .org-children::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 0;
-  height: 20px;
-  border-left: 1px dashed #aaa;
+  /* Barra horizontal que une a los hermanos. Se recorta media tarjeta por cada
+     lado para que no sobresalga cuando solo hay un hijo. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: 70px;
+    left: 70px;
+    border-top: 1px dashed $pvn-linea;
+  }
+
+  /* Con un único hijo no hay nada que unir: la barra sobra. */
+  &:has(> :only-child)::before {
+    display: none;
+  }
 }
 
 .children-container > * {
   position: relative;
-}
 
-.children-container > *::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  width: 0;
-  height: 20px;
-  border-left: 1px dashed #aaa;
-}
-
-.children-container::before {
-  content: '';
-  position: absolute;
-  top: -20px;
-  left: 0;
-  right: 0;
-  height: 0;
-  border-top: 1px dashed #aaa;
+  /* Bajante de cada hijo hasta la barra horizontal. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    height: 20px;
+    border-left: 1px dashed $pvn-linea;
+  }
 }

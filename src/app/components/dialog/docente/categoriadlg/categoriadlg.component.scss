@@ -1,58 +1,15 @@
-// ─── Variables ───────────────────────────────────────────────────────────────
-$primary:       #5c6bc0;
-$primary-light: #e8eaf6;
-$primary-dark:  #3949ab;
-$accent:        #7c4dff;
-$error:         #e53935;
+/* Estilos propios de este diálogo.
+
+   Lo común —contenedor, título, secciones, rejillas, franja del docente, botón
+   y barra de acciones— está en `src/styles.scss`, en el bloque «Estructura de
+   los formularios de diálogo». Aquí queda solo lo específico de esta pantalla. */
+
+// ─── Variables (tokens del tema; se definen en styles.scss) ─────────────────
+$primary:       var(--pvn-primario);
+$primary-light: var(--pvn-primario-claro);
+$primary-dark:  var(--pvn-primario-oscuro);
 $radius:        6px;
 $transition:    0.2s ease;
-
-// ─── Contenedor ───────────────────────────────────────────────────────────────
-.dialog-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 780px;
-  height: calc(100vh - 60px);
-  max-height: calc(100vh - 60px);
-  font-family: 'Segoe UI', sans-serif;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-// ─── Título ───────────────────────────────────────────────────────────────────
-.dialog-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: $primary-dark;
-  margin: 10px 16px 2px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid $primary-light;
-  flex-shrink: 0;
-
-  .title-accent {
-    display: inline-block;
-    width: 5px;
-    height: 20px;
-    background: linear-gradient(to bottom, $accent, $primary);
-    border-radius: 3px;
-  }
-}
-
-// ─── Info Docente ─────────────────────────────────────────────────────────────
-.docente-info {
-  background: $primary-light;
-  padding: 8px 16px;
-  margin: 8px 16px;
-  border-radius: $radius;
-  font-size: 0.9rem;
-  color: $primary-dark;
-  font-weight: 500;
-  border-left: 4px solid $primary;
-}
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 .dialog-tabs {
@@ -62,6 +19,8 @@ $transition:    0.2s ease;
   display: flex;
   flex-direction: column;
 
+  // `::ng-deep` anidado dentro de .dialog-tabs: el selector previo ya lleva el
+  // atributo del componente, así que NO filtra al resto de la aplicación.
   ::ng-deep {
     .mat-mdc-tab-group {
       height: 100%;
@@ -94,7 +53,9 @@ $transition:    0.2s ease;
       transition: background-color $transition;
 
       &.mdc-tab--active {
-        background-color: darken($primary-light, 8%);
+        // Literal equivalente al antiguo darken($primary-light, 8%)
+        // (Dart Sass marca darken() como obsoleto).
+        background-color: #cbd3e1;
         color: $primary-dark;
       }
     }
@@ -103,265 +64,20 @@ $transition:    0.2s ease;
       gap: 4px;
       padding: 0 12px;
     }
-
-    .mat-tab-label {
-      pointer-events: none;
-    }
   }
 }
 
-// ─── Formulario: Scroll interno ───────────────────────────────────────────────
-.tab-form {
-  width: 100%;
-  height: 100%;
-  padding: 8px 14px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  &::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #c5cae9;
-    border-radius: 4px;
-  }
+// Separación entre controles. `mat-checkbox`/`mat-radio-button` son elementos
+// de la plantilla, así que se pueden estilar sin `::ng-deep`.
+mat-checkbox,
+mat-radio-button {
+  margin-right: 8px;
 }
 
-// ─── Secciones ────────────────────────────────────────────────────────────────
-.form-section {
-  width: 100%;
-  background: #f9f9fc;
-  border: 1px solid #e3e6f5;
-  border-radius: $radius;
-  padding: 8px 12px 10px;
-  margin-bottom: 8px;
-  box-sizing: border-box;
-
-  .section-title {
-    display: block;
-    font-size: 0.68rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: $primary;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid $primary-light;
-  }
-}
-
-.form-section-inner {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed #d1d8e0;
-}
-
-// ─── Grids ────────────────────────────────────────────────────────────────────
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  align-items: start;
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  align-items: start;
-}
-
-.span-2 {
-  grid-column: span 2;
-}
-
-.full-width {
-  width: 100%;
-}
-
-// ─── Checkboxes & Radios ──────────────────────────────────────────────────────
-.checkbox-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 4px;
-}
-
-.example-radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.example-radio-button {
-  margin-left: 4px;
-}
-
-// ─── Barra de acciones ────────────────────────────────────────────────────────
-.dialog-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px 10px;
-  border-top: 1px solid #e0e0e0;
-  flex-shrink: 0;
-
-  .actions-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-}
-
-// ─── Botón estilizado ─────────────────────────────────────────────────────────
-.btn-nav {
-  position: relative;
-  cursor: pointer;
-  font-size: 12px;
-  border-top-right-radius: 10px;
-  border-bottom-left-radius: 10px;
-  transition: border-radius $transition, box-shadow $transition;
-
-  &::after,
-  &::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    position: absolute;
-    transition: all 0.35s;
-  }
-
-  &::after {
-    top: -1px;
-    left: -1px;
-    border-top: 3px solid $primary-dark;
-    border-left: 3px solid $primary-dark;
-  }
-
-  &::before {
-    bottom: -1px;
-    right: -1px;
-    border-bottom: 3px solid $primary-dark;
-    border-right: 3px solid $primary-dark;
-  }
-
-  &:hover {
-    border-top-right-radius: 0;
-    border-bottom-left-radius: 0;
-    box-shadow: 0 3px 10px rgba($primary, 0.3);
-
-    &::after,
-    &::before {
-      width: 100%;
-      height: 100%;
-    }
-  }
-}
-
-// ─── Overrides de Material (ALTURA UNIFORME PARA TODOS LOS INPUTS) ───────────
-::ng-deep {
-  // ✅ ALTURA UNIFORME: 40px para todos los campos (texto y fecha)
-  .mat-mdc-form-field-infix {
-    min-height: 40px !important;
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-  }
-
-  .mat-mdc-text-field-wrapper {
-    padding: 0 8px !important;
-  }
-
-  .mat-mdc-floating-label {
-    font-size: 0.8rem;
-  }
-
-  input.mat-mdc-input-element,
-  textarea.mat-mdc-input-element {
-    font-size: 0.82rem;
-  }
-
-  .mdc-text-field--outlined .mdc-notched-outline__leading,
-  .mdc-text-field--outlined .mdc-notched-outline__trailing {
-    border-radius: $radius;
-  }
-
-  .mat-mdc-form-field {
-    width: 100%;
-  }
-
-  // Select Panel
-  .mat-mdc-select-panel {
-    border-radius: $radius !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
-    overflow: hidden;
-
-    .mat-mdc-option {
-      background-color: #fafafa !important;
-      color: #333 !important;
-      border-bottom: 1px solid $primary-light !important;
-      padding: 8px 14px !important;
-      min-height: 36px !important;
-      font-size: 0.82rem;
-      transition: background-color $transition;
-
-      &:hover {
-        background-color: $primary-light !important;
-        color: $primary-dark !important;
-      }
-
-      &.mat-mdc-option-selected {
-        background-color: #c5cae9 !important;
-        color: $primary-dark !important;
-        font-weight: 600;
-      }
-
-      &:last-child {
-        border-bottom: none !important;
-      }
-    }
-  }
-
-  // Checkbox y Radio
-  .mat-mdc-checkbox,
-  .mat-mdc-radio-button {
-    margin-right: 8px;
-  }
-
-  .mdc-label {
-    font-size: 0.82rem;
-  }
-
-  // Datepicker
-  .mat-datepicker-content {
-    border-radius: $radius !important;
-    box-shadow: 0 4px 12px rgba($primary, 0.15) !important;
-
-    .mat-calendar-header {
-      background-color: $primary;
-      color: white;
-    }
-
-    .mat-calendar-body-selected {
-      background-color: $primary;
-      color: white;
-    }
-
-    .mat-calendar-body-today:not(.mat-calendar-body-selected) {
-      border-color: $accent;
-    }
-  }
-}
-
-.formato {
-  gap: 10px 20px;
-}
+// El estilo del calendario (redondeo, sombra, día seleccionado y borde de hoy)
+// se movió a `src/styles.scss`: el panel del datepicker se renderiza en el
+// overlay del CDK, fuera del host, así que desde aquí no alcanzaba al
+// calendario y el bloque no se aplicaba nunca.
 
 // ─── Histórico de ascensos (tabla de filas dinámicas) ─────────────────────────
 .table-header-actions {
@@ -385,7 +101,7 @@ $transition:    0.2s ease;
 .ascensos-container {
   width: 100%;
   background: #fff;
-  border: 1px solid #e3e6f5;
+  border: 1px solid var(--pvn-borde);
   border-radius: $radius;
   overflow-x: auto;
 }
@@ -402,14 +118,14 @@ $transition:    0.2s ease;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: $primary;
-    background: #f3f5fc;
+    background: var(--pvn-fondo);
     border-bottom: 1px solid $primary-light;
   }
 
   td {
     padding: 2px 8px;
     vertical-align: middle;
-    border-bottom: 1px solid #eef0f8;
+    border-bottom: 1px solid var(--pvn-borde);
   }
 
   tbody tr:last-child td {
@@ -441,7 +157,7 @@ $transition:    0.2s ease;
   gap: 8px;
   padding: 14px 10px;
   font-size: 0.75rem;
-  color: #7a7f9a;
+  color: var(--pvn-texto-suave);
 
   mat-icon {
     font-size: 18px;

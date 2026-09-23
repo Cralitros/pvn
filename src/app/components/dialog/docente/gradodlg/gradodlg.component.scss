@@ -1,116 +1,23 @@
-// ─── Variables ──────────────────────────────────────────────────────────────
-$primary: #5c6bc0;
-$primary-light: #e8eaf6;
-$primary-dark: #3949ab;
-$accent: #7c4dff;
-$error: #e53935;
+/* Estilos propios de este diálogo.
+
+   Lo común —contenedor, título, secciones, rejillas, franja del docente, botón
+   y barra de acciones— está en `src/styles.scss`, en el bloque «Estructura de
+   los formularios de diálogo». Aquí queda solo lo específico de esta pantalla. */
+
+// ─── Variables (tokens del tema; se definen en styles.scss) ─────────────────
+$primary-light: var(--pvn-primario-claro);
+$primary-dark: var(--pvn-primario-oscuro);
 $radius: 6px;
-$transition: 0.2s ease;
 
-// ─── Contenedor Principal ────────────────────────────────────────────────────
-.dialog-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-width: 1100px;
-    height: calc(100vh - 60px);
-    max-height: calc(100vh - 60px);
-    font-family: 'Segoe UI', sans-serif;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-// ─── Título ──────────────────────────────────────────────────────────────────
-.dialog-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: $primary-dark;
-    margin: 10px 16px 2px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid $primary-light;
-    flex-shrink: 0;
-
-    .title-accent {
-        display: inline-block;
-        width: 5px;
-        height: 20px;
-        background: linear-gradient(to bottom, $accent, $primary);
-        border-radius: 3px;
-    }
-}
-
-// ─── Info Docente ────────────────────────────────────────────────────────────
-.docente-info {
-    background: $primary-light;
-    padding: 8px 16px;
-    margin: 8px 16px;
-    border-radius: $radius;
-    font-size: 0.9rem;
-    color: $primary-dark;
-    font-weight: 500;
-    border-left: 4px solid $primary;
-}
-
-// ─── Formulario: Scroll interno ──────────────────────────────────────────────
-.tab-form {
+// ─── Host ────────────────────────────────────────────────────────────────────
+// OJO: este componente declara ViewEncapsulation.None, así que Angular NO
+// compila los estilos: `:host` y `::ng-deep` se emiten tal cual y no aplican a
+// nada. Se conserva el bloque por si algún día se pasa a Emulated; el
+// equivalente que sí funcionaría hoy sería el selector `app-gradodlg`.
+:host {
+    display: block;
     width: 100%;
     height: 100%;
-    padding: 8px 14px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: auto;
-
-    &::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: #c5cae9;
-        border-radius: 4px;
-    }
-}
-
-// ─── Secciones ───────────────────────────────────────────────────────────────
-.form-section {
-    width: 100%;
-    background: #f9f9fc;
-    border: 1px solid #e3e6f5;
-    border-radius: $radius;
-    padding: 8px 12px 10px;
-    margin-bottom: 8px;
-    box-sizing: border-box;
-
-    .section-title {
-        display: block;
-        font-size: 0.68rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.09em;
-        color: $primary;
-        margin-bottom: 6px;
-        padding-bottom: 4px;
-        border-bottom: 1px solid $primary-light;
-    }
-}
-
-// ─── Grids ───────────────────────────────────────────────────────────────────
-.grid-2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    align-items: start;
-}
-
-.full-width {
-    width: 100%;
 }
 
 // ─── Tabla de Grados ─────────────────────────────────────────────────────────
@@ -136,13 +43,14 @@ $transition: 0.2s ease;
 .table-container {
     overflow-x: auto;
     border-radius: $radius;
-    border: 1px solid #e3e6f5;
+    border: 1px solid var(--pvn-borde);
     background: white;
 
     .grados-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 0.75rem;
+        // 9 columnas: se conserva el scroll horizontal dentro de la tabla.
         min-width: 900px;
 
         th,
@@ -164,20 +72,6 @@ $transition: 0.2s ease;
 
         tr:hover td {
             background-color: #fafbff;
-        }
-
-        .table-field {
-            width: 100%;
-
-            ::ng-deep .mat-mdc-form-field-infix {
-                min-height: 32px !important;
-                padding-top: 4px !important;
-                padding-bottom: 4px !important;
-            }
-
-            ::ng-deep .mat-mdc-text-field-wrapper {
-                background-color: transparent;
-            }
         }
 
         .date-field {
@@ -203,6 +97,12 @@ $transition: 0.2s ease;
 
         .col-lugar {
             min-width: 160px;
+        }
+
+        // .col-pais solo estaba declarado en el bloque duplicado del final del
+        // archivo; el HTML lo usa en la cabecera y en las filas (PAÍS).
+        .col-pais {
+            width: 110px;
         }
 
         .col-revalidado {
@@ -231,7 +131,9 @@ $transition: 0.2s ease;
             }
 
             &:hover {
-                background-color: rgba($error, 0.1);
+                // rgba() literal: rgba(var(--token), α) no es CSS válido porque
+                // el token es un hex; --pvn-peligro = #c62828.
+                background-color: rgba(198, 40, 40, 0.1);
             }
         }
 
@@ -263,6 +165,22 @@ $transition: 0.2s ease;
     }
 }
 
+// Los campos de la tabla son más compactos (32px) que el resto del diálogo
+// (40px, definido en styles.scss). Sin `::ng-deep`: al ser ViewEncapsulation.None
+// los estilos ya son globales, así que basta acotar por `.grados-table`, clase
+// que solo existe en la plantilla de este diálogo.
+.grados-table .table-field {
+    .mat-mdc-form-field-infix {
+        min-height: 32px !important;
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+    }
+
+    .mat-mdc-text-field-wrapper {
+        background-color: transparent;
+    }
+}
+
 // ─── Checkbox Fields ─────────────────────────────────────────────────────────
 .checkbox-field {
     display: flex;
@@ -275,198 +193,3 @@ $transition: 0.2s ease;
         font-weight: 500;
     }
 }
-
-// ─── Barra de acciones ───────────────────────────────────────────────────────
-.dialog-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px 10px;
-    border-top: 1px solid #e0e0e0;
-    flex-shrink: 0;
-
-    .actions-right {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-    }
-}
-
-// ─── Botón estilizado ────────────────────────────────────────────────────────
-.btn-nav {
-    position: relative;
-    cursor: pointer;
-    font-size: 12px;
-    border-top-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    transition: border-radius $transition, box-shadow $transition;
-
-    &::after,
-    &::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        position: absolute;
-        transition: all 0.35s;
-    }
-
-    &::after {
-        top: -1px;
-        left: -1px;
-        border-top: 3px solid $primary-dark;
-        border-left: 3px solid $primary-dark;
-    }
-
-    &::before {
-        bottom: -1px;
-        right: -1px;
-        border-bottom: 3px solid $primary-dark;
-        border-right: 3px solid $primary-dark;
-    }
-
-    &:hover {
-        border-top-right-radius: 0;
-        border-bottom-left-radius: 0;
-        box-shadow: 0 3px 10px rgba($primary, 0.3);
-
-        &::after,
-        &::before {
-            width: 100%;
-            height: 100%;
-        }
-    }
-}
-
-// ─── Overrides de Material ───────────────────────────────────────────────────
-::ng-deep {
-    .mat-mdc-form-field-infix {
-        min-height: 36px !important;
-        padding-top: 6px !important;
-        padding-bottom: 6px !important;
-    }
-
-    .mat-mdc-text-field-wrapper {
-        padding: 0 8px !important;
-    }
-
-    .mat-mdc-floating-label {
-        font-size: 0.75rem;
-    }
-
-    input.mat-mdc-input-element,
-    textarea.mat-mdc-input-element {
-        font-size: 0.8rem;
-    }
-
-    .mdc-text-field--outlined .mdc-notched-outline__leading,
-    .mdc-text-field--outlined .mdc-notched-outline__trailing {
-        border-radius: $radius;
-    }
-
-    .mat-mdc-form-field {
-        width: 100%;
-    }
-
-    .mat-mdc-select-panel {
-        border-radius: $radius !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1) !important;
-
-        .mat-mdc-option {
-            background-color: #fafafa !important;
-            color: #333 !important;
-            border-bottom: 1px solid $primary-light !important;
-            padding: 6px 12px !important;
-            min-height: 32px !important;
-            font-size: 0.8rem;
-
-            &:hover {
-                background-color: $primary-light !important;
-                color: $primary-dark !important;
-            }
-
-            &.mat-mdc-option-selected {
-                background-color: #c5cae9 !important;
-                color: $primary-dark !important;
-                font-weight: 600;
-            }
-        }
-    }
-
-    // Estilos para checkboxes
-    .mat-mdc-checkbox {
-        .mdc-checkbox__background {
-            border-radius: 3px !important;
-        }
-    }
-}
-
-// ─── Variables ──────────────────────────────────────────────────────────────
-$primary: #5c6bc0;
-$primary-light: #e8eaf6;
-$primary-dark: #3949ab;
-$accent: #7c4dff;
-$error: #e53935;
-$radius: 6px;
-$transition: 0.2s ease;
-
-// ─── Contenedor Principal ────────────────────────────────────────────────────
-:host {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.dialog-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-width: 1100px;
-    height: 100%;
-    max-height: 100%;
-    font-family: 'Segoe UI', sans-serif;
-    box-sizing: border-box;
-    overflow: hidden;
-    background: white;
-}
-
-.col-conservar {
-    width: 70px;
-    text-align: center;
-}
-
-.col-grado {
-    width: 140px;
-}
-
-.col-titulo {
-    min-width: 150px;
-}
-
-.col-fecha {
-    width: 120px;
-}
-
-.col-lugar {
-    min-width: 160px;
-}
-
-.col-pais {
-    width: 110px;
-}
-
-// ← Nueva columna
-.col-revalidado {
-    width: 70px;
-    text-align: center;
-}
-
-.col-fecha-rev {
-    width: 120px;
-}
-
-.col-acciones {
-    width: 50px;
-    text-align: center;
-}
-
-// ... el resto de tus estilos se mantienen igual ...

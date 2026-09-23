@@ -26,7 +26,10 @@
     Exportar a Excel
   </button>
 
-  <button mat-stroked-button color="warn" (click)="refresh()" class="toolbar-btn">
+  <!-- Sin `color="warn"`: con la paleta roja de avisos, un botón de refrescar en
+       rojo se lee como una acción peligrosa. Queda neutro, entre el azul del
+       reporte y el verde de la exportación. -->
+  <button mat-stroked-button (click)="refresh()" class="toolbar-btn">
     <mat-icon>refresh</mat-icon>
     Refrescar
   </button>
@@ -44,13 +47,17 @@
 <!-- Tabla -->
 <div class="table-container">
   <div class="table-wrapper">
-    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z2" multiTemplateDataRows>
 
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>
           {{ column.header }}
         </th>
-        <td mat-cell *matCellDef="let element">
+        <!-- `cssClass` es una propiedad de la columna que hasta ahora no se
+             aplicaba en ningún sitio: la columna de grado declaraba
+             `pre-formatted` para que se respetaran sus saltos de línea y no
+             servía de nada. -->
+        <td mat-cell *matCellDef="let element" [ngClass]="column.cssClass">
           <ng-container *ngIf="column.isAction; else normalCell">
             <div class="buttons">
               <button mat-icon-button color="primary" (click)="editElement(element)" matTooltip="Editar">
@@ -65,17 +72,58 @@
             </div>
           </ng-container>
 
+          <!-- El valor va dentro de un bloque con recorte: un `max-width`
+               puesto directamente en la celda lo ignora el algoritmo de las
+               tablas. El texto completo permanece en el DOM y se lee entero en
+               la fila desplegada. -->
           <ng-template #normalCell>
-            {{ datos(column.cell(element), column) }}
+            <span class="celda-texto">{{ datos(column.cell(element), column) }}</span>
           </ng-template>
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.selected-row]="isRowSelected(row)"
-        [class.highlighted-row]="isRowHighlighted(row)" [class.example-element-row]="true"
-        (click)="dataCliked(row, $event)" (dblclick)="dataClickedData(row)" (contextmenu)="clkderecho(row, $event)">
+      <!-- Botón que despliega el detalle. No lleva manejador propio: el clic de
+           la fila ya despliega, así que este botón solo lo propaga. Se mantiene
+           como botón para que la fila se pueda abrir con el teclado y para que
+           se vea que hay algo desplegable. -->
+      <ng-container matColumnDef="expandir">
+        <th mat-header-cell *matHeaderCellDef class="col-expandir"></th>
+        <td mat-cell *matCellDef="let element" class="col-expandir">
+          <button type="button" mat-icon-button [attr.aria-expanded]="isRowExpanded(element)"
+            [matTooltip]="isRowExpanded(element) ? 'Ocultar detalle' : 'Ver todos los campos'">
+            <mat-icon [class.girada]="isRowExpanded(element)">expand_more</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Fila desplegable: repite todos los campos con espacio para leerlos
+           enteros, que es donde no caben en la celda. La fila de datos NO lleva
+           esta columna: si la llevara, renderizaría su propia copia del panel y
+           al desplegar crecería con el contenido duplicado. -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="columnasCabecera.length"
+          class="celda-detalle">
+          <div class="detalle" [@detailExpand]="isRowExpanded(element) ? 'expanded' : 'collapsed'">
+            <div class="detalle__campos">
+              <div class="detalle__campo" *ngFor="let column of columnasDetalle">
+                <span class="detalle__etiqueta">{{ column.header }}</span>
+                <span class="detalle__valor">{{ datos(column.cell(element), column) }}</span>
+              </div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnasCabecera"></tr>
+      <tr mat-row *matRowDef="let row; columns: columnasCabecera;"
+        [class.selected-row]="isRowSelected(row)" [class.highlighted-row]="isRowHighlighted(row)"
+        [class.fila-abierta]="isRowExpanded(row)" [class.example-element-row]="true"
+        (click)="dataCliked(row, $event)" (dblclick)="dataClickedData(row)"
+        (contextmenu)="clkderecho(row, $event)">
       </tr>
+      <!-- Una fila de detalle por registro: con `multiTemplateDataRows` se
+           intercala debajo de su fila y solo ocupa altura cuando está abierta. -->
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="fila-detalle"></tr>
     </table>
   </div>
 </div>

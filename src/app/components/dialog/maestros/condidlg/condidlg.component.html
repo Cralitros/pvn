@@ -20,7 +20,10 @@
 
 
         <div mat-dialog-actions class="buttons">
-            <button class="btn" mat-raised-button color="primary" type="submit" (click)="onNoClick()">Cancel</button>
+            <!-- Cancelar iba como `mat-raised-button color="primary" type="submit"`,
+                 igual que el botón de confirmar: se veían dos acciones idénticas y,
+                 al ser `submit`, además disparaba el envío del formulario. -->
+            <button class="btn" mat-button type="button" (click)="onNoClick()">Cancelar</button>
             <button class="btn" mat-raised-button color="primary" type="submit" (click)="onSubmit()"
                 cdkFocusInitial>{{funcion}}</button>
         </div>

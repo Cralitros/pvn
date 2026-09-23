@@ -8,7 +8,10 @@
     Docente: {{verificarInfo(this.data.valores.docente)}}
   </div>
 
-  <div class="dialog-form">
+  <!-- El cuerpo usa la convención común de los diálogos (`.tab-form`, definida
+       en src/styles.scss). Era el único que usaba `.dialog-form` y por eso no
+       seguía el mismo relleno ni el mismo comportamiento de scroll. -->
+  <div class="tab-form">
     <!-- Sección: Información Laboral -->
     <div class="form-section">
       <span class="section-title">Información Laboral</span>

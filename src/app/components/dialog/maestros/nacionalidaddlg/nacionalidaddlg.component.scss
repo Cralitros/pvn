@@ -2,19 +2,10 @@
   display: block;
   padding: 24px;
   font-family: 'Roboto', 'Segoe UI', sans-serif;
-  min-width: 400px; /* Ancho mínimo para que se vea bien */
+  min-width: 0; // antes 400px: en móvil el diálogo no cabía en la pantalla
 }
 
-.titulo {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #673ab7; /* Tono violeta moderno */
-  margin-bottom: 20px;
-  text-align: center;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 12px;
-}
-
+// Una sola columna: no necesita media query de apilado.
 .form-grid {
   display: flex;
   flex-direction: column;
@@ -26,19 +17,22 @@
 }
 
 .mensaje {
-  color: #f44336;
+  color: var(--pvn-peligro); // antes un rojo fijo
   font-size: 0.75rem;
   margin-top: 4px;
   font-weight: 500;
 }
 
+// Barra de acciones unificada en los 15 diálogos de maestros: separador
+// superior y botones alineados a la derecha.
 .buttons {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #f0f0f0;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pvn-borde);
 }
 
 .btn {

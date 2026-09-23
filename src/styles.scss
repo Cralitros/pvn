@@ -1,83 +1,600 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos globales de la aplicación.
+   Tres bloques: (1) tema de Angular Material, (2) tokens de diseño,
+   (3) estilos compartidos por varias pantallas. */
+
 @use '@angular/material' as mat;
 
-html,
-body {
-    height: 100%;
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. TEMA DE MATERIAL
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-body {
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-$custom-primary-palette: (
-    50:#e5e9f0,
-    100:#bec7db,
-    200:#94a3c2,
-    300:#6b80aa,
-    400:#4b659a,
-    500:#274c8b,
-    600:#204583,
-    700:#163c77,
-    800:#0e336b,
-    900:#042354,
-    contrast:(50:#eee2ee,
-        100:#eee2ee,
-        200:#eee2ee,
-        300:#eee2ee,
-        400:#d6b6d5,
-        500:#d6b6d5,
-        600:#d6b6d5,
-        700:#bb86ba,
-        800:#bb86ba,
-        900:#350454,
-    )
+/* Azul institucional. Los valores de color se conservan tal cual: son la
+   identidad visual del sistema. */
+$pvn-palette: (
+  50: #e5e9f0,
+  100: #bec7db,
+  200: #94a3c2,
+  300: #6b80aa,
+  400: #4b659a,
+  500: #274c8b,
+  600: #204583,
+  700: #163c77,
+  800: #0e336b,
+  900: #042354,
+  /* Los colores de contraste son el texto que se pinta ENCIMA de cada tono.
+     Antes eran morados y rosas (#eee2ee, #d6b6d5, #bb86ba, #350454): el texto
+     de la barra superior salía malva y sobre el tono 900 quedaba casi
+     ilegible. Ahora son oscuros sobre los tonos claros y blancos sobre los
+     oscuros, como corresponde. */
+  contrast: (
+    50: #042354,
+    100: #042354,
+    200: #042354,
+    300: #042354,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+  )
 );
-$custom-typography: mat.define-typography-config($font-family: "Roboto, sans-serif");
-$custom-primary: mat.define-palette($custom-primary-palette);
-$custom-accent: mat.define-palette($custom-primary-palette);
-$custom-warn: mat.define-palette($custom-primary-palette);
 
-$custom-theme: mat.define-light-theme((color:(primary:$custom-primary,
-                accent:$custom-accent,
-                warn:$custom-warn ),
-            typography:$custom-typography));
+/* Verde azulado para las acciones secundarias (exportar, aplicar filtros).
+   Antes `accent` era la misma paleta azul que `primary`, así que los dos
+   colores de botón se veían idénticos y no había forma de distinguir unas
+   acciones de otras. */
+$pvn-accent-palette: (
+  50: #e2f5f3,
+  100: #b6e7e2,
+  200: #86d8d0,
+  300: #56c8be,
+  400: #31bcb1,
+  500: #0f9b8e,
+  600: #0c8579,
+  700: #087064,
+  800: #045b50,
+  900: #013f37,
+  contrast: (
+    50: #042354,
+    100: #042354,
+    200: #042354,
+    300: #042354,
+    400: #ffffff,
+    500: #ffffff,
+    600: #ffffff,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+  )
+);
+
+$custom-typography: mat.define-typography-config($font-family: 'Roboto, "Helvetica Neue", sans-serif');
+$custom-primary: mat.define-palette($pvn-palette);
+$custom-accent: mat.define-palette($pvn-accent-palette);
+
+/* `warn` pasa a ser rojo de verdad. Con la paleta azul anterior, los avisos de
+   validación de los formularios y los botones de eliminar salían azules: un
+   error no se distinguía de una acción normal. */
+$custom-warn: mat.define-palette(mat.$red-palette);
+
+$custom-theme: mat.define-light-theme((
+  color: (
+    primary: $custom-primary,
+    accent: $custom-accent,
+    warn: $custom-warn,
+  ),
+  typography: $custom-typography,
+));
 
 @include mat.all-component-themes($custom-theme);
 
-::ng-deep .mat-tooltip.multi-line-tooltip {
-    white-space: pre-line;
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. TOKENS DE DISEÑO
+   Únicos valores de color, radios y sombras del proyecto. Cualquier pantalla
+   nueva debería usar estas variables en lugar de escribir un hexadecimal
+   suelto: así se evita que convivan tres azules distintos.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --pvn-primario: #274c8b;
+  --pvn-primario-oscuro: #163c77;
+  --pvn-primario-profundo: #042354;
+  --pvn-primario-claro: #e5e9f0;
+  --pvn-acento: #0f9b8e;
+  --pvn-peligro: #c62828;
+  --pvn-exito: #2e7d32;
+
+  --pvn-superficie: #ffffff;
+  --pvn-superficie-suave: #f8fafd;
+  --pvn-fondo: #f4f6fa;
+  --pvn-borde: #e3e8f1;
+  --pvn-texto: #1f2937;
+  --pvn-texto-suave: #64748b;
+
+  --pvn-radio-xs: 6px;
+  --pvn-radio-sm: 8px;
+  --pvn-radio: 12px;
+  --pvn-radio-lg: 16px;
+  --pvn-sombra: 0 10px 24px -18px rgba(4, 35, 84, 0.45);
+  --pvn-sombra-alta: 0 18px 38px -20px rgba(4, 35, 84, 0.5);
+  --pvn-transicion: 180ms ease;
 }
 
-.myTooltip {
-    .mdc-tooltip__surface {
-        max-width: 350px;
-        padding: 5px;
-        white-space: pre-line;
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. BASE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  color: var(--pvn-texto);
+  background: var(--pvn-fondo);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Barras de desplazamiento coherentes en toda la aplicación. Se declaran una
+   sola vez aquí en lugar de repetirlas (y contradecirlas) en cada componente:
+   antes la tabla tenía una barra negra con borde blanco y el resto, la de por
+   defecto del navegador. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c3cee0 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: #c3cee0;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9fb0cb;
+  background-clip: content-box;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. UTILIDADES DE ESPACIADO
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Las plantillas de firma usan `p-4`, `mt-2`, `mt-4` y `mt-5` como si fueran
+   utilidades de Bootstrap, pero el proyecto no incluye Bootstrap ni Tailwind:
+   esas clases no hacían absolutamente nada, así que los bloques del diálogo
+   quedaban pegados unos a otros. Se definen aquí solo las que se usan. */
+
+.p-4 {
+  padding: 16px;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.mt-5 {
+  margin-top: 24px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. COMPONENTES COMPARTIDOS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Tarjeta que envuelve las tablas de todas las pantallas de listado ────── */
+
+.contenedortabla {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid var(--pvn-borde);
+  border-radius: var(--pvn-radio);
+  background: var(--pvn-superficie);
+  box-shadow: var(--pvn-sombra);
+  overflow: hidden;
+}
+
+/* ── Tooltips largos ──────────────────────────────────────────────────────── */
+/* El texto de los tooltips trae saltos de línea deliberados (listas de campos,
+   nombres completos), así que se respetan en vez de aplanarlos. */
+
+.myTooltip .mdc-tooltip__surface,
+.multi-line-tooltip .mdc-tooltip__surface {
+  max-width: 350px;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+/* ── Formularios dentro de los diálogos: densidad compacta ────────────────── */
+/* Se declara UNA sola vez aquí.
+
+   Antes había 7 bloques `::ng-deep { .mat-mdc-form-field-infix { ... } }`
+   repartidos por los diálogos, con valores distintos (36, 40 y 44px) y todos
+   con `!important`. Como `::ng-deep` sin `:host` elimina el encapsulado, esas
+   7 reglas eran globales: ganaba la que se cargara última, así que el alto de
+   los campos de TODA la aplicación dependía del orden en que el usuario fuera
+   abriendo diálogos. Se unifica en 40px.
+
+   Se mantiene `!important` porque hay que vencer las variables de densidad que
+   Material aplica al propio campo. */
+
+mat-dialog-container {
+  .mat-mdc-form-field-infix {
+    min-height: 40px !important;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .mat-mdc-text-field-wrapper {
+    padding: 0 8px !important;
+  }
+
+  .mat-mdc-floating-label {
+    font-size: 0.8rem;
+  }
+
+  input.mat-mdc-input-element,
+  textarea.mat-mdc-input-element {
+    font-size: 0.84rem;
+  }
+
+  .mat-mdc-form-field {
+    width: 100%;
+  }
+
+  textarea.mat-mdc-input-element {
+    min-height: 50px;
+    resize: vertical;
+  }
+}
+
+/* ── Paneles desplegables (select y autocompletar) ────────────────────────── */
+/* Viven en el overlay del CDK, fuera del componente que los abre, así que no
+   se pueden acotar por componente: van aquí una sola vez en lugar de repetidos
+   en cada diálogo. */
+
+.mat-mdc-select-panel,
+.mat-mdc-autocomplete-panel {
+  border-radius: var(--pvn-radio-sm) !important;
+  box-shadow: var(--pvn-sombra-alta) !important;
+  overflow: hidden;
+
+  .mat-mdc-option {
+    min-height: 40px;
+    border-bottom: 1px solid var(--pvn-borde);
+    color: var(--pvn-texto);
+    font-size: 0.84rem;
+
+    &:hover:not(.mdc-list-item--disabled),
+    &.mat-mdc-option-active {
+      background-color: var(--pvn-primario-claro) !important;
+      color: var(--pvn-primario-profundo) !important;
     }
-}
 
-// Estilos para el diálogo de grados - FUERZA EL ANCHO
-.grados-dialog {
-  width: 1200px !important;
-  max-width: 95vw !important;
-  
-  .mat-mdc-dialog-container {
-    padding: 0 !important;
-    
-    .mdc-dialog__surface {
-      border-radius: 12px !important;
-      overflow: hidden !important;
-      width: 100% !important;
-      min-width: 1000px !important;
+    &.mat-mdc-option-selected {
+      background-color: #d7e0f0 !important;
+      color: var(--pvn-primario-profundo) !important;
+      font-weight: 600;
+    }
+
+    &:last-child {
+      border-bottom: none;
     }
   }
 }
 
-// También para cualquier diálogo de grados (por si no aplica la clase)
+/* ── Calendario del selector de fecha ─────────────────────────────────────── */
+/* El calendario se renderiza en el overlay del CDK, fuera de cualquier
+   componente, así que no se puede acotar por componente: va aquí una sola vez.
+   En categoriadlg estaba definido con `:host ::ng-deep`, donde no alcanzaba al
+   calendario y por tanto no se aplicaba nunca.
+
+   Se recuperan el redondeo, la sombra, el día seleccionado y el borde de hoy.
+   El fondo de la cabecera NO se toca: el autor la pintaba de azul, pero como
+   nunca llegó a aplicarse, activarla ahora sin poder comprobarla podría dejar
+   el texto de la cabecera en oscuro sobre azul. */
+
+.mat-datepicker-content {
+  border-radius: var(--pvn-radio-sm) !important;
+  box-shadow: var(--pvn-sombra-alta) !important;
+
+  .mat-calendar-body-selected {
+    background-color: var(--pvn-primario);
+    color: #ffffff;
+  }
+
+  .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+    border-color: var(--pvn-acento);
+  }
+}
+
+/* ── Estructura de los formularios de diálogo ─────────────────────────────── */
+/* Estas convenciones salen del diálogo de categoría, que es el más completo, y
+   se aplican a todos: contenedor con scroll propio, cuerpo del formulario con
+   barra fina, secciones rotuladas, rejillas de dos columnas y el botón con las
+   esquinas marcadas.
+
+   Las clases se usan únicamente dentro de diálogos (comprobado en todas las
+   plantillas del proyecto), así que se definen una sola vez aquí. Antes cada
+   diálogo las repetía y tres de ellos —investigación, laboral y cursos— habían
+   tomado valores propios, así que el mismo formulario se veía distinto según
+   dónde estuviera. */
+
+mat-dialog-container {
+  .dialog-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  /* Franja con el nombre del docente, encima del formulario. */
+  .docente-info {
+    margin: 8px 16px;
+    padding: 8px 16px;
+    border-left: 4px solid var(--pvn-primario);
+    border-radius: var(--pvn-radio-xs);
+    background: var(--pvn-primario-claro);
+    color: var(--pvn-primario-oscuro);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  /* El desplazamiento vive en el cuerpo del formulario y no en el diálogo, para
+     que el título y la barra de acciones se queden quietos. */
+  .tab-form {
+    width: 100%;
+    height: 100%;
+    padding: 8px 14px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--pvn-primario-claro);
+      border-radius: 4px;
+    }
+  }
+
+  .form-section {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 8px 12px 10px;
+    border: 1px solid var(--pvn-borde);
+    border-radius: var(--pvn-radio-xs);
+    background: var(--pvn-superficie-suave);
+    box-sizing: border-box;
+
+    .section-title {
+      display: block;
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--pvn-primario-claro);
+      color: var(--pvn-primario);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+  }
+
+  .form-section-inner {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #d1d8e0;
+  }
+
+  /* `minmax(0, 1fr)` deja que los campos se encojan en vez de desbordar. */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: start;
+  }
+
+  .checkbox-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .example-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .example-radio-button {
+    margin-left: 4px;
+  }
+
+  mat-checkbox,
+  mat-radio-button {
+    margin-right: 8px;
+  }
+
+  /* El texto de casillas y radios lo pinta Material dentro de su componente. */
+  .mdc-label {
+    font-size: 0.82rem;
+  }
+
+  /* Botón principal, con las esquinas marcadas que usa el diálogo de categoría. */
+  .btn-nav {
+    position: relative;
+    cursor: pointer;
+    font-size: 12px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    transition: border-radius var(--pvn-transicion), box-shadow var(--pvn-transicion);
+
+    &::after,
+    &::before {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      transition: all 0.35s;
+    }
+
+    &::after {
+      top: -1px;
+      left: -1px;
+      border-top: 3px solid var(--pvn-primario-oscuro);
+      border-left: 3px solid var(--pvn-primario-oscuro);
+    }
+
+    &::before {
+      right: -1px;
+      bottom: -1px;
+      border-right: 3px solid var(--pvn-primario-oscuro);
+      border-bottom: 3px solid var(--pvn-primario-oscuro);
+    }
+
+    &:hover {
+      border-top-right-radius: 0;
+      border-bottom-left-radius: 0;
+      box-shadow: 0 3px 10px rgba(39, 76, 139, 0.3);
+
+      &::after,
+      &::before {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+}
+
+/* En pantallas estrechas las rejillas de dos columnas pasan a una sola. */
+@media (max-width: 700px) {
+  mat-dialog-container .grid-2 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Diálogos ─────────────────────────────────────────────────────────────── */
+
+.mat-mdc-dialog-surface {
+  border-radius: var(--pvn-radio-lg);
+}
+
+/* Ningún diálogo debe ser más alto que la ventana: sin esto, las barras de
+   acciones (Guardar / Cancelar) quedan fuera de la pantalla en portátiles. */
+.cdk-overlay-pane .mat-mdc-dialog-container {
+  max-height: 92vh;
+}
+
+.mat-mdc-dialog-content {
+  max-height: 70vh;
+}
+
 mat-dialog-container.mat-mdc-dialog-container {
   &.mat-dialog-container {
     padding: 0 !important;
   }
+}
+
+/* El diálogo de grados necesita mucho ancho, pero nunca más que la ventana:
+   con `width: 1200px` fijo se salía de la pantalla en portátiles pequeños. */
+.grados-dialog {
+  width: min(1200px, 95vw) !important;
+  max-width: 95vw !important;
+
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+
+    .mdc-dialog__surface {
+      border-radius: var(--pvn-radio-lg) !important;
+      overflow: hidden !important;
+      width: 100% !important;
+      min-width: min(1000px, 90vw) !important;
+    }
+  }
+}
+
+/* ── Piezas comunes de los diálogos ───────────────────────────────────────── */
+/* Estas clases se usan únicamente dentro de diálogos (comprobado en todas las
+   plantillas del proyecto), así que se definen aquí una sola vez.
+
+   Antes cada diálogo repetía su versión y habían divergido: tres títulos
+   distintos —uno centrado con borde, otro alineado a la izquierda sin barra y
+   otro con barra de acento— y tres barras de acciones distintas (con y sin
+   separador, con márgenes de 0, 8 o 20 px, alineadas al centro o a la derecha)
+   según qué diálogo hubiera escrito cada quien. Se unifica sobre la variante
+   mayoritaria: título con barra de acento y acciones alineadas a la derecha. */
+
+.dialog-title,
+.titulo,
+mat-dialog-container h2:not([mat-dialog-title]) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin: 10px 16px 2px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--pvn-primario-claro);
+  color: var(--pvn-primario-profundo);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Barra de acento que precede al título en varios diálogos. */
+.title-accent {
+  display: inline-block;
+  width: 5px;
+  height: 20px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, var(--pvn-acento), var(--pvn-primario));
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-top: 20px;
+  padding: 12px 14px 8px;
+  border-top: 1px solid var(--pvn-borde);
+}
+
+/* Grupos laterales que usan varios diálogos. Con la barra alineada a la derecha,
+   "Cancelar" queda junto al resto de acciones en el orden habitual:
+   Cancelar · Anterior · Siguiente · Guardar. */
+.actions-left,
+.actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }

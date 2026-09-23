@@ -1,48 +1,159 @@
-<div class="dashboard-container">
-  <!-- Organigrama: SIN MODIFICAR -->
-  <div class="organigrama-wrapper">
-    <app-orga></app-orga>
-  </div>
-
-  <!-- Tarjetas con scroll vertical independiente -->
-  <div class="estadisticas-wrapper">
-    <!-- Sección: Maestros y Gestión -->
-    <div class="grid-container">
-      <h1 class="mat-h1">📊 TOTAL DE REGISTROS</h1>
-      <h2 class="section-title">Maestros y Gestión</h2>
-      <div class="cards-grid">
-        <mat-card class="stat-card" *ngFor="let valor of valores; let i = index">
-          <mat-card-content class="stat-content">
-            <div class="stat-icon">
-              <mat-icon>{{ getIcon(maestros[i]) }}</mat-icon>
-            </div>
-            <div class="stat-info">
-              <p class="stat-label">{{ maestros[i] | titlecase }}</p>
-              <p class="stat-value">{{ valor }}</p>
-              <p class="stat-desc">registros</p>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
+<div class="panel">
+  <!-- ── Cabecera ─────────────────────────────────────────────────────── -->
+  <header class="cabecera">
+    <div class="cabecera__titulo">
+      <h1>Panel de control</h1>
+      <p>Resumen general del sistema de gestión docente</p>
     </div>
 
-    <!-- Sección: Docentes -->
-    <div class="grid-container">
-      <h2 class="section-title">👨‍🏫 Información de Docentes</h2>
-      <div class="cards-grid">
-        <mat-card class="stat-card" *ngFor="let valor of valoresDocentes; let i = index">
-          <mat-card-content class="stat-content">
-            <div class="stat-icon">
-              <mat-icon>{{ getIcon(docentesRutas[i]) }}</mat-icon>
-            </div>
-            <div class="stat-info">
-              <p class="stat-label">{{ docentesRutas[i] | titlecase }}</p>
-              <p class="stat-value">{{ valor }}</p>
-              <p class="stat-desc">registros</p>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
+    <div class="cabecera__acciones">
+      @if (ultimaActualizacion(); as momento) {
+        <span class="sello">
+          <mat-icon>schedule</mat-icon>
+          Actualizado {{ momento | date: 'HH:mm' }}
+        </span>
+      }
+      <button mat-stroked-button color="primary" (click)="recargar()" [disabled]="cargando()">
+        <mat-icon>{{ cargando() ? 'hourglass_top' : 'refresh' }}</mat-icon>
+        <span>Actualizar</span>
+      </button>
     </div>
-  </div>
+  </header>
+
+  @if (error(); as mensaje) {
+    <div class="aviso" role="alert">
+      <mat-icon>warning_amber</mat-icon>
+      <span>{{ mensaje }}</span>
+    </div>
+  }
+
+  @if (cargando()) {
+    <!-- ── Esqueletos de carga ────────────────────────────────────────── -->
+    <section class="hero">
+      @for (hueco of [1, 2, 3, 4]; track hueco) {
+        <div class="esqueleto esqueleto--kpi"></div>
+      }
+    </section>
+    <section class="rejilla-doble">
+      <div class="esqueleto esqueleto--alta"></div>
+      <div class="esqueleto esqueleto--alta"></div>
+    </section>
+  } @else {
+    <!-- ── Indicadores principales ────────────────────────────────────── -->
+    <section class="hero">
+      @for (kpi of kpis(); track kpi.recurso) {
+        <a class="kpi kpi--{{ kpi.acento }}" [routerLink]="['/dashboard', kpi.ruta]">
+          <span class="kpi__icono"><mat-icon>{{ kpi.icono }}</mat-icon></span>
+          <span class="kpi__cuerpo">
+            <span class="kpi__etiqueta">{{ kpi.etiqueta }}</span>
+            <span class="kpi__valor">{{ valorAnimado(kpi.total) | number }}</span>
+            <span class="kpi__pie">{{ kpi.pie }}</span>
+          </span>
+          <mat-icon class="kpi__flecha">arrow_forward</mat-icon>
+        </a>
+      }
+    </section>
+
+    <section class="rejilla-doble">
+      <!-- ── Completitud de la ficha docente ──────────────────────────── -->
+      <div class="tarjeta">
+        <div class="tarjeta__cabecera">
+          <h2><mat-icon>donut_large</mat-icon> Completitud de la ficha docente</h2>
+        </div>
+
+        <div class="cobertura">
+          <div class="donut" [style.background]="gradienteDonut()">
+            <div class="donut__centro">
+              <strong>{{ coberturaAnimada() }}%</strong>
+              <span>promedio</span>
+            </div>
+          </div>
+
+          <ul class="leyenda">
+            @for (bloque of coberturaBloques(); track bloque.recurso) {
+              <li>
+                <mat-icon [matTooltip]="bloque.etiqueta">{{ bloque.icono }}</mat-icon>
+                <span class="leyenda__nombre">{{ bloque.etiqueta }}</span>
+                <span class="leyenda__pista">
+                  <span class="leyenda__relleno" [style.width.%]="bloque.porcentaje * progreso()"></span>
+                </span>
+                <span class="leyenda__cifra">{{ bloque.porcentaje }}%</span>
+                <span class="leyenda__total">{{ valorAnimado(bloque.total) | number }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+
+        <p class="nota">
+          Porcentaje de docentes con cada bloque de información registrado. Un valor bajo indica
+          exactamente qué tabla falta cargar.
+        </p>
+      </div>
+
+      <!-- ── Ranking de volumen ───────────────────────────────────────── -->
+      <div class="tarjeta">
+        <div class="tarjeta__cabecera">
+          <h2><mat-icon>bar_chart</mat-icon> Mayor volumen de registros</h2>
+        </div>
+
+        <ul class="ranking">
+          @for (fila of ranking(); track fila.recurso) {
+            <li class="barra">
+              <span class="barra__nombre">
+                <mat-icon>{{ fila.icono }}</mat-icon>
+                {{ fila.etiqueta }}
+              </span>
+              <span class="barra__pista">
+                <span class="barra__relleno" [style.width.%]="fila.porcentaje * progreso()"></span>
+              </span>
+              <span class="barra__valor">{{ valorAnimado(fila.total) | number }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── Todas las tablas ───────────────────────────────────────────── -->
+    <section class="tarjeta">
+      <div class="tarjeta__cabecera">
+        <h2><mat-icon>table_chart</mat-icon> Todas las tablas</h2>
+        <span class="contador">
+          {{ tablas.length }} tablas · {{ valorAnimado(totalGeneral()) | number }} registros
+        </span>
+      </div>
+
+      <div class="tablas">
+        @for (tabla of tablas; track tabla.recurso) {
+          <a class="celda celda--{{ tabla.familia }}" [routerLink]="['/dashboard', tabla.ruta]">
+            <mat-icon>{{ tabla.icono }}</mat-icon>
+            <span class="celda__nombre">{{ tabla.etiqueta }}</span>
+            <span class="celda__valor">{{ valorAnimado(valorDe(tabla.recurso)) | number }}</span>
+          </a>
+        }
+      </div>
+    </section>
+
+    <!-- ── Organigrama ────────────────────────────────────────────────── -->
+    <section class="tarjeta">
+      <div class="tarjeta__cabecera">
+        <h2>
+          <mat-icon>account_tree</mat-icon>
+          Organigrama institucional
+          <span class="chip" matTooltip="OrgaComponent usa datos de demostración, no de la API">
+            datos de ejemplo
+          </span>
+        </h2>
+        <button mat-button (click)="alternarOrganigrama()">
+          <mat-icon>{{ organigramaVisible() ? 'expand_less' : 'expand_more' }}</mat-icon>
+          <span>{{ organigramaVisible() ? 'Ocultar' : 'Mostrar' }}</span>
+        </button>
+      </div>
+
+      @if (organigramaVisible()) {
+        <div class="organigrama__lienzo">
+          <app-orga />
+        </div>
+      }
+    </section>
+  }
 </div>

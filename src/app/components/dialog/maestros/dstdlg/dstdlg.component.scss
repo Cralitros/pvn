@@ -1,27 +1,26 @@
+// Campos al ancho real del diálogo: antes margin-left 20px + width
+// calc(100% - 40px) descuadraba los campos respecto al título.
 .example-full-width {
-  margin-left: 20px;
-  width: calc(100% - 40px); /* Asegura que no se salga del contenedor */
+  width: 100%;
 }
 
+// Barra de acciones unificada en los 15 diálogos de maestros: antes no tenía
+// separación con el contenido.
 .buttons {
-  margin-left: 20px;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--pvn-borde);
 }
 
 .btn {
-  margin-left: 10px;
-  padding-right: 10px;
+  min-width: 100px;
+  font-weight: 500;
 }
 
 .mensaje {
-  color: red;
-}
-
-.titulo {
-  font-weight: bold;
-  color: blueviolet;
-  margin-left: 10px;
-  margin-top: 10px;
+  color: var(--pvn-peligro); // antes: red
 }

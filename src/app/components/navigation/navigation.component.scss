@@ -1,37 +1,129 @@
+/* Armazón del área privada: barra lateral de navegación y barra superior. */
+
 .sidenav-container {
   height: 100%;
 }
 
 .sidenav {
-  width: 300px;
+  width: 280px;
+  border-right: 1px solid var(--pvn-borde);
+  background: var(--pvn-superficie);
 }
 
-.sidenav .mat-toolbar {
-  background: inherit;
+/* ── Cabecera de la barra: logo + título ─────────────────────────────────── */
+
+.cnt-rw {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--pvn-borde);
+  text-decoration: none;
+
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--pvn-radio-sm);
+  }
+
+  /* El título es parte de la marca, no una barra de herramientas: se anula el
+     estilo por defecto de `mat-toolbar` (alto, fondo y tipografía). */
+  mat-toolbar {
+    height: auto;
+    padding: 0;
+    background: transparent;
+    color: var(--pvn-primario-profundo);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
 }
+
+/* ── Secciones plegables del menú ────────────────────────────────────────── */
+
+mat-nav-list {
+  padding-top: 8px;
+}
+
+/* Dentro de un menú, un panel con sombra y esquinas redondeadas se lee como
+   una tarjeta suelta y rompe la lista: aquí van planos. */
+mat-expansion-panel {
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* La altura se fija en los dos estados: Material usa 48px plegado y 64px
+   desplegado, así que sin esta segunda regla la cabecera saltaba de tamaño al
+   abrir la sección. */
+mat-expansion-panel-header,
+mat-expansion-panel-header.mat-expanded {
+  height: 44px;
+  padding: 0 16px;
+  font-size: 0.9rem;
+}
+
+mat-panel-description {
+  justify-content: flex-start;
+  color: var(--pvn-texto-suave);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* La flecha la dibuja Material dentro del componente de la cabecera, así que
+   necesita `::ng-deep`; va con `:host` delante para seguir encapsulada. */
+:host ::ng-deep .mat-expansion-indicator::after {
+  color: var(--pvn-primario);
+}
+
+/* ── Enlaces del menú ────────────────────────────────────────────────────── */
+
+/* `routerLinkActive="active-link"` se usa en los 22 enlaces del menú, pero la
+   clase no estaba definida en ningún archivo: no había ninguna señal visual de
+   en qué sección estabas. */
+.sidenav a.active-link {
+  background: var(--pvn-primario-claro);
+  font-weight: 600;
+  /* Barra de acento a la izquierda: además del color, una marca de posición
+     que se distingue aunque no se diferencien bien los tonos. */
+  box-shadow: inset 3px 0 0 0 var(--pvn-primario);
+}
+
+/* El texto del enlace lo pinta Material dentro de un componente hijo, así que
+   necesita `::ng-deep`; va precedido de `:host` para no escaparse del
+   encapsulado y no afectar a otros componentes. */
+:host ::ng-deep .sidenav a.active-link .mdc-list-item__primary-text {
+  color: var(--pvn-primario-profundo);
+}
+
+/* ── Barra superior y contenido ──────────────────────────────────────────── */
 
 .mat-toolbar.mat-primary {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+  font-size: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 12px -8px rgba(4, 35, 84, 0.75);
 }
 
-.btn {
-  border-color: rgb(71, 24, 102);
-  border-width: 2px;
-  border-style: dashed;
-  background-color: #819fd3;
+mat-sidenav-content {
+  background: var(--pvn-fondo);
 }
-.imagen{
+
+.imagen {
   cursor: pointer;
-
 }
 
 .example-spacer {
   flex: 1 1 auto;
 }
-.cnt-rw{
-  padding-top: 5px;
-  padding-left: 5px;
-  display: flex; /* or inline-flex */
+
+/* En manos pequeñas la barra ocupa menos para dejar sitio al contenido. */
+@media (max-width: 600px) {
+  .sidenav {
+    width: 260px;
+  }
 }

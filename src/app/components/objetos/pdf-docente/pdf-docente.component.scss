@@ -1,10 +1,18 @@
+/* Plantilla imprimible de constancias y contratos.
+
+   Este componente se renderiza para generar un documento (y luego se exporta a
+   PDF), así que mantiene la tipografía y los márgenes propios del papel. Se
+   corrigieron dos cosas: los azules indigo (#1a237e) que no son del tema y dos
+   bloques `.firma-derecha` duplicados que se contradecían entre sí
+   (`margin-top` 40px frente a 30px: ganaba el segundo por orden, no por
+   intención). */
+
 .document-container {
-  //width: 21cm;
-  //min-height: 29.7cm;
-  padding: 2cm;
   margin: 0 auto;
+  padding: 2cm;
   box-sizing: border-box;
   background: white;
+  color: #1a1a1a;
   font-family: 'Helvetica', Arial, sans-serif;
   font-size: 12px;
   line-height: 1.5;
@@ -18,62 +26,91 @@
 
 .logo {
   width: 200px;
+  max-width: 100%;
 }
 
-.institution {
-  text-align: center;
+.institution,
+.department {
+  margin: 0 0 5px;
+  color: var(--pvn-primario-profundo);
   font-weight: bold;
-  color: #1a237e;
-  margin: 0 0 5px 0;
+  text-align: center;
   font-size: 14px;
 }
 
 .department {
-  text-align: center;
-  font-weight: bold;
-  color: #1a237e;
-  margin: 0 0 30px 0;
+  margin-bottom: 30px;
   font-size: 12px;
 }
 
 .main-text,
 .body-text {
-  text-align: justify;
   margin-bottom: 15px;
+  text-align: justify;
 }
 
 .footer-text {
-  font-style: italic;
   margin-top: 30px;
+  font-style: italic;
 }
 
 .date {
-  text-align: right;
   margin-top: 20px;
+  text-align: right;
 }
 
 .signature {
   margin-top: 50px;
-  text-align: right;
   font-size: 12px;
+  text-align: right;
 }
 
 .signatureleft {
   margin-top: 50px;
-  text-align: left;
   font-size: 12px;
+  text-align: left;
 }
+
+/* ── Bloque de firma (una sola declaración) ──────────────────────────────── */
+
+.firma-derecha {
+  margin-top: 30px;
+  padding-right: 20px;
+  font-family: 'Times New Roman', serif;
+  font-size: 14px;
+  line-height: 1.8;
+  text-align: right;
+
+  p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.5;
+  }
+
+  p:first-child {
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+}
+
+.imagen-firma {
+  max-width: 200px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+/* ── Indicador de carga mientras se compone el documento ─────────────────── */
 
 .loading-overlay {
   position: fixed;
   top: 0;
   left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
   background: rgba(255, 255, 255, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 9999;
 }
 
@@ -84,11 +121,11 @@
 .loading-logo {
   width: 60px;
   height: 60px;
-  animation: spin 1.5s linear infinite;
   margin-bottom: 16px;
+  animation: giro 1.5s linear infinite;
 }
 
-@keyframes spin {
+@keyframes giro {
   from {
     transform: rotate(0deg);
   }
@@ -98,48 +135,18 @@
   }
 }
 
-/* Opcional: deshabilitar el botón visualmente */
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.firma-derecha {
-  text-align: right;
-  margin-top: 40px;
-  font-family: 'Times New Roman', serif;
-  font-size: 14px;
-  line-height: 1.8;
-  padding-right: 20px;
-  /* opcional, para dar espacio */
-}
+/* En pantallas estrechas el documento no necesita márgenes de papel. */
+@media (max-width: 700px) {
+  .document-container {
+    padding: 1cm;
+  }
 
-.firma-derecha p {
-  margin: 0;
-  padding: 0;
-  font-weight: normal;
-}
-
-.firma-derecha p:first-child {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.firma-derecha {
-  text-align: right;
-  margin-top: 30px;
-  padding-right: 20px;
-}
-
-.imagen-firma {
-  max-width: 200px;
-  height: auto;
-  margin-bottom: 10px;
-  /* Opcional: si es una firma escaneada, puede ser más ancha */
-}
-
-.firma-derecha p {
-  margin: 0;
-  padding: 0;
-  line-height: 1.5;
+  .logo {
+    width: 140px;
+  }
 }
