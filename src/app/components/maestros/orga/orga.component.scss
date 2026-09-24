@@ -12,3 +12,12 @@
   padding: 8px;
   overflow: auto;
 }
+
+/* Mensaje de carga, de error o de tabla vacía. */
+.org-estado {
+  margin: 0;
+  padding: 16px;
+  color: var(--pvn-texto-suave);
+  font-size: 0.85rem;
+  text-align: center;
+}

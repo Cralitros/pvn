@@ -136,13 +136,7 @@
     <!-- ── Organigrama ────────────────────────────────────────────────── -->
     <section class="tarjeta">
       <div class="tarjeta__cabecera">
-        <h2>
-          <mat-icon>account_tree</mat-icon>
-          Organigrama institucional
-          <span class="chip" matTooltip="OrgaComponent usa datos de demostración, no de la API">
-            datos de ejemplo
-          </span>
-        </h2>
+        <h2><mat-icon>account_tree</mat-icon> Organigrama por rol</h2>
         <button mat-button (click)="alternarOrganigrama()">
           <mat-icon>{{ organigramaVisible() ? 'expand_less' : 'expand_more' }}</mat-icon>
           <span>{{ organigramaVisible() ? 'Ocultar' : 'Mostrar' }}</span>

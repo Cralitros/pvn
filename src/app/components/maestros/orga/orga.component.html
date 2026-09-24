@@ -1,3 +1,11 @@
 <div class="org-container">
-    <app-organigrama [nodo]="raiz"></app-organigrama>
+  @if (cargando()) {
+    <p class="org-estado">Cargando los usuarios…</p>
+  } @else {
+    @if (raiz(); as arbol) {
+      <app-organigrama [nodo]="arbol"></app-organigrama>
+    } @else {
+      <p class="org-estado">{{ error() ?? 'No hay usuarios que mostrar.' }}</p>
+    }
+  }
 </div>
