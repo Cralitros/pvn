@@ -42,6 +42,25 @@ export class ApiService {
     return this.http.post<T>(this.url(recurso), cuerpo);
   }
 
+  /**
+   * `POST {recurso}/{segmentos}` con el cuerpo en binario.
+   *
+   * Se usa para subir el documento del histórico por trozos: el hosting corta
+   * cualquier cuerpo de más de 128 KB, así que el archivo viaja en bloques de
+   * `application/octet-stream` en lugar de ir en base64 dentro del JSON.
+   */
+  enviarBinario<T>(
+    recurso: RutaApi,
+    segmentos: readonly IdRecurso[],
+    cuerpo: Blob,
+    parametros?: ParametrosApi,
+  ): Observable<T> {
+    return this.http.post<T>(this.url(recurso, ...segmentos), cuerpo, {
+      headers: { 'Content-Type': 'application/octet-stream' },
+      params: this.httpParams(parametros),
+    });
+  }
+
   /** `PUT {recurso}/{id}` */
   actualizar<T>(recurso: RutaApi, id: IdRecurso, cuerpo: unknown): Observable<T> {
     return this.http.put<T>(this.url(recurso, id), cuerpo);

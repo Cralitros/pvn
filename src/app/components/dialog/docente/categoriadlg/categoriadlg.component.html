@@ -124,48 +124,176 @@
     <!-- TAB 2: Histórico -->
     <mat-tab label="Histórico">
       <div class="tab-form" [formGroup]="formularioHistorico">
+
+        <!-- Sección: Eventos del escalafón -->
         <div class="form-section">
-          <span class="section-title">Registro de Ascensos y Fechas</span>
+          <span class="section-title">Histórico de Eventos</span>
 
           <div class="table-header-actions">
+            <span class="hint-eventos">
+              Puedes dejar campos vacíos: completa solo lo que tengas registrado.
+            </span>
             <button mat-raised-button color="primary" type="button" class="btn-add-row"
-              (click)="agregarFilaAscenso()">
-              <mat-icon>add</mat-icon> Agregar Categoría
+              (click)="agregarFilaEvento()">
+              <mat-icon>add</mat-icon> Agregar Evento
             </button>
           </div>
 
-          <div class="ascensos-container">
-            <table class="ascensos-table">
+          <!-- Tabla ancha: el detalle completo no cabe en el ancho del diálogo,
+               así que el contenedor se desplaza en horizontal. -->
+          <div class="eventos-container">
+            <table class="eventos-table">
               <thead>
                 <tr>
-                  <th class="col-categoria">CATEGORÍA</th>
-                  <th class="col-fecha">FECHA</th>
+                  <th class="col-fecha">FECHA INICIO</th>
+                  <th class="col-fecha">FECHA FIN</th>
+                  <th class="col-tipo">TIPO DE PROCESO</th>
+                  <th class="col-linea">LÍNEA</th>
+                  <th class="col-departamento">DEPARTAMENTO</th>
+                  <th class="col-categoria">CATEGORÍA PREDOCENTE</th>
+                  <th class="col-categoria">CATEGORÍA DOCENTE</th>
+                  <th class="col-modalidad">MODALIDAD DE INGRESO</th>
+                  <th class="col-dedicacion">DEDICACIÓN</th>
+                  <th class="col-documento">RESOLUCIÓN / DOCUMENTO</th>
                   <th class="col-acciones"></th>
                 </tr>
               </thead>
-              <tbody formArrayName="ascensos">
-                @for (fila of ascensosArray.controls; track $index) {
+              <tbody formArrayName="eventos">
+                @for (fila of eventosArray.controls; track $index) {
                 <tr [formGroup]="$any(fila)">
-                  <td class="col-categoria">
+                  <td class="col-fecha">
                     <mat-form-field appearance="outline" class="table-field">
-                      <mat-select formControlName="nombre" placeholder="Seleccione categoría">
-                        @for (cat of catalogoAscensos; track cat) {
-                        <mat-option [value]="cat">{{ cat }}</mat-option>
-                        }
-                      </mat-select>
+                      <input matInput [matDatepicker]="pickerInicio" formControlName="fechaInicio"
+                        placeholder="DD/MM/YYYY">
+                      <mat-datepicker-toggle matIconSuffix [for]="pickerInicio"></mat-datepicker-toggle>
+                      <mat-datepicker #pickerInicio></mat-datepicker>
                     </mat-form-field>
                   </td>
                   <td class="col-fecha">
                     <mat-form-field appearance="outline" class="table-field">
-                      <input matInput [matDatepicker]="pickerAscenso_$index" formControlName="fecha"
-                        placeholder="DD/MM/YYYY">
-                      <mat-datepicker-toggle matIconSuffix [for]="pickerAscenso_$index"></mat-datepicker-toggle>
-                      <mat-datepicker #pickerAscenso_$index></mat-datepicker>
+                      <input matInput [matDatepicker]="pickerFin" formControlName="fechaFin" placeholder="Vigente">
+                      <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
+                      <mat-datepicker #pickerFin></mat-datepicker>
                     </mat-form-field>
                   </td>
+                  <td class="col-tipo">
+                    <mat-form-field appearance="outline" class="table-field">
+                      <mat-select formControlName="tipoProceso" placeholder="Seleccione proceso">
+                        @for (proceso of catalogoTiposProceso; track proceso) {
+                        <mat-option [value]="proceso">{{ proceso }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td class="col-linea">
+                    <mat-form-field appearance="outline" class="table-field">
+                      <mat-select formControlName="linea" placeholder="Seleccione línea"
+                        (selectionChange)="onLineaChange($index)">
+                        @for (linea of catalogoLineas; track linea) {
+                        <mat-option [value]="linea">{{ linea }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td class="col-departamento">
+                    <mat-form-field appearance="outline" class="table-field">
+                      <mat-select formControlName="departamento" placeholder="Seleccione departamento">
+                        @for (departamento of catalogoDepartamentos; track departamento) {
+                        <mat-option [value]="departamento">{{ departamento }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <!-- Categoría predocente: sólo aplica a la línea predocente. -->
+                  <td class="col-categoria">
+                    <mat-form-field appearance="outline" class="table-field"
+                      *ngIf="lineaDe($index) === 'Predocente'">
+                      <mat-select formControlName="categoriaPredocente" placeholder="Seleccione categoría">
+                        @for (categoria of catalogoCategoriasPredocente; track categoria) {
+                        <mat-option [value]="categoria">{{ categoria }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <span class="sin-aplica" *ngIf="lineaDe($index) !== 'Predocente'">—</span>
+                  </td>
+                  <!-- Categoría docente: sólo aplica a la línea docente. -->
+                  <td class="col-categoria">
+                    <mat-form-field appearance="outline" class="table-field"
+                      *ngIf="lineaDe($index) === 'Docente'">
+                      <mat-select formControlName="categoriaDocente" placeholder="Seleccione categoría">
+                        @for (categoria of catalogoCategoriasDocente; track categoria) {
+                        <mat-option [value]="categoria">{{ categoria }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <span class="sin-aplica" *ngIf="lineaDe($index) !== 'Docente'">—</span>
+                  </td>
+                  <td class="col-modalidad">
+                    <mat-form-field appearance="outline" class="table-field">
+                      <mat-select formControlName="modalidadIngreso" placeholder="Seleccione modalidad">
+                        @for (modalidad of catalogoModalidadesIngreso; track modalidad) {
+                        <mat-option [value]="modalidad">{{ modalidad }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <td class="col-dedicacion">
+                    <mat-form-field appearance="outline" class="table-field">
+                      <mat-select formControlName="dedicacion" placeholder="Seleccione dedicación">
+                        @for (dedi of catalogoDedicaciones; track dedi) {
+                        <mat-option [value]="dedi">{{ dedi }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                  <!-- Resolución o documento que sustenta el evento (base64 dentro del JSON). -->
+                  <td class="col-documento">
+                    <div class="documento-celda">
+                      <input type="file" class="documento-input" #documentoInput
+                        [attr.accept]="aceptaDocumento" (change)="onDocumentoSeleccionado($event, $index)">
+
+                      @if (subiendoEn($index)) {
+                      <div class="documento-subiendo">
+                        <mat-icon>cloud_upload</mat-icon>
+                        <div class="documento-progreso">
+                          <span>Subiendo… {{ progresoDe($index) }}%</span>
+                          <div class="barra">
+                            <span [style.width.%]="progresoDe($index)"></span>
+                          </div>
+                        </div>
+                      </div>
+                      } @else {
+                      <!-- El alias `as` no se resuelve en un `@else if`: se anida. -->
+                      @if (documentoDe($index); as documento) {
+                      <div class="documento-archivo" [title]="documento.nombre">
+                        <mat-icon>description</mat-icon>
+                        <div class="documento-datos">
+                          <span class="documento-nombre">{{ documento.nombre }}</span>
+                          <span class="documento-tamano">{{ tamanoLegible(documento.tamano) }}</span>
+                        </div>
+                      </div>
+                      <div class="documento-acciones">
+                        <button mat-icon-button type="button" title="Ver el documento"
+                          (click)="verDocumento($index)">
+                          <mat-icon>visibility</mat-icon>
+                        </button>
+                        <button mat-icon-button type="button" title="Quitar el documento"
+                          (click)="quitarDocumento($index)">
+                          <mat-icon>close</mat-icon>
+                        </button>
+                      </div>
+                      } @else {
+                      <button mat-stroked-button type="button" class="btn-documento"
+                        (click)="documentoInput.click()">
+                        <mat-icon>attach_file</mat-icon> Adjuntar
+                      </button>
+                      }
+                      }
+                    </div>
+                  </td>
                   <td class="col-acciones">
-                    <button mat-icon-button color="warn" type="button" aria-label="Eliminar ascenso"
-                      (click)="eliminarFilaAscenso($index)">
+                    <button mat-icon-button color="warn" type="button" aria-label="Eliminar evento"
+                      (click)="eliminarFilaEvento($index)">
                       <mat-icon>delete</mat-icon>
                     </button>
                   </td>
@@ -174,14 +302,19 @@
               </tbody>
             </table>
 
-            @if (ascensosArray.length === 0) {
-            <div class="empty-ascensos">
+            @if (eventosArray.length === 0) {
+            <div class="empty-eventos">
               <mat-icon>info_outline</mat-icon>
-              <span>No hay ascensos registrados. Haz clic en "Agregar Categoría" para comenzar.</span>
+              <span>No hay eventos registrados. Haz clic en "Agregar Evento" para comenzar.</span>
             </div>
             }
           </div>
-          <div class="grid-2" style="margin-top: 12px;">
+        </div>
+
+        <!-- Sección: Jubilación -->
+        <div class="form-section">
+          <span class="section-title">Jubilación</span>
+          <div class="grid-2">
             <mat-form-field appearance="outline">
               <mat-label>Categoría Jubilación</mat-label>
               <mat-select formControlName="categoriaJubilacion" placeholder="Seleccione">

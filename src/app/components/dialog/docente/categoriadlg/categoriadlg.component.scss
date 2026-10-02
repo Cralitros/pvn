@@ -79,11 +79,20 @@ mat-radio-button {
 // overlay del CDK, fuera del host, así que desde aquí no alcanzaba al
 // calendario y el bloque no se aplicaba nunca.
 
-// ─── Histórico de ascensos (tabla de filas dinámicas) ─────────────────────────
+// ─── Histórico de eventos (tabla ancha de filas dinámicas) ───────────────────
 .table-header-actions {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   margin-bottom: 6px;
+}
+
+/* Aviso de que el detalle es opcional: la tabla se puede guardar a medias. */
+.hint-eventos {
+  font-size: 0.68rem;
+  line-height: 1.2;
+  color: var(--pvn-texto-suave);
 }
 
 .btn-add-row {
@@ -98,7 +107,9 @@ mat-radio-button {
   }
 }
 
-.ascensos-container {
+/* El detalle de un evento son diez campos, así que la tabla es más ancha que el
+   diálogo: el desplazamiento horizontal vive aquí y no en el cuerpo del tab. */
+.eventos-container {
   width: 100%;
   background: #fff;
   border: 1px solid var(--pvn-borde);
@@ -106,8 +117,9 @@ mat-radio-button {
   overflow-x: auto;
 }
 
-.ascensos-table {
+.eventos-table {
   width: 100%;
+  min-width: 1740px;
   border-collapse: collapse;
 
   th {
@@ -120,6 +132,7 @@ mat-radio-button {
     color: $primary;
     background: var(--pvn-fondo);
     border-bottom: 1px solid $primary-light;
+    white-space: nowrap;
   }
 
   td {
@@ -132,25 +145,207 @@ mat-radio-button {
     border-bottom: none;
   }
 
-  .col-categoria {
-    width: 62%;
+  tbody tr:hover td {
+    background: #f7f9fc;
+  }
+
+  /* La fecha de inicio se queda a la vista al desplazarse a la derecha: es la
+     referencia para ubicar el evento que se está editando. */
+  thead th.col-fecha:first-child,
+  tbody td.col-fecha:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+  }
+
+  thead th.col-fecha:first-child {
+    z-index: 3;
+  }
+
+  tbody td.col-fecha:first-child {
+    background: #fff;
+  }
+
+  tbody tr:hover td.col-fecha:first-child {
+    background: #f7f9fc;
   }
 
   .col-fecha {
-    width: 28%;
+    min-width: 132px;
+  }
+
+  .col-tipo {
+    min-width: 180px;
+  }
+
+  .col-linea {
+    min-width: 120px;
+  }
+
+  .col-departamento {
+    min-width: 165px;
+  }
+
+  .col-categoria {
+    min-width: 180px;
+  }
+
+  .col-modalidad {
+    min-width: 175px;
+  }
+
+  .col-dedicacion {
+    min-width: 130px;
+  }
+
+  .col-documento {
+    min-width: 245px;
   }
 
   .col-acciones {
-    width: 10%;
+    width: 56px;
     text-align: center;
   }
 
   .table-field {
     width: 100%;
   }
+
+  /* Los campos de la tabla no muestran errores ni sugerencias, así que el
+     espacio reservado para ellos sólo hacía las filas más altas. */
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
 }
 
-.empty-ascensos {
+.sin-aplica {
+  display: block;
+  padding-left: 4px;
+  color: var(--pvn-texto-suave);
+}
+
+// ─── Documento de sustento ───────────────────────────────────────────────────
+.documento-celda {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 34px;
+}
+
+.documento-input {
+  display: none;
+}
+
+.btn-documento {
+  font-size: 11px;
+  line-height: 30px;
+  padding: 0 8px;
+  min-width: 0;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;
+  }
+}
+
+.documento-archivo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+
+  mat-icon {
+    flex-shrink: 0;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: $primary;
+  }
+}
+
+.documento-datos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.documento-nombre {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+}
+
+.documento-tamano {
+  font-size: 0.62rem;
+  color: var(--pvn-texto-suave);
+}
+
+.documento-acciones {
+  display: flex;
+  flex-shrink: 0;
+
+  button {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+/* Subida por trozos: el archivo no cabe en una sola petición (el hosting corta
+   a 128 KB), así que se muestra el avance. */
+.documento-subiendo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+
+  mat-icon {
+    flex-shrink: 0;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: $primary;
+  }
+}
+
+.documento-progreso {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.68rem;
+  color: var(--pvn-texto-suave);
+
+  .barra {
+    height: 4px;
+    border-radius: 2px;
+    background: var(--pvn-borde);
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      background: $primary;
+      transition: width $transition;
+    }
+  }
+}
+
+.empty-eventos {
   display: flex;
   align-items: center;
   justify-content: center;

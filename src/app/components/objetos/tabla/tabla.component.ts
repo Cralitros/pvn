@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, TemplateRef, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Column } from '../../modelos/column';
@@ -75,6 +75,16 @@ export class TablaComponent {
    * cualquier componente de la aplicación.
    */
   @Input() recursoReporte?: Recurso;
+  /**
+   * Plantilla opcional para el panel que se abre al desplegar una fila.
+   *
+   * Recibe el registro en `$implicit`, de modo que cada pantalla puede mostrar su
+   * detalle a su manera —la tabla de categorías pinta ahí la lista de eventos del
+   * histórico, con sus campos y su documento— sin que este componente, que es
+   * genérico, tenga que conocer el recurso. Sin plantilla se sigue mostrando la
+   * lista de campos de siempre.
+   */
+  @Input() plantillaDetalle?: TemplateRef<{ $implicit: any }>;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort?: MatSort | any;
 
@@ -897,54 +907,5 @@ export class TablaComponent {
       data: { persona: element }
     });
     dialogRef.afterClosed().subscribe(result => { });
-  }
-
-  datos(element: any, title: any) {
-    if (title?.columnDef === 'categoria') {
-      return this.resumenCategoria(element);
-    }
-    return element;
-  }
-
-  /**
-   * Resumen de la columna `categoria`, que la API entrega como texto JSON.
-   *
-   * Antes hacía `JSON.parse(element)` sin protección: con una fila sin categorías
-   * (`''` o el texto `undefined`) lanzaba una excepción dentro de la plantilla, y
-   * una excepción durante el change detection aborta el ciclo a media tabla: el
-   * resto de filas y columnas se quedaba sin pintar y el contenido solo aparecía
-   * al provocar nuevos ciclos.
-   *
-   * Devuelve un valor por línea, que en la fila desplegada se ve con sus saltos.
-   */
-  private resumenCategoria(element: any): string {
-    if (typeof element !== 'string' || element.trim() === '' || element === 'undefined') {
-      return '';
-    }
-
-    let categorias: unknown;
-    try {
-      categorias = JSON.parse(element);
-    } catch {
-      // No es JSON válido: se muestra el texto tal cual en lugar de romper la tabla.
-      return element;
-    }
-
-    if (!Array.isArray(categorias)) {
-      return '';
-    }
-
-    return categorias
-      .filter((categoria: any) => categoria?.seleccionada)
-      .map((categoria: any) => `${categoria?.nombre ?? ''} - Asignado: ${this.fechaformat(categoria?.fecha)}`)
-      .join('\n');
-  }
-
-  fechaformat(fechaParam?: Date | string) {
-    const fecha = fechaParam ? new Date(fechaParam) : new Date();
-    const dia = String(fecha.getDate()).padStart(2, '0');
-    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
-    const anio = fecha.getFullYear();
-    return `${dia}/${mes}/${anio}`;
   }
 }

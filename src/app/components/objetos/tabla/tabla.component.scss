@@ -224,6 +224,20 @@ mat-paginator {
   box-shadow: inset 3px 0 0 0 var(--pvn-primario);
 }
 
+/* Cuando la pantalla aporta su propia plantilla (`plantillaDetalle`), el panel
+   mantiene el mismo marco que la lista de campos por defecto: el borde, el fondo
+   y la barra de acento de la fila abierta. El contenido de dentro lo estiliza
+   cada pantalla. */
+.detalle__personalizado {
+  padding: 12px 18px;
+  max-height: 420px;
+  overflow: auto;
+  border-top: 1px solid var(--pvn-borde);
+  border-bottom: 1px solid var(--pvn-borde);
+  background: var(--pvn-superficie-suave);
+  box-shadow: inset 3px 0 0 0 var(--pvn-primario);
+}
+
 /* Con `display: contents` la etiqueta y el valor pasan a ser celdas directas de
    la rejilla, así que cada campo ocupa exactamente una fila. */
 .detalle__campo {

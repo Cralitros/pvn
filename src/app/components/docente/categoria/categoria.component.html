@@ -13,6 +13,75 @@
 
     <!-- Tabla -->
     <div class="contenedortabla">
-    <app-tabla class="tabla" [columns]="columns" [dataSource]="dataSource" (edit)="editar($event)"
-        (delete)="eliminar($event)" (refreshTable)="cargartabla()" [recursoReporte]="'docentescategoria'"></app-tabla>
+        <app-tabla class="tabla" [columns]="columns" [dataSource]="dataSource" (edit)="editar($event)"
+            (delete)="eliminar($event)" (refreshTable)="cargartabla()" [recursoReporte]="'docentescategoria'"
+            [plantillaDetalle]="detalleHistorico"></app-tabla>
+    </div>
 </div>
+
+<!--
+  Detalle de la fila desplegada: el histórico de eventos con todos sus campos.
+
+  El resumen de la celda sólo da una línea por evento; aquí se ve el detalle que
+  se registra en el diálogo (fechas, proceso, línea, departamento, categoría,
+  modalidad, dedicación) y se puede abrir el documento que lo sustenta.
+-->
+<ng-template #detalleHistorico let-elemento>
+    @if (eventosDe(elemento).length) {
+    <div class="detalle-historico">
+        <div class="detalle-historico__titulo">
+            Histórico de eventos ({{ eventosDe(elemento).length }})
+        </div>
+
+        <div class="detalle-historico__scroll">
+            <table class="eventos">
+                <thead>
+                    <tr>
+                        <th>Fecha inicio</th>
+                        <th>Fecha fin</th>
+                        <th>Tipo de proceso</th>
+                        <th>Línea</th>
+                        <th>Departamento</th>
+                        <th>Categoría</th>
+                        <th>Modalidad de ingreso</th>
+                        <th>Dedicación</th>
+                        <th>Resolución / documento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (evento of eventosDe(elemento); track $index) {
+                    <tr>
+                        <td>{{ fechaCorta(evento.fechaInicio) || '—' }}</td>
+                        <td>{{ fechaCorta(evento.fechaFin) || 'Vigente' }}</td>
+                        <td>{{ evento.tipoProceso || '—' }}</td>
+                        <td>{{ evento.linea || '—' }}</td>
+                        <td>{{ evento.departamento || '—' }}</td>
+                        <td>{{ categoriaDe(evento) || '—' }}</td>
+                        <td>{{ evento.modalidadIngreso || '—' }}</td>
+                        <td>{{ evento.dedicacion || '—' }}</td>
+                        <td>
+                            @if (tieneDocumento(evento)) {
+                            <button mat-button class="documento" type="button"
+                                [title]="'Ver ' + (evento.documento?.nombre ?? 'el documento')"
+                                (click)="verDocumento(evento)">
+                                <mat-icon>visibility</mat-icon>
+                                <span class="documento__nombre">{{ evento.documento?.nombre }}</span>
+                                <span class="documento__tamano">{{ tamanoLegible(evento.documento?.tamano ?? 0) }}</span>
+                            </button>
+                            } @else {
+                            <span class="sin-documento">Sin documento</span>
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    } @else {
+    <div class="detalle-historico__vacio">
+        <mat-icon>info_outline</mat-icon>
+        <span>Este registro no tiene eventos en el histórico. Se añaden desde «Editar».</span>
+    </div>
+    }
+</ng-template>

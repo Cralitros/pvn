@@ -54,6 +54,16 @@ export const SUBRUTAS = {
   docenteInfoPorCodigo: 'docentesinfo/cod',
   /** `GET docentescurso/docente/{codigo}` */
   docenteCursoPorDocente: 'docentescurso/docente',
+  /**
+   * Documento que sustenta un evento del histórico (`docentescategoria`).
+   *
+   * - `POST docentescategoria/documento/{archivo}?indice=N` → un trozo del archivo.
+   * - `GET docentescategoria/documento/{archivo}` → el archivo completo.
+   * - `DELETE docentescategoria/documento/{archivo}` → borra el archivo.
+   *
+   * Va por trozos porque el hosting corta cualquier cuerpo de más de 128 KB.
+   */
+  docenteCategoriaDocumento: 'docentescategoria/documento',
   /** `GET firma/dni/{dni}` */
   firmaPorDni: 'firma/dni',
   /** `POST login/login` */

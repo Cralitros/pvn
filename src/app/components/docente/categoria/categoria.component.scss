@@ -4,3 +4,116 @@
    pantallas que usan este mismo patrón. Antes cada archivo repetía una copia
    idéntica de 50 líneas. */
 @use '../../../estilos/listado';
+
+// ─── Detalle del histórico (fila desplegada de la tabla) ─────────────────────
+// El marco del panel (borde, fondo y barra de acento) lo pone `app-tabla`; aquí
+// queda sólo lo que es propio de este listado.
+
+.detalle-historico {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.detalle-historico__titulo {
+  color: var(--pvn-primario);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.detalle-historico__scroll {
+  overflow-x: auto;
+}
+
+.eventos {
+  width: 100%;
+  min-width: 1080px;
+  border-collapse: collapse;
+
+  th {
+    padding: 5px 8px;
+    text-align: left;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--pvn-primario);
+    background: #fff;
+    border-bottom: 1px solid var(--pvn-primario-claro);
+  }
+
+  td {
+    padding: 5px 8px;
+    vertical-align: top;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--pvn-texto);
+    border-bottom: 1px solid var(--pvn-borde);
+    /* Los campos largos (departamento, modalidad) parten en vez de estirar la
+       columna y sacar la tabla del panel. */
+    overflow-wrap: anywhere;
+  }
+
+  tbody tr:hover td {
+    background: #f7f9fc;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+/* Documento de sustento: se comporta como enlace, con el nombre recortado. */
+.documento {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 0 6px;
+  font-size: 0.75rem;
+  line-height: 28px;
+  text-transform: none;
+
+  mat-icon {
+    flex-shrink: 0;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.documento__nombre {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.documento__tamano {
+  flex-shrink: 0;
+  font-size: 0.66rem;
+  color: var(--pvn-texto-suave);
+}
+
+.sin-documento {
+  font-size: 0.75rem;
+  color: var(--pvn-texto-suave);
+}
+
+.detalle-historico__vacio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--pvn-texto-suave);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

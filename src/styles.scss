@@ -543,6 +543,15 @@ mat-dialog-container.mat-mdc-dialog-container {
   }
 }
 
+/* El histórico de categoría tiene diez columnas (fechas, proceso, línea,
+   departamento, categorías, modalidad, dedicación y documento), así que el
+   diálogo necesita más ancho que el resto: se acota al ancho de la ventana para
+   que no se salga en portátiles y la tabla se desplaza dentro de su contenedor. */
+.categoria-dialog {
+  width: min(1400px, 96vw) !important;
+  max-width: 96vw !important;
+}
+
 /* ── Piezas comunes de los diálogos ───────────────────────────────────────── */
 /* Estas clases se usan únicamente dentro de diálogos (comprobado en todas las
    plantillas del proyecto), así que se definen aquí una sola vez.

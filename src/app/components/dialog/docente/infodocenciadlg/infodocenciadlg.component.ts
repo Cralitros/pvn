@@ -59,6 +59,10 @@ export class InfodocenciadlgComponent {
   pais_dictado:Nacionalidad|any=[];
   rol_anterior = ["Asesoria", "De baja", "Extension", "Egresado", "Externo", "Jefe de práctica", "Otro departamento", "Profesr visitante"]
   comisiones=["C. Seguimiento Docente","C. Investigación","C. Internacionalización","C. Responsabilidad Social Universitaria","No aplica"]
+  estados=["Vigente","No ratificado","Fallecido","Jubilado","Suspendido"];
+  lineas=["Predocente","Docente"];
+  tiposDocente=["Contratado","Ordinario","Extraordinario"];
+  tiposPreDocente=["Instructor","Ayudante","Asistente","Jefe de Práctica"];
   constructor(public dialogRef: MatDialogRef<InfodocenciadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
@@ -68,6 +72,13 @@ export class InfodocenciadlgComponent {
 
 
 
+  }
+  seleccion(){
+    if(this.formularioInfo.value?.lineaActual=="Predocente"){
+      return this.tiposPreDocente;
+    }else{
+      return this.tiposDocente;
+    }
   }
   poner_datos() {
     this.formularioInfo.setValue({

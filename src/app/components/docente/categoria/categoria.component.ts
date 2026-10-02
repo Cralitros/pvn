@@ -4,15 +4,23 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TablaComponent } from '../../objetos/tabla/tabla.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { Categoria } from '../../modelos/categoria';
+import { Categoria, DocumentoEvento, EventoCategoria } from '../../modelos/categoria';
+import {
+  categoriaVisible,
+  fechaLocal,
+  formatearTamano,
+  parsearCategoria,
+} from '../../modelos/categoria-historico.util';
 import { Column } from '../../modelos/column';
 import { CargatablaService } from '../../../services/cargatabla.service';
 import { ConversiontablaService } from '../../../services/conversiontabla.service';
-import { DocenteApiService, DocenteCategoriaApiService } from '../../../core/api';
+import { DocumentoArchivoService } from '../../../services/documento-archivo.service';
+import { detalleDeErrorHttp, DocenteApiService, DocenteCategoriaApiService, tituloDeErrorHttp } from '../../../core/api';
 import { MatDialog } from '@angular/material/dialog';
 import { lastValueFrom } from 'rxjs';
 import { CategoriadlgComponent } from '../../dialog/docente/categoriadlg/categoriadlg.component';
@@ -29,6 +37,7 @@ import Swal from 'sweetalert2';
     ReactiveFormsModule,
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
     TablaComponent,
     MatPaginatorModule,
     MatTableModule
@@ -45,8 +54,10 @@ export class CategoriaComponent {
     { columnDef: 'id', header: 'No.', cell: (element: Categoria) => `${element.id}` },
     { columnDef: 'codigo', header: 'Codigo Docente', cell: (element: Categoria) => `${element.codigoDocente}` },
     { columnDef: 'tipo', header: 'Tipo', cell: (element: Categoria) => `${element.tipo}` },
-    { columnDef: 'fecha', header: 'Fecha', cell: (element: Categoria) => `${element.fecha}` },
-    { columnDef: 'categoria', header: 'Categoria', cell: (element: Categoria) => `${element.categoria}` },
+    { columnDef: 'fecha', header: 'Fecha', cell: (element: Categoria) => `${this.fechaCorta(element.fecha)}` },
+    // El histórico llega como texto JSON: en la celda se resume en una línea por
+    // evento y en la fila desplegada se ve el detalle completo (ver la plantilla).
+    { columnDef: 'categoria', header: 'Categoria', cell: (element: Categoria) => this.resumenEventos(element) },
     { columnDef: 'condiciondap', header: 'Condicion', cell: (element: Categoria) => `${element.condiciondap}` },
     { columnDef: 'dedicacion', header: 'Dedicacion', cell: (element: Categoria) => `${element.dedicacion}` },
     { columnDef: 'labor', header: 'Labor', cell: (element: Categoria) => `${element.labor}` },
@@ -59,6 +70,21 @@ export class CategoriaComponent {
   departamentoForm: FormGroup;
   dataSource = new MatTableDataSource<any>([]);
 
+  /**
+   * Tamaño con el que se abre el diálogo de categoría.
+   *
+   * La pestaña «Histórico» tiene diez columnas, así que necesita más ancho que
+   * el resto de diálogos; se acota al ancho de la ventana para que no se salga
+   * en pantallas pequeñas (dentro, la tabla se desplaza en horizontal).
+   */
+  private readonly configuracionDialogo = {
+    width: '1400px',
+    maxWidth: '96vw',
+    height: '85vh',
+    maxHeight: '92vh',
+    panelClass: 'categoria-dialog',
+  };
+
   titulo = "Provincias";
 
   @Output() titulos = new EventEmitter<any>();
@@ -67,6 +93,7 @@ export class CategoriaComponent {
     private sctabla: CargatablaService,
     private readonly docenteApi: DocenteApiService,
     private readonly docenteCategoriaApi: DocenteCategoriaApiService,
+    private readonly archivos: DocumentoArchivoService,
     private cartabla: ConversiontablaService,
     private formBuilder: FormBuilder,
     public dialog: MatDialog,
@@ -77,6 +104,107 @@ export class CategoriaComponent {
       nombre: ['', Validators.required]
     });
     this.titulos.emit(this.titulo);
+  }
+
+  // ─── Histórico de eventos en la tabla ────────────────────────────────────────
+
+  /**
+   * Eventos del histórico de un registro.
+   *
+   * La API entrega la columna `categoria` como texto JSON, así que se parsea con
+   * la misma función tolerante que usa el diálogo: un valor vacío, corrupto o de
+   * un formato viejo devuelve `[]` en lugar de romper la tabla.
+   */
+  eventosDe(elemento: Categoria | null | undefined): EventoCategoria[] {
+    return parsearCategoria((elemento as Categoria | undefined)?.categoria)
+      .filter(evento => evento.seleccionada);
+  }
+
+  /** Resumen de la celda: una línea por evento, para que la tabla siga siendo legible. */
+  resumenEventos(elemento: Categoria | null | undefined): string {
+    return this.eventosDe(elemento)
+      .map(evento => this.resumenEvento(evento))
+      .join('\n');
+  }
+
+  /** `Categoría - Proceso: inicio a fin` de un evento. */
+  private resumenEvento(evento: EventoCategoria): string {
+    const categoria = categoriaVisible(evento) || 'Sin categoría';
+    const proceso = evento.tipoProceso || 'Asignado';
+    const inicio = this.fechaCorta(evento.fechaInicio ?? evento.fecha);
+    const fin = this.fechaCorta(evento.fechaFin);
+    const rango = inicio ? `: ${inicio}${fin ? ` a ${fin}` : ''}` : '';
+
+    return `${categoria} - ${proceso}${rango}`;
+  }
+
+  /** Categoría que corresponde al evento según su línea. */
+  categoriaDe(evento: EventoCategoria): string {
+    return categoriaVisible(evento);
+  }
+
+  /** Fecha del evento en `dd/mm/aaaa`; vacío si no hay fecha válida. */
+  fechaCorta(valor: unknown): string {
+    // `fechaLocal` (y no `fechaValida`) para que un `2021-08-01` sin hora no se
+    // lea como UTC y salga el día anterior en hora de Perú.
+    const fecha = fechaLocal(valor);
+
+    if (!fecha) {
+      return '';
+    }
+
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+
+    return `${dia}/${mes}/${fecha.getFullYear()}`;
+  }
+
+  /** Tamaño del documento en texto legible. */
+  tamanoLegible(bytes: number): string {
+    return formatearTamano(bytes);
+  }
+
+  /**
+   * Abre el documento que sustenta un evento.
+   *
+   * Los documentos nuevos se piden al servidor por su nombre de archivo; los
+   * registros antiguos traen el base64 dentro del JSON del histórico.
+   */
+  verDocumento(evento: EventoCategoria): void {
+    const documento = evento.documento;
+
+    if (!documento) {
+      return;
+    }
+
+    if (documento.archivo) {
+      this.docenteCategoriaApi.descargarDocumento(documento.archivo).subscribe({
+        next: (blob) => this.archivos.abrir(blob, documento.nombre, documento.tipo),
+        error: (error) => {
+          console.error('No se pudo abrir el documento:', error);
+          Swal.fire({
+            title: tituloDeErrorHttp('No se pudo abrir el documento', error),
+            text: detalleDeErrorHttp(error).mensaje ?? 'El archivo ya no está en el servidor.',
+            icon: 'error'
+          });
+        }
+      });
+      return;
+    }
+
+    if (documento.dataUrl) {
+      this.archivos.abrir(
+        this.archivos.desdeBase64(documento.dataUrl, documento.tipo),
+        documento.nombre,
+        documento.tipo
+      );
+    }
+  }
+
+  /** ¿El evento tiene un documento que se pueda abrir? */
+  tieneDocumento(evento: EventoCategoria): boolean {
+    const documento: DocumentoEvento | null = evento.documento;
+    return !!documento && (!!documento.archivo || !!documento.dataUrl);
   }
   ngOnInit(): void {
     this.cargartabla();
@@ -132,8 +260,7 @@ export class CategoriaComponent {
       const docenteInfo = Array.isArray(docenteData) ? docenteData[0] : docenteData;
 
       const dialogRef = this.dialog.open(CategoriadlgComponent, {
-        width: '750px',
-        height: '700px',
+        ...this.configuracionDialogo,
         data: {
           title: `Agregar ${this.titulo}`,
           valores: {
@@ -203,8 +330,7 @@ export class CategoriaComponent {
         this.docenteCategoriaApi.obtener(this.formulario?.value.codigo ? this.formulario?.value.codigo : 0).subscribe((data2: any) => {//verifica si existe registro del docente
 
           const dialogRef = this.dialog.open(CategoriadlgComponent, {
-            width: '1000px',
-            height: '750px',
+            ...this.configuracionDialogo,
             data: {
               title: `Agregar ${this.titulo}`,
               valores: { laboral },
@@ -236,8 +362,7 @@ export class CategoriaComponent {
       categoriadap:  this.formularioCategoria.value?.categoriadap */
   editar(element: any) {
     const dialogRef = this.dialog.open(CategoriadlgComponent, {
-      width: '1000px',
-      height: '750px',
+      ...this.configuracionDialogo,
       data: {
         title: `Editar ${this.titulo}`,
         valores: {

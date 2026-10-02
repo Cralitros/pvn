@@ -1,8 +1,10 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
+import { MatTableDataSource } from '@angular/material/table';
 
 import { TablaComponent } from './tabla.component';
 import { Column } from '../../modelos/column';
@@ -225,56 +227,70 @@ describe('TablaComponent', () => {
     expect(component.isRowExpanded(FILAS[0])).toBeFalse();
   });
 
-  describe('columna categoria (llega como texto JSON)', () => {
-    const columna = { columnDef: 'categoria' } as Column;
-    const HISTORIAL = JSON.stringify([
-      { nombre: 'Principal', fecha: '2024-03-01', seleccionada: true },
-      { nombre: 'Asociado', fecha: '2020-01-15', seleccionada: false },
-    ]);
+  describe('plantilla de detalle de la pantalla', () => {
+    /** Pantalla que aporta su propio panel de detalle, como hace categoría. */
+    @Component({
+      standalone: true,
+      imports: [TablaComponent],
+      template: `
+        <app-tabla [columns]="columns" [dataSource]="dataSource" [plantillaDetalle]="detalle"></app-tabla>
+        <ng-template #detalle let-elemento>
+          <span class="detalle-propio">Eventos de {{ elemento.codigo }}</span>
+        </ng-template>
+      `,
+    })
+    class AnfitrionComponent {
+      columns: Column[] = [{ columnDef: 'codigo', header: 'Código', cell: (e: any) => e.codigo }];
+      dataSource = new MatTableDataSource<any>(FILAS);
+    }
 
-    /** El resumen no depende del render: basta con instanciar el componente. */
-    function crearComponente(): TablaComponent {
-      TestBed.configureTestingModule({
-        imports: [TablaComponent],
+    async function crearAnfitrion() {
+      await TestBed.configureTestingModule({
+        imports: [AnfitrionComponent],
         providers: [
           provideHttpClient(),
           provideHttpClientTesting(),
           provideNoopAnimations(),
           provideRouter([]),
         ],
-      });
+      }).compileComponents();
 
-      return TestBed.createComponent(TablaComponent).componentInstance;
+      const fixture = TestBed.createComponent(AnfitrionComponent);
+      fixture.detectChanges();
+
+      // Las filas entran por el servicio compartido, igual que en la aplicación.
+      TestBed.inject(CargatablaService).setData(FILAS);
+      fixture.detectChanges();
+
+      return fixture;
     }
 
-    it('resume solo las categorías asignadas, una por línea', () => {
-      const component = crearComponente();
+    it('pinta la plantilla de la pantalla en la fila desplegada', async () => {
+      const fixture = await crearAnfitrion();
 
-      const resumen = component.datos(HISTORIAL, columna);
+      const boton = fixture.nativeElement.querySelectorAll('.col-expandir button')[0] as HTMLButtonElement;
+      boton.click();
+      fixture.detectChanges();
 
-      // La fecha se comprueba por formato y no por valor: `fechaformat` usa
-      // `new Date(...)` sobre la cadena, y una fecha sin hora se interpreta como
-      // UTC, así que el día que sale depende de la zona horaria del navegador.
-      expect(resumen).toMatch(/^Principal - Asignado: \d{2}\/\d{2}\/\d{4}$/);
-      expect(resumen).not.toContain('Asociado');
-      expect(resumen.split('\n').length).toBe(1);
+      const detalle = fixture.nativeElement.querySelectorAll('tr.fila-detalle')[0] as HTMLElement;
+
+      expect(detalle.querySelector('.detalle-propio')?.textContent).toContain('0001');
+      // Con plantilla propia no se pinta la lista de campos por defecto.
+      expect(detalle.querySelector('.detalle__campos')).toBeNull();
+      // El marco del panel (borde, fondo y acento) sigue siendo el de la tabla.
+      expect(detalle.querySelector('.detalle__personalizado')).not.toBeNull();
     });
 
-    it('no rompe con un valor vacío, nulo o no válido', () => {
-      const component = crearComponente();
+    it('sin plantilla sigue mostrando la lista de campos', async () => {
+      const { fixture } = await crear();
 
-      // Regresión: `JSON.parse('')` lanzaba una excepción dentro de la
-      // plantilla, y eso aborta el change detection a media tabla.
-      expect(() => component.datos('', columna)).not.toThrow();
-      expect(() => component.datos('undefined', columna)).not.toThrow();
-      expect(() => component.datos(null, columna)).not.toThrow();
-      expect(() => component.datos('[1,2,3]', columna)).not.toThrow();
+      (fixture.nativeElement.querySelectorAll('.col-expandir button')[0] as HTMLButtonElement).click();
+      fixture.detectChanges();
 
-      expect(component.datos('', columna)).toBe('');
-      expect(component.datos('undefined', columna)).toBe('');
-      expect(component.datos(null, columna)).toBe('');
-      // Si no es JSON, se muestra el texto tal cual en vez de perderlo.
-      expect(component.datos('texto suelto', columna)).toBe('texto suelto');
+      const detalle = fixture.nativeElement.querySelectorAll('tr.fila-detalle')[0] as HTMLElement;
+
+      expect(detalle.querySelector('.detalle__campos')).not.toBeNull();
+      expect(detalle.querySelector('.detalle-propio')).toBeNull();
     });
   });
 });

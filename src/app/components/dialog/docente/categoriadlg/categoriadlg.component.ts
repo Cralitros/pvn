@@ -13,18 +13,39 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { AscensoCategoria, Categoria } from '../../../modelos/categoria';
+import { Categoria, DocumentoEvento, EventoCategoria } from '../../../modelos/categoria';
 import {
   ascensosDesdeColumnas,
-  CATEGORIAS_ASCENSO,
+  CATEGORIAS_DOCENTE,
+  CATEGORIAS_JUBILACION,
+  CATEGORIAS_PREDOCENTE,
+  categoriaVisible,
+  crearEventoVacio,
+  cuerpoDemasiadoGrande,
+  DEDICACIONES_HISTORICO,
+  DEPARTAMENTOS_HISTORICO,
   derivarColumnasHistorico,
+  eventoVacio,
   fechaMasReciente,
+  fechaLocal,
+  fechaValida,
+  formatearTamano,
+  esDocumento,
+  LIMITE_CUERPO_BYTES,
+  LINEAS_HISTORICO,
+  MODALIDADES_INGRESO,
+  nombreDocumento,
   parsearCategoria,
-} from './ascensos.util';
+  TAMANO_TROZO_BYTES,
+  TIPOS_PROCESO,
+  validarDocumento,
+} from '../../../modelos/categoria-historico.util';
 import { MatRadioModule } from '@angular/material/radio';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DocenteCategoriaApiService } from '../../../../core/api';
+import { detalleDeErrorHttp, DocenteCategoriaApiService, tituloDeErrorHttp } from '../../../../core/api';
+import { DocumentoArchivoService } from '../../../../services/documento-archivo.service';
 import { Condiciones } from '../../../modelos/condiciones';
+import { lastValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 
 
@@ -92,11 +113,34 @@ export class CategoriadlgComponent {
   bloqueadorg1 = true;
   bloqueadorg2 = true;
 
-  cateJubilacion = ['Principal', 'Asociado', 'Auxiliar', 'Contratado'];
+  /** Catálogos del detalle de cada evento del histórico. */
+  readonly catalogoTiposProceso = TIPOS_PROCESO;
+  readonly catalogoLineas = LINEAS_HISTORICO;
+  readonly catalogoDepartamentos = DEPARTAMENTOS_HISTORICO;
+  readonly catalogoCategoriasPredocente = CATEGORIAS_PREDOCENTE;
+  readonly catalogoCategoriasDocente = CATEGORIAS_DOCENTE;
+  readonly catalogoModalidadesIngreso = MODALIDADES_INGRESO;
+  readonly catalogoDedicaciones = DEDICACIONES_HISTORICO;
+  readonly cateJubilacion = CATEGORIAS_JUBILACION;
 
+  /** Formatos que acepta el selector de archivos del documento de sustento. */
+  readonly aceptaDocumento = '.pdf,.doc,.docx,.png,.jpg,.jpeg,.webp';
 
-  /** Categorías que se pueden registrar en el histórico de ascensos. */
-  readonly catalogoAscensos = CATEGORIAS_ASCENSO;
+  /**
+   * Avance (0-100) de la subida del documento de cada fila, por índice.
+   *
+   * La ausencia de la clave significa «no se está subiendo».
+   */
+  readonly progresoSubida: Record<number, number> = {};
+
+  /**
+   * Documentos subidos en esta sesión del diálogo y todavía no guardados.
+   *
+   * Si el usuario cancela o quita la fila, se borran del servidor para no dejar
+   * archivos huérfanos.
+   */
+  private readonly documentosSubidos = new Set<string>();
+
 
   trackByNombre(index: number, item: any) {
     return item.nombre;
@@ -119,58 +163,13 @@ export class CategoriadlgComponent {
   constructor(public dialogRef: MatDialogRef<CategoriadlgComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private formBuilder: FormBuilder,
+    private readonly archivos: DocumentoArchivoService,
     private readonly docenteCategoriaApi: DocenteCategoriaApiService) {
 
     //this.selectedCategory2=true;
 
   }
 
-  onPaste(event: ClipboardEvent, campo: string) {
-    event.preventDefault();
-    const pastedText = event.clipboardData?.getData('text/plain') || '';
-
-    // Limpiar el texto pegado (eliminar espacios, caracteres no numéricos)
-    const cleanText = pastedText.replace(/[^\d]/g, '');
-
-    let fecha: Date | null = null;
-
-    // Caso 1: DDMMYYYY (8 dígitos)
-    if (cleanText.length === 8) {
-      const day = parseInt(cleanText.substring(0, 2), 10);
-      const month = parseInt(cleanText.substring(2, 4), 10) - 1; // mesIndex: 0-11
-      const year = parseInt(cleanText.substring(4, 8), 10);
-      fecha = new Date(year, month, day);
-    }
-    // Caso 2: DD/MM/YYYY
-    else if (pastedText.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-      const [dayStr, monthStr, yearStr] = pastedText.split('/');
-      const day = parseInt(dayStr, 10);
-      const month = parseInt(monthStr, 10) - 1;
-      const year = parseInt(yearStr, 10);
-      fecha = new Date(year, month, day);
-    }
-
-    if (fecha) {
-      let fechaControl;
-      if (campo == 'Principal') {
-        let grupo = this.formularioCategoria.get("categoria") as FormGroup;
-        //console.log(grupo);
-        // 2. Obtener el control específico de "Principal"
-        const controlPrincipal = grupo.value;
-        controlPrincipal[0].fecha = '2025-04-16T05:00:00.000Z'
-        fechaControl = grupo.get('0')?.value;
-
-      } else {
-        fechaControl = this.formularioCategoria.get(campo);
-      }
-      fechaControl?.patchValue(fecha);
-
-      // Forzar la actualización del datepicker si es necesario
-      setTimeout(() => {
-        fechaControl?.updateValueAndValidity();
-      });
-    }
-  }
   poner_datos() {
     let g1 = "";
     let d1 = "";
@@ -199,8 +198,9 @@ export class CategoriadlgComponent {
     this.formularioCategoria.setValue({
       id: this.data.valores.id,
       tipo: this.data.valores.tipo,
-      fecha: new Date(this.data.valores.fecha),
-      categoria: parsearCategoria(this.data.valores.categoria),
+      // Fecha válida o `null`: antes `new Date(valor)` convertía una fecha nula
+      // en 1970, una ausente en `Invalid Date` y una sin hora en el día anterior.
+      fecha: fechaLocal(this.data.valores.fecha),
       condiciondap: d2,
       codigoDocente: this.data.valores.codigoDocente,
       dedicacion: this.data.valores.dedicacion,
@@ -208,12 +208,15 @@ export class CategoriadlgComponent {
       categoriadap: d1,
       rg1: g1,
       rg2: g2,
-      ratificado: ratificado.ratificado,
-      chk1: ratificado.chk1,
-      chk2: ratificado.chk2,
-      chk3: ratificado.chk3,
-      chk4: ratificado.chk4,
-      chk5: ratificado.chk5,
+      // `setValue` exige un valor para todos los controles: los registros sin
+      // `ratificado` guardado (llega vacío) rompían la apertura del diálogo con
+      // NG01002, así que se completan con los valores por defecto.
+      ratificado: ratificado.ratificado ?? '',
+      chk1: ratificado.chk1 ?? false,
+      chk2: ratificado.chk2 ?? false,
+      chk3: ratificado.chk3 ?? false,
+      chk4: ratificado.chk4 ?? false,
+      chk5: ratificado.chk5 ?? false,
     });
 
     this.formularioHistorico.patchValue({
@@ -222,7 +225,7 @@ export class CategoriadlgComponent {
     });
 
     // Las filas del histórico vienen de la lista JSON guardada en `categoria`.
-    this.cargarAscensos();
+    this.cargarEventos();
 
     let event = { value: ratificado.ratificado }
     this.onCategoryChangeRatificado(event);
@@ -239,7 +242,6 @@ export class CategoriadlgComponent {
       id: [''],
       tipo: [''],
       fecha: [''],
-      categoria: [''],
       condiciondap: [''],
       codigoDocente: [''],
       dedicacion: [''],
@@ -257,8 +259,8 @@ export class CategoriadlgComponent {
     });
 
     this.formularioHistorico = this.formBuilder.group({
-      // Filas dinámicas del histórico: cada fila es { categoría, fecha }.
-      ascensos: this.formBuilder.array([]),
+      // Filas dinámicas del histórico: cada fila es un evento del escalafón.
+      eventos: this.formBuilder.array([]),
       categoriaJubilacion: [''],
       dedicacionJubilacion: [''],
 
@@ -268,7 +270,7 @@ export class CategoriadlgComponent {
       this.condiciones = data;
     })*/
 
-    // ✅ NUEVO: Cada vez que cambie CUALQUIER fecha en el histórico, recalculamos la fecha contrato
+    // ✅ NUEVO: Cada vez que cambie CUALQUIER fecha del histórico, recalculamos la fecha contrato
     this.formularioHistorico.valueChanges.subscribe(() => {
       this.actualizarFechaContrato();
     });
@@ -307,24 +309,37 @@ export class CategoriadlgComponent {
      }*/
 
   }
-  // ─── Histórico de ascensos (filas dinámicas) ─────────────────────────────────
 
-  get ascensosArray(): FormArray {
-    return this.formularioHistorico.get('ascensos') as FormArray;
+  // ─── Histórico de eventos (filas dinámicas) ──────────────────────────────────
+
+  get eventosArray(): FormArray {
+    return this.formularioHistorico.get('eventos') as FormArray;
   }
 
-  /** Añade una fila al histórico. Sin argumentos crea una fila vacía. */
-  agregarFilaAscenso(datos?: AscensoCategoria | null): void {
-    this.ascensosArray.push(this.formBuilder.group({
-      nombre: [datos?.nombre ?? ''],
-      fecha: [datos?.fecha ? new Date(datos.fecha) : ''],
+  /** Añade un evento al histórico. Sin argumentos crea una fila vacía. */
+  agregarFilaEvento(datos?: EventoCategoria | null): void {
+    const evento = datos ?? crearEventoVacio();
+
+    this.eventosArray.push(this.formBuilder.group({
+      // `fechaLocal`: un `2021-08-01` sin hora se leería como UTC y el campo
+      // mostraría (y volvería a guardar) el día anterior.
+      fechaInicio: [fechaLocal(evento.fechaInicio) ?? ''],
+      fechaFin: [fechaLocal(evento.fechaFin) ?? ''],
+      tipoProceso: [evento.tipoProceso ?? ''],
+      linea: [evento.linea ?? ''],
+      departamento: [evento.departamento ?? ''],
+      categoriaPredocente: [evento.categoriaPredocente ?? ''],
+      categoriaDocente: [evento.categoriaDocente ?? ''],
+      modalidadIngreso: [evento.modalidadIngreso ?? ''],
+      dedicacion: [evento.dedicacion ?? ''],
+      documento: [evento.documento ?? null],
     }));
   }
 
-  eliminarFilaAscenso(index: number): void {
+  eliminarFilaEvento(index: number): void {
     Swal.fire({
       title: '¿Estás seguro?',
-      text: 'Esta acción eliminará el ascenso de la lista',
+      text: 'Esta acción eliminará el evento de la lista',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
@@ -333,9 +348,207 @@ export class CategoriadlgComponent {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.ascensosArray.removeAt(index);
+        const documento = this.documentoDe(index);
+
+        // El archivo subido se borra del servidor: si no, quedaría huérfano.
+        if (documento?.archivo) {
+          this.documentosSubidos.delete(documento.archivo);
+          this.eliminarDelServidor(documento.archivo);
+        }
+
+        delete this.progresoSubida[index];
+        this.eventosArray.removeAt(index);
       }
     });
+  }
+
+  /** Línea elegida en una fila: decide qué categoría se muestra. */
+  lineaDe(index: number): string {
+    return (this.eventosArray.at(index)?.get('linea')?.value ?? '') as string;
+  }
+
+  /** Documento adjunto de una fila, ya tipado para la plantilla. */
+  documentoDe(index: number): DocumentoEvento | null {
+    const documento = this.eventosArray.at(index)?.get('documento')?.value;
+    return esDocumento(documento) ? documento : null;
+  }
+
+  /** Tamaño del documento en texto legible. */
+  tamanoLegible(bytes: number): string {
+    return formatearTamano(bytes);
+  }
+
+  /** Avance (0-100) de la subida del documento de una fila. */
+  progresoDe(index: number): number {
+    return this.progresoSubida[index] ?? 0;
+  }
+
+  /** ¿Se está subiendo el documento de esa fila? */
+  subiendoEn(index: number): boolean {
+    return this.progresoSubida[index] !== undefined;
+  }
+
+  /** Al cambiar la línea se limpia la categoría de la otra línea. */
+  onLineaChange(index: number): void {
+    const fila = this.eventosArray.at(index);
+    if (!fila) {
+      return;
+    }
+
+    if (this.lineaDe(index) === 'Predocente') {
+      fila.get('categoriaDocente')?.setValue('');
+    } else if (this.lineaDe(index) === 'Docente') {
+      fila.get('categoriaPredocente')?.setValue('');
+    }
+  }
+
+  /**
+   * Adjunta el documento que sustenta el evento.
+   *
+   * El archivo **no** viaja dentro del JSON del histórico: el hosting corta
+   * cualquier petición de más de 128 KB, así que se sube por trozos a
+   * `docentescategoria/documento/{archivo}` y en el evento sólo queda la
+   * referencia (`archivo`). Así el registro se mantiene pequeño y el archivo se
+   * puede volver a ver sin engordar la tabla.
+   */
+  async onDocumentoSeleccionado(event: Event, index: number): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    input.value = '';
+
+    if (!archivo) {
+      return;
+    }
+
+    const fila = this.eventosArray.at(index);
+    if (!fila) {
+      return;
+    }
+
+    const motivo = validarDocumento(archivo);
+    if (motivo) {
+      Swal.fire({
+        title: 'No se pudo adjuntar',
+        text: motivo,
+        icon: 'warning'
+      });
+      return;
+    }
+
+    const nombreServidor = nombreDocumento(this.formularioCategoria.value?.codigoDocente, archivo.name);
+    this.progresoSubida[index] = 0;
+
+    try {
+      await this.subirTrozos(archivo, nombreServidor, index);
+
+      const documento: DocumentoEvento = {
+        nombre: archivo.name,
+        tipo: archivo.type || 'application/octet-stream',
+        tamano: archivo.size,
+        archivo: nombreServidor,
+      };
+
+      fila.get('documento')?.setValue(documento);
+      fila.get('documento')?.markAsDirty();
+      this.documentosSubidos.add(nombreServidor);
+    } catch (error) {
+      console.error('No se pudo subir el documento:', error);
+      this.eliminarDelServidor(nombreServidor);
+      Swal.fire({
+        title: 'No se pudo adjuntar',
+        text: this.textoDeErrorDeSubida(error),
+        icon: 'error'
+      });
+    } finally {
+      delete this.progresoSubida[index];
+    }
+  }
+
+  /** Envía el archivo en trozos de `TAMANO_TROZO_BYTES`, en orden. */
+  private async subirTrozos(archivo: File, nombreServidor: string, index: number): Promise<void> {
+    const total = Math.max(1, Math.ceil(archivo.size / TAMANO_TROZO_BYTES));
+
+    for (let indice = 0; indice < total; indice++) {
+      const trozo = archivo.slice(indice * TAMANO_TROZO_BYTES, (indice + 1) * TAMANO_TROZO_BYTES);
+
+      await lastValueFrom(this.docenteCategoriaApi.subirTrozoDocumento(nombreServidor, indice, trozo));
+      this.progresoSubida[index] = Math.round(((indice + 1) / total) * 100);
+    }
+  }
+
+  /** Mensaje del fallo al subir: el 404 delata que falta desplegar la ruta. */
+  private textoDeErrorDeSubida(error: unknown): string {
+    const { estado, mensaje } = detalleDeErrorHttp(error);
+
+    if (estado === 404) {
+      return 'El servidor no tiene la ruta de documentos (docentescategoria/documento). Despliega la ruta del backend antes de adjuntar archivos.';
+    }
+
+    if (estado === 413) {
+      return 'El servidor cortó la subida por tamaño, aunque va por trozos. Avisa a sistemas.';
+    }
+
+    return mensaje ?? 'No se pudo subir el archivo. Inténtalo de nuevo.';
+  }
+
+  /** Quita el documento adjunto de una fila (y lo borra del servidor). */
+  quitarDocumento(index: number): void {
+    const documento = this.documentoDe(index);
+
+    if (documento?.archivo) {
+      this.documentosSubidos.delete(documento.archivo);
+      this.eliminarDelServidor(documento.archivo);
+    }
+
+    this.eventosArray.at(index)?.get('documento')?.setValue(null);
+  }
+
+  /** Borra un archivo del servidor sin bloquear la interfaz si falla. */
+  private eliminarDelServidor(nombreServidor: string): void {
+    this.docenteCategoriaApi.eliminarDocumento(nombreServidor).subscribe({
+      error: (error) => console.warn('No se pudo borrar el documento del servidor:', error)
+    });
+  }
+
+  /**
+   * Abre el documento adjunto en otra pestaña.
+   *
+   * Los documentos nuevos se piden al servidor (`archivo`); los antiguos traen
+   * el base64 dentro del JSON (`dataUrl`) y se abren desde memoria. Lo que el
+   * navegador sabe mostrar (PDF e imágenes) se abre en una pestaña; el resto se
+   * descarga. Si el navegador bloquea la pestaña, se descarga igualmente.
+   */
+  verDocumento(index: number): void {
+    const documento = this.documentoDe(index);
+    if (!documento) {
+      Swal.fire({
+        title: 'Sin documento',
+        text: 'Este evento no tiene un documento adjunto.',
+        icon: 'info'
+      });
+      return;
+    }
+
+    if (documento.archivo) {
+      this.docenteCategoriaApi.descargarDocumento(documento.archivo).subscribe({
+        next: (blob) => this.archivos.abrir(blob, documento.nombre, documento.tipo),
+        error: (error) => {
+          console.error('No se pudo descargar el documento:', error);
+          Swal.fire({
+            title: tituloDeErrorHttp('No se pudo abrir el documento', error),
+            text: detalleDeErrorHttp(error).mensaje ?? 'El archivo ya no está en el servidor.',
+            icon: 'error'
+          });
+        }
+      });
+      return;
+    }
+
+    this.archivos.abrir(
+      this.archivos.desdeBase64(documento.dataUrl ?? '', documento.tipo),
+      documento.nombre,
+      documento.tipo
+    );
   }
 
   /** `JSON.parse` tolerante: devuelve `{}` si el valor viene vacío o corrupto. */
@@ -359,24 +572,24 @@ export class CategoriadlgComponent {
    * este cambio (la lista llegó vacía, con todas las fechas en null), la
    * reconstruye desde las columnas `h*` para no perder lo ya registrado.
    */
-  private cargarAscensos(): void {
-    while (this.ascensosArray.length > 0) {
-      this.ascensosArray.removeAt(0);
+  private cargarEventos(): void {
+    while (this.eventosArray.length > 0) {
+      this.eventosArray.removeAt(0);
     }
 
     // Filas guardadas en la lista JSON, en su orden original.
     const guardadas = parsearCategoria(this.data.valores?.categoria)
-      .filter(fila => !!fila?.nombre && !!fila.fecha);
+      .filter(evento => !eventoVacio(evento));
 
-    guardadas.forEach(fila => this.agregarFilaAscenso({ nombre: fila.nombre, fecha: fila.fecha }));
+    guardadas.forEach(evento => this.agregarFilaEvento(evento));
 
     // Completa con las columnas `h*` que no vinieran ya en la lista: son los
     // registros anteriores a este cambio, que sólo tienen esas columnas.
-    const nombresCargados = new Set(guardadas.map(fila => fila.nombre));
+    const categoriasCargadas = new Set(guardadas.map(evento => categoriaVisible(evento)));
 
     ascensosDesdeColumnas(this.data.valores)
-      .filter(fila => !nombresCargados.has(fila.nombre))
-      .forEach(fila => this.agregarFilaAscenso(fila));
+      .filter(evento => !categoriasCargadas.has(categoriaVisible(evento)))
+      .forEach(evento => this.agregarFilaEvento(evento));
   }
 
   poner_codigo() {
@@ -394,37 +607,35 @@ export class CategoriadlgComponent {
 
     let ratificadoString = JSON.stringify(ratificado);
 
-    // Filas del histórico: una categoría por fila con su fecha.
-    const ascensos = this.ascensosArray.controls
-      .map(control => ({
-        nombre: (control.get('nombre')?.value ?? '') as string,
-        fecha: control.get('fecha')?.value ?? null,
-      }))
-      .filter(fila => !!fila.nombre && !!fila.fecha);
+    // Eventos del histórico: se guardan las filas que tengan algún dato, aunque
+    // les falten campos (el detalle es opcional a propósito).
+    const eventos: EventoCategoria[] = [];
 
-    const filasIncompletas = this.ascensosArray.controls
-      .filter(control => !!control.get('nombre')?.value && !control.get('fecha')?.value);
+    for (let indice = 0; indice < this.eventosArray.length; indice++) {
+      const evento = this.eventoDeFila(this.eventosArray.at(indice) as FormGroup);
 
-    if (filasIncompletas.length > 0) {
-      Swal.fire({
-        title: 'Faltan fechas',
-        text: 'Hay ascensos con categoría pero sin fecha. Completa la fecha o elimina la fila.',
-        icon: 'warning'
-      });
-      return;
+      if (eventoVacio(evento)) {
+        continue;
+      }
+
+      const motivo = this.validarFechas(evento, indice + 1);
+      if (motivo) {
+        Swal.fire({
+          title: 'Revisa las fechas',
+          text: motivo,
+          icon: 'warning'
+        });
+        return;
+      }
+
+      eventos.push({ ...evento, seleccionada: true });
     }
-
-    const categoriasGuardar: AscensoCategoria[] = ascensos.map(fila => ({
-      nombre: fila.nombre,
-      seleccionada: true,
-      fecha: fila.fecha,
-    }));
 
     let body = {
       id: this.formularioCategoria.value?.id,
       tipo: this.formularioCategoria.value?.tipo,
       fecha: this.formularioCategoria.value?.fecha,
-      categoria: JSON.stringify(categoriasGuardar),
+      categoria: JSON.stringify(eventos),
       condiciondap: this.formularioCategoria.value?.condiciondap,
       codigoDocente: this.formularioCategoria.value?.codigoDocente,
       dedicacion: this.formularioCategoria.value?.dedicacion,
@@ -433,7 +644,7 @@ export class CategoriadlgComponent {
       ratificado: ratificadoString,
       // Columnas heredadas, derivadas de las filas: las siguen leyendo los
       // generadores de PDF/Word del backend.
-      ...derivarColumnasHistorico(ascensos),
+      ...derivarColumnasHistorico(eventos),
       dedicacionJubilacion: this.formularioHistorico.value?.dedicacionJubilacion,
       categoriaJubilacion: this.formularioHistorico.value?.categoriaJubilacion,
     }
@@ -449,6 +660,9 @@ export class CategoriadlgComponent {
       if (this.fnc == true) {
         this.docenteCategoriaApi.crear(body).subscribe({
           next: () => {
+            // Los documentos subidos ya quedaron referenciados en el registro:
+            // dejan de ser huérfanos y no se borran al cerrar.
+            this.documentosSubidos.clear();
             Swal.fire({
               title: "Agregado",
               text: "Continuar",
@@ -461,6 +675,7 @@ export class CategoriadlgComponent {
       } else {
         this.docenteCategoriaApi.actualizar(body.codigoDocente, body).subscribe({
           next: () => {
+            this.documentosSubidos.clear();
             Swal.fire({
               title: "Actualizado",
               text: "Continuar",
@@ -477,17 +692,118 @@ export class CategoriadlgComponent {
     }
   }
 
-  /** Aviso común si el guardado falla: el diálogo se queda abierto para reintentar. */
+  /** Valores de una fila del formulario como evento del histórico. */
+  private eventoDeFila(fila: FormGroup): EventoCategoria {
+    const valor = fila.value;
+
+    return {
+      seleccionada: true,
+      fechaInicio: valor.fechaInicio || null,
+      fechaFin: valor.fechaFin || null,
+      tipoProceso: valor.tipoProceso ?? '',
+      linea: valor.linea ?? '',
+      departamento: valor.departamento ?? '',
+      categoriaPredocente: valor.categoriaPredocente ?? '',
+      categoriaDocente: valor.categoriaDocente ?? '',
+      modalidadIngreso: valor.modalidadIngreso ?? '',
+      dedicacion: valor.dedicacion ?? '',
+      documento: valor.documento ?? null,
+    };
+  }
+
+  /**
+   * Única comprobación que bloquea el guardado: una fecha de fin anterior a la
+   * de inicio.
+   *
+   * Del resto del detalle no se exige nada: un evento se puede registrar con los
+   * datos que se tengan a mano (sin departamento, sin modalidad de ingreso, sin
+   * dedicación...) y completarse después. Sólo se descartan las filas que
+   * quedaron totalmente vacías.
+   *
+   * Devuelve `null` si está correcto o el motivo, ya redactado con el número de
+   * fila para que se ubique sin buscarla.
+   */
+  private validarFechas(evento: EventoCategoria, numero: number): string | null {
+    const inicio = fechaValida(evento.fechaInicio);
+    const fin = fechaValida(evento.fechaFin);
+
+    if (inicio && fin && fin.getTime() < inicio.getTime()) {
+      return `Evento ${numero}: la fecha de fin es anterior a la fecha de inicio.`;
+    }
+
+    return null;
+  }
+
+  /**
+   * ¿Alguna fila lleva el documento dentro del JSON?
+   *
+   * Sólo pasa con los registros antiguos (base64): los documentos nuevos viajan
+   * por su propia ruta y no engordan el cuerpo del guardado.
+   */
+  private hayDocumentoEnElJson(): boolean {
+    return this.eventosArray.controls.some(control => !!control.get('documento')?.value?.dataUrl);
+  }
+
+  /** JSON del histórico tal como se va a enviar. */
+  private jsonHistorico(): string {
+    const eventos = this.eventosArray.controls
+      .map(control => this.eventoDeFila(control as FormGroup));
+
+    return JSON.stringify(eventos);
+  }
+
+  /** ¿El error apunta a que el cuerpo enviado es demasiado grande? */
+  private pareceErrorDeTamano(estado: number | null, mensaje: string | null): boolean {
+    if (estado === 413 || estado === 431) {
+      return true;
+    }
+
+    return /too long|too large|payload|entity too large|max_allowed_packet|exceeds/i.test(mensaje ?? '');
+  }
+
+  /**
+   * Aviso de guardado fallido.
+   *
+   * Muestra el estado y el mensaje del servidor en lugar del texto genérico de
+   * antes: sin ese detalle no hay forma de distinguir un problema de tamaño, de
+   * permisos o de datos.
+   */
   private mostrarErrorAlGuardar(error: unknown): void {
     console.error('Error al guardar:', error);
+
+    const { estado, mensaje } = detalleDeErrorHttp(error);
+    const json = this.jsonHistorico();
+    const llevaBase64 = this.hayDocumentoEnElJson();
+
+    const partes = ['No se pudo guardar el registro.'];
+
+    if (estado === 0) {
+      partes.push('La petición se quedó sin respuesta: el navegador vio cortada la conexión antes de que el servidor contestara.');
+    } else if (estado) {
+      partes.push(`El servidor respondió ${estado}${mensaje ? `: ${mensaje}` : '.'}`);
+    } else if (mensaje) {
+      partes.push(mensaje);
+    }
+
+    partes.push(`El histórico enviado pesa ${formatearTamano(json.length)}${llevaBase64 ? ' e incluye un documento antiguo en base64' : ''}.`);
+
+    if (llevaBase64 && (cuerpoDemasiadoGrande(json) || this.pareceErrorDeTamano(estado, mensaje))) {
+      partes.push(`El cuerpo supera los ${formatearTamano(LIMITE_CUERPO_BYTES)} que el backend acepta: vuelve a adjuntar el documento (ahora se sube por trozos) o pide que se amplíe el límite del servidor.`);
+    }
+
     Swal.fire({
-      title: 'Error',
-      text: 'No se pudo guardar. Inténtalo de nuevo.',
+      title: tituloDeErrorHttp('No se pudo guardar', error),
+      text: partes.join(' '),
       icon: 'error'
     });
   }
 
   onNoClick(): void {
+    // Los documentos subidos y no guardados se borran: si no, quedarían
+    // huérfanos en el servidor al cancelar.
+    this.documentosSubidos.forEach(nombreServidor => this.eliminarDelServidor(nombreServidor));
+    this.documentosSubidos.clear();
+
     this.dialogRef.close();
   }
   selectedCategory = '';
@@ -549,15 +865,24 @@ export class CategoriadlgComponent {
   }
 
   /**
- * Calcula la fecha más reciente de todas las filas del histórico
- * y actualiza la Fecha Contrato automáticamente.
- */
+   * Pone en «Fecha contrato» la fecha de inicio más reciente del histórico.
+   *
+   * Si ninguna fila tiene fecha de inicio **no se toca** la fecha del contrato.
+   * Antes se escribía `null` en ese caso: como el detalle del histórico es
+   * opcional, bastaba con añadir una fila sin fechas para dejar el campo vacío y
+   * que el guardado lo rechazara (y de paso perdía la fecha ya registrada).
+   */
   actualizarFechaContrato() {
     if (!this.formularioHistorico) return;
 
-    // La fecha de contrato es la más reciente de las filas del histórico.
-    const fechas = this.ascensosArray.controls.map(control => control.get('fecha')?.value);
+    // La fecha de contrato es la fecha de inicio más reciente del histórico.
+    const fechas = this.eventosArray.controls.map(control => control.get('fechaInicio')?.value);
+    const masReciente = fechaMasReciente(fechas);
 
-    this.formularioCategoria.get('fecha')?.setValue(fechaMasReciente(fechas));
+    if (!masReciente) {
+      return;
+    }
+
+    this.formularioCategoria.get('fecha')?.setValue(masReciente);
   }
 }

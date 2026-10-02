@@ -178,19 +178,31 @@
       <div class="grid-2">
         <mat-form-field appearance="outline">
           <mat-label>Estado</mat-label>
-          <input matInput formControlName="estado" placeholder="Estado">
+          <mat-select formControlName="estado">
+            @for (item of estados; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Línea Actual</mat-label>
-          <input matInput formControlName="lineaActual" placeholder="Línea actual">
+          <mat-select formControlName="lineaActual">
+            @for (item of lineas; track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
         </mat-form-field>
       </div>
 
       <div class="grid-2">
         <mat-form-field appearance="outline">
           <mat-label>Tipo de Docente</mat-label>
-          <input matInput formControlName="tipoDocente" placeholder="Tipo de docente">
+          <mat-select formControlName="tipoDocente">
+            @for (item of seleccion(); track item) {
+              <mat-option [value]="item">{{ item }}</mat-option>
+            }
+          </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="formato">
@@ -236,17 +248,12 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Histórico de Ratificación</mat-label>
-          <textarea matInput formControlName="historico" placeholder="Historial de ratificaciones" rows="2"></textarea>
-        </mat-form-field>
-      </div>
-
-      <div class="grid-2">
-        <mat-form-field appearance="outline">
           <mat-label>Felicitaciones Encuesta</mat-label>
           <textarea matInput formControlName="felicitacion" placeholder="Registro de felicitaciones por encuestas" rows="2"></textarea>
         </mat-form-field>
       </div>
+
+     
     </div>
 
   </div>
